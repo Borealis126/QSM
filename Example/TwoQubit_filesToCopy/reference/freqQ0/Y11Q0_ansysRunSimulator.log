@@ -1,0 +1,14 @@
+ 
+ANSYS Electronics Desktop Version 2019.3.7, Build: 2019-11-19 10:57:41
+Location: C:\Program Files\AnsysEM\AnsysEM19.5\Win64\ansysedt.exe
+Batch Script: O:/68707/RZ/ChipDesign/SWIFT/freqQ0/Y11Q0_ansysRunSimulator.py
+Starting Batch Run: 8:32:07 PM  Oct 07, 2020
+Running as user: NIST\68707
+Temp directory: C:\Users\68707\AppData\Local\Temp
+Project directory: C:\Users\68707\Documents\Ansoft
+[info] Project:Y11Q0, Design:Netlist, (info): Processing circuit for new analysis. (8:32:22 PM  Oct 07, 2020)
+[warning] Project:Y11Q0, Design:Netlist, diagnostics(warning): No DC path to ground from node port1. (8:32:28 PM  Oct 07, 2020)
+[info] Project:Y11Q0, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (8:32:28 PM  Oct 07, 2020)
+[info] Project:Y11Q0, Design:Netlist, (info): Starting analysis type LNA. (8:32:28 PM  Oct 07, 2020)
+[info] Project:Y11Q0, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:05 (8:32:28 PM  Oct 07, 2020)
+Stopping Batch Run: 8:32:31 PM  Oct 07, 2020

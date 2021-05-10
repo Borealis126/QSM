@@ -1,0 +1,34 @@
+(status): Nexxim version: 2019.3.0 WIN64, build time: Jul 26 2019, 23:10:11
+
+(status): Analyzing O:/68707/RZ/ChipDesign/SWIFT/lumpedR1/YRestR1.aedtresults/Netlist/temp/DV2_S0_V0.cir.
+(info): Processing circuit for new analysis.
+circuit_details(status): Total device types: 5
+device type                                       number of devices
+----------------------------------------------------------------------
+capacitor                                         36
+inductor                                          2
+port_impedance                                    1
+resistor                                          3
+transmission_line                                 4
+models:resistor(warning): rr1pad1_r1pad2 - Resistance value less than RESMIN, resetting value to 1e-05
+diagnostics(warning): No DC path to ground from node net_q0pad1.
+(status): Reached the limit (1) for maximum number of warning messages in message manager.
+(info): See simulation logfile for a complete list of warning messages.
+diagnostics(warning): No DC path to ground from node net_q0pad2.
+diagnostics(warning): No DC path to ground from node net_q1pad1.
+diagnostics(warning): No DC path to ground from node net_q1pad2.
+diagnostics(warning): Only one connection for node net_r1pad1.
+(status): License checkout took 0.003 seconds.
+(info): Starting analysis type LNA.
+analysis:dc(status): Total DC newton iterations = 4, DC conv = 1.
+analysis:small_signal(status): Detected floating nodes. Changing beta...
+analysis:small_signal(status): Setting beta to 1e-12. The default is 0. Use .option small_signal.beta=value to change to value
+analysis:small_signal(status): Detected floating nodes. Changing beta...
+analysis:small_signal(status): Setting beta to 1e-12. The default is 0. Use .option small_signal.beta=value to change to value
+analysis:small_signal(status): Detected floating nodes. Changing beta...
+analysis:small_signal(status): Setting beta to 1e-12. The default is 0. Use .option small_signal.beta=value to change to value
+analysis:small_signal(status): Detected floating nodes. Changing beta...
+analysis:small_signal(status): Setting beta to 1e-12. The default is 0. Use .option small_signal.beta=value to change to value
+(status): LNA cpu time = 0.015
+(info): Simulation succeeded. Total simulator time: 0:00:05
+(status): Start Time:  10/07/2020 20:36:36, End Time:  10/07/2020 20:36:42, Host 68707MAX, 

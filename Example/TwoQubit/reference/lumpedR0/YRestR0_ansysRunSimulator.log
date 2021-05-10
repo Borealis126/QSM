@@ -1,0 +1,16 @@
+ 
+ANSYS Electronics Desktop Version 2019.3.7, Build: 2019-11-19 10:57:41
+Location: C:\Program Files\AnsysEM\AnsysEM19.5\Win64\ansysedt.exe
+Batch Script: O:/68707/RZ/ChipDesign/SWIFT/lumpedR0/YRestR0_ansysRunSimulator.py
+Starting Batch Run: 8:34:40 PM  Oct 07, 2020
+Running as user: NIST\68707
+Temp directory: C:\Users\68707\AppData\Local\Temp
+Project directory: C:\Users\68707\Documents\Ansoft
+[info] Project:YRestR0, Design:Netlist, (info): Processing circuit for new analysis. (8:34:55 PM  Oct 07, 2020)
+[warning] Project:YRestR0, Design:Netlist, models:resistor(warning): rr0pad1_r0pad2 - Resistance value less than RESMIN, resetting value to 1e-05 (8:35:01 PM  Oct 07, 2020)
+[warning] Project:YRestR0, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (8:35:01 PM  Oct 07, 2020)
+[info] Project:YRestR0, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (8:35:01 PM  Oct 07, 2020)
+[warning] Project:YRestR0, Design:Netlist, diagnostics(warning): Only one connection for node net_r0pad1. (8:35:01 PM  Oct 07, 2020)
+[info] Project:YRestR0, Design:Netlist, (info): Starting analysis type LNA. (8:35:01 PM  Oct 07, 2020)
+[info] Project:YRestR0, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:05 (8:35:01 PM  Oct 07, 2020)
+Stopping Batch Run: 8:35:03 PM  Oct 07, 2020

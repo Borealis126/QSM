@@ -1,0 +1,13 @@
+Qubits,Index,Type,Inductance(H),JJ Critical Current(A),
+,0,Floating-rectangularPads-singleJJ,1.15E-08,1.00E-08,
+,1,Floating-rectangularPads-singleJJ,1.15E-08,1.00E-08,
+,,,,,
+Resonators,Index,Pad 1 Type,Pad 2 Type,Capacitance to Feedline (F),Feedline Pad Capacitance to Ground (F)
+,0,T,curveLeft-T,8.84E-15,5.36E-14
+,1,T,curveRight-T,8.84E-15,5.36E-14
+,,,,,
+Control Lines,Index,Type,,,
+,0,feedline,,,
+,,,,,
+CPW,Phase Velocity(um/s),,,,
+,1.20E+14,,,,

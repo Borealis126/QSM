@@ -1,0 +1,16 @@
+4927792
+Starting SLURM job test.4927792
+Number of NODES:1
+Number of Processors:36
+nodelist found this many CPUs:36
+started quantize
+Start assembling H
+Finished assembling H 3.0644570708274843
+Initial matrix dimension: (20736, 20736)
+Start adding inductance
+Finished adding inductance 21.760846189657848
+(10.454670261236148+0j)
+Final matrix dimension: (14640, 14640)
+Inverting H
+Finished inverting H 11.364169255892437
+Total time: 36.416300976276396
