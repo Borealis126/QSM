@@ -17,5 +17,5 @@ oModuleReport.CreateReport("Y Parameter Table 1", "Standard", "Data Table", "LNA
         "X Component:="		, "F",
         "Y Component:="		, ["Y(1,1)"]
     ], [])
-oModuleReport.ExportToFile("Y Parameter Table 1", "/beegfs/scratch/joelhoward/QSMSimulations/QSMSource/WendianValidationTesting/SWIFT500um/lumpedR0/YRestR0_Results.csv", False)
+oModuleReport.ExportToFile("Y Parameter Table 1", "/beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_Results.csv", False)
 oProject.Save()

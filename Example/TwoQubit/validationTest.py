@@ -6,9 +6,9 @@ import os
 computeLocation="Cluster"#Edit this based on where the QSM is being run. Users at NIST should use "68707Max"
 QSMSourceFolder=""
 if computeLocation=="Windows":
-    QSMSourceFolder=Path("O:/68707/JoelHoward/ChipDesign/QSMSource/")
+    QSMSourceFolder=Path("O:/68707/JoelHoward/ChipDesign/QSMSource/src")
 elif computeLocation=="Cluster":
-    QSMSourceFolder=Path("/beegfs/scratch/joelhoward/QSMSimulations/QSMSource/")
+    QSMSourceFolder=Path("/beegfs/scratch/joelhoward/QSMSimulations/QSMSource/src")
 sys.path.append(str(QSMSourceFolder))
 import qubitSimulationModule as QSM
 
@@ -17,9 +17,9 @@ copyDir=projectFolder/".."/"TwoQubit_filesToCopy"
 
 def copyFile(sourceFile,destinationFile):
     copyCommand=""
-    if computeLocation=="68707Max":
+    if computeLocation=="Windows":
         copyCommand="copy "+str(Path(sourceFile))+" "+str(Path(destinationFile))
-    if computeLocation=="Wendian":
+    if computeLocation=="Cluster":
         copyCommand="cp "+str(Path(sourceFile))+" "+str(Path(destinationFile))
     subprocess.call(copyCommand,shell=True)
 
@@ -41,19 +41,16 @@ qSys=QSM.initialize(projectFolder,computeLocation,QSMSourceFolder)#Once systemPa
 # qSys.simulationCommand(["simulation","capMat","run"])
 # qSys.simulationCommand(["simulation","capMat","postProcess"])
 
-for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.items():
-    qSys.simulationCommand(["simulation","lumpedR"+str(readoutResonatorIndex),"init"])
-    qSys.simulationCommand(["simulation","lumpedR"+str(readoutResonatorIndex),"run"])
-    #qSys.simulationCommand(["simulation","lumpedR"+str(readoutResonatorIndex),"postProcess"])
+# for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.items():
+    # qSys.simulationCommand(["simulation","lumpedR"+str(readoutResonatorIndex),"init"])
+    # qSys.simulationCommand(["simulation","lumpedR"+str(readoutResonatorIndex),"run"])
+    # qSys.simulationCommand(["simulation","lumpedR"+str(readoutResonatorIndex),"postProcess"])
 
-# qSys.simulationCommand(["simulation","capMatGE","init"])
-# qSys.simulationCommand(["simulation","capMatGE","postProcess"])
+#qSys.simulationCommand(["simulation","capMatGE","init"])
+#qSys.simulationCommand(["simulation","capMatGE","postProcess"])
 
-# for qubitIndex,qubit in qSys.allQubitsDict.items():
-    # qSys.simulationCommand(["simulation","ECQ"+str(qubitIndex),"init"])
-    # qSys.simulationCommand(["simulation","ECQ"+str(qubitIndex),"postProcess"])
-    # qSys.simulationCommand(["simulation","L_iQ"+str(qubitIndex),"init"])
-    # qSys.simulationCommand(["simulation","L_iQ"+str(qubitIndex),"postProcess"])
+#qSys.simulationCommand("GEPlusAllEC")
+qSys.simulationCommand("AllL_i")
     
 # qSys.simulationCommand(["simulation","quantize","postProcess"])
 # qSys.simulationCommand(["simulation","zzQ0-1","postProcess"])
@@ -62,9 +59,9 @@ for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.item
     # qSys.simulationCommand(["simulation","anharmonicityQ"+str(qubitIndex),"init"])
     # qSys.simulationCommand(["simulation","anharmonicityQ"+str(qubitIndex),"postProcess"])
 
-# for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.items():
-    # qSys.simulationCommand(["simulation","dispersiveShiftR"+str(readoutResonatorIndex),"init"])
-    # qSys.simulationCommand(["simulation","dispersiveShiftR"+str(readoutResonatorIndex),"postProcess"])
+for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.items():
+    qSys.simulationCommand(["simulation","dispersiveShiftR"+str(readoutResonatorIndex),"init"])
+    qSys.simulationCommand(["simulation","dispersiveShiftR"+str(readoutResonatorIndex),"postProcess"])
 
 #SIMULATION COMMANDS
 #-----------------------------------------------------------------------------------------------------------
