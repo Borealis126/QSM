@@ -151,8 +151,8 @@ class Node:  # A Node is any 3D element.
                 # The fingers are all inserted between component[1] and component[2]
                 componentLeft = component[0:2]
                 componentRight = component[2:]
-                for fingerIndex in range(
-                        numFingers):  # Fingers are indexed left to right along the top of the rectangle.
+                # Fingers are indexed left to right along the top of the rectangle.
+                for fingerIndex in range(numFingers):
                     # First make the stem of each finger.
                     fingerStemPolyline, fingerStemPeripheryPolyline, fingerStemMeshPeripheryPolyline = \
                         rectanglePolylineSet(

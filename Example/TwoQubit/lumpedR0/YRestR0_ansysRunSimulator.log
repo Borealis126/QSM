@@ -2,18 +2,112 @@
 ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
 Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
 Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py
-Starting Batch Run: 10:40:05 PM  May 10, 2021
+Starting Batch Run: 10:36:23 AM  May 12, 2021
 A new installation of your ANSYS product has been detected.  
 The library directories have been reset to those of the newly installed libraries.  
 To change this, go to Tools/Options/General Options.
 Temp directory: /tmp
 Project directory: /u/eu/an/joelhoward/Ansoft
-[info] Project:YRestR0, Design:Netlist, (info): Processing circuit for new analysis. (10:40:18 PM  May 10, 2021)
-[warning] Project:YRestR0, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (10:40:18 PM  May 10, 2021)
-[warning] Project:YRestR0, Design:Netlist, models:resistor(warning): rr0pad1_r0pad2 - Resistance value less than RESMIN, resetting value to 1e-05 (10:40:19 PM  May 10, 2021)
-[warning] Project:YRestR0, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (10:40:19 PM  May 10, 2021)
-[info] Project:YRestR0, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (10:40:19 PM  May 10, 2021)
-[warning] Project:YRestR0, Design:Netlist, diagnostics(warning): Only one connection for node net_r0pad1. (10:40:19 PM  May 10, 2021)
-[info] Project:YRestR0, Design:Netlist, (info): Starting analysis type LNA. (10:40:19 PM  May 10, 2021)
-[info] Project:YRestR0, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:01 (10:40:19 PM  May 10, 2021)
-Stopping Batch Run: 10:40:21 PM  May 10, 2021
+[error] Project:YRestR0, Design:Netlist, Script macro error: Loading project failed: Y11R0. (10:36:35 AM  May 12, 2021)
+[error] Error in command execution
+[error] Exception: SetActiveProject(string projName) -> IDispatch(Y11R0) - call failed. Logs or message window might have more details
+In file "/beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py", line 4 ---- While executing script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py
+Stopping Batch Run: 10:36:38 AM  May 12, 2021
+ 
+ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
+Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
+Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py
+Starting Batch Run: 10:44:59 AM  May 12, 2021
+A new installation of your ANSYS product has been detected.  
+The library directories have been reset to those of the newly installed libraries.  
+To change this, go to Tools/Options/General Options.
+Temp directory: /tmp
+Project directory: /u/eu/an/joelhoward/Ansoft
+[error] Project:YRestR0, Design:Netlist, Script macro error: Loading project failed: Y11R0. (10:45:11 AM  May 12, 2021)
+[error] Error in command execution
+[error] Exception: SetActiveProject(string projName) -> IDispatch(Y11R0) - call failed. Logs or message window might have more details
+In file "/beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py", line 4 ---- While executing script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py
+Stopping Batch Run: 10:45:14 AM  May 12, 2021
+ 
+ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
+Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
+Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py
+Starting Batch Run: 10:48:55 AM  May 12, 2021
+A new installation of your ANSYS product has been detected.  
+The library directories have been reset to those of the newly installed libraries.  
+To change this, go to Tools/Options/General Options.
+Temp directory: /tmp
+Project directory: /u/eu/an/joelhoward/Ansoft
+[error] Project:YRestR0, Design:Netlist, Script macro error: Loading project failed: Y11R0. (10:49:06 AM  May 12, 2021)
+[error] Error in command execution
+[error] Exception: SetActiveProject(string projName) -> IDispatch(Y11R0) - call failed. Logs or message window might have more details
+In file "/beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py", line 4 ---- While executing script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py
+Stopping Batch Run: 10:49:09 AM  May 12, 2021
+ 
+ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
+Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
+Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py
+Starting Batch Run: 10:49:54 AM  May 12, 2021
+Temp directory: /tmp
+Project directory: /u/eu/an/joelhoward/Ansoft
+[error] Project:YRestR0, Design:Netlist, Script macro error: Loading project failed: Y11R0. (10:50:12 AM  May 12, 2021)
+[error] Error in command execution
+[error] Exception: SetActiveProject(string projName) -> IDispatch(Y11R0) - call failed. Logs or message window might have more details
+In file "/beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py", line 4 ---- While executing script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py
+Stopping Batch Run: 10:50:15 AM  May 12, 2021
+ 
+ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
+Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
+Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py
+Starting Batch Run: 10:51:28 AM  May 12, 2021
+Temp directory: /tmp
+Project directory: /u/eu/an/joelhoward/Ansoft
+[error] Project:YRestR0, Design:Netlist, Script macro error: Loading project failed: Y11R0. (10:51:40 AM  May 12, 2021)
+[error] Error in command execution
+[error] Exception: SetActiveProject(string projName) -> IDispatch(Y11R0) - call failed. Logs or message window might have more details
+In file "/beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py", line 4 ---- While executing script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py
+Stopping Batch Run: 10:51:42 AM  May 12, 2021
+ 
+ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
+Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
+Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py
+Starting Batch Run: 10:52:18 AM  May 12, 2021
+Temp directory: /tmp
+Project directory: /u/eu/an/joelhoward/Ansoft
+[error] Project:YRestR0, Design:Netlist, Script macro error: Loading project failed: Y11R0. (10:52:35 AM  May 12, 2021)
+[error] Error in command execution
+[error] Exception: SetActiveProject(string projName) -> IDispatch(Y11R0) - call failed. Logs or message window might have more details
+In file "/beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py", line 4 ---- While executing script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py
+Stopping Batch Run: 10:52:37 AM  May 12, 2021
+ 
+ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
+Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
+Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py
+Starting Batch Run: 10:56:33 AM  May 12, 2021
+Temp directory: /tmp
+Project directory: /u/eu/an/joelhoward/Ansoft
+[info] Project:YRestR0, Design:Netlist, (info): Processing circuit for new analysis. (10:56:50 AM  May 12, 2021)
+[warning] Project:YRestR0, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (10:56:50 AM  May 12, 2021)
+[warning] Project:YRestR0, Design:Netlist, models:resistor(warning): rr0pad1_r0pad2 - Resistance value less than RESMIN, resetting value to 1e-05 (10:56:51 AM  May 12, 2021)
+[warning] Project:YRestR0, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (10:56:51 AM  May 12, 2021)
+[info] Project:YRestR0, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (10:56:51 AM  May 12, 2021)
+[warning] Project:YRestR0, Design:Netlist, diagnostics(warning): Only one connection for node net_r0pad1. (10:56:51 AM  May 12, 2021)
+[info] Project:YRestR0, Design:Netlist, (info): Starting analysis type LNA. (10:56:51 AM  May 12, 2021)
+[info] Project:YRestR0, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:01 (10:56:51 AM  May 12, 2021)
+Stopping Batch Run: 10:56:54 AM  May 12, 2021
+ 
+ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
+Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
+Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py
+Starting Batch Run: 10:59:41 AM  May 12, 2021
+Temp directory: /tmp
+Project directory: /u/eu/an/joelhoward/Ansoft
+[info] Project:YRestR0, Design:Netlist, (info): Processing circuit for new analysis. (10:59:55 AM  May 12, 2021)
+[warning] Project:YRestR0, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (10:59:55 AM  May 12, 2021)
+[warning] Project:YRestR0, Design:Netlist, models:resistor(warning): rr0pad1_r0pad2 - Resistance value less than RESMIN, resetting value to 1e-05 (10:59:57 AM  May 12, 2021)
+[warning] Project:YRestR0, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (10:59:57 AM  May 12, 2021)
+[info] Project:YRestR0, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (10:59:57 AM  May 12, 2021)
+[warning] Project:YRestR0, Design:Netlist, diagnostics(warning): Only one connection for node net_r0pad1. (10:59:57 AM  May 12, 2021)
+[info] Project:YRestR0, Design:Netlist, (info): Starting analysis type LNA. (10:59:57 AM  May 12, 2021)
+[info] Project:YRestR0, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:01 (10:59:57 AM  May 12, 2021)
+Stopping Batch Run: 10:59:59 AM  May 12, 2021

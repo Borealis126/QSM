@@ -3,10 +3,7 @@ import sys
 import os
 computeLocation="Windows"#Edit this based on where the QSM is being run. Users at NIST should use "68707Max"
 QSMSourceFolder=""
-if computeLocation=="Windows":
-    QSMSourceFolder="O:/68707/JoelHoward/ChipDesign/QSMSource/"
-elif computeLocation=="Cluster":
-    QSMSourceFolder="/beegfs/scratch/joelhoward/QSMSimulations/QSMSource/"
+QSMSourceFolder="O:/68707/JoelHoward/ChipDesign/QSMSource/"
 sys.path.append(QSMSourceFolder)
 import qubitSimulationModule as QSM
 
@@ -14,7 +11,7 @@ projectFolder=Path(os.path.dirname(os.path.abspath( __file__ )))
 
 #QSM.generateSystemParametersFile(projectFolder)#Run this command to generate the systemParameters file.
 
-#qSys=QSM.initialize(projectFolder,computeLocation,QSMSourceFolder)#Once systemParameters is available and filled out, ALWAYS run this command first.
+qSys=QSM.initialize(projectFolder,computeLocation,QSMSourceFolder)#Once systemParameters is available and filled out, ALWAYS run this command first.
 #qSys.generateFile("GDS")#Run this command to generate layout files. "componentParams" --> "geometries" --> "GDS"
 #qSys.simulationCommand(["simulation","ECQ0","postProcess"])#All "simulations" require completed layout files. 
 

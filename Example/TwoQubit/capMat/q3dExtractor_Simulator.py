@@ -7471,5 +7471,5 @@ oModuleAnalysis.InsertSetup("Matrix",
         ]
     ])
 oDesign.AnalyzeAll()
-oDesign.ExportMatrixData("/beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/capMat/q3dExtractor_Results.csv", "C", "", "capSim:LastAdaptive", "Original", "ohm", "nH", "pF", "mSie", 1000000000, "Maxwell,Spice,Couple", 0, False, 5, 8, 0)
+oDesign.ExportMatrixData("/beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/capMat/q3dExtractor_Results.csv", "C", "", "capSim:LastAdaptive", "Original", "ohm", "nH", "pF", "mSie", 5000000000, "Maxwell,Spice,Couple", 0, False, 5, 8, 0)
 oProject.Save()

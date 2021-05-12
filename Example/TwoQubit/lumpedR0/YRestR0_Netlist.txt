@@ -70,8 +70,6 @@ CR0Pad1_F0 net_R0Pad1 net_F0 0
 CR1Pad1_F1 net_R1Pad1 net_F1 8.84e-15
 LQ0Pad1_Q0Pad2 net_Q0Pad1 net_Q0Pad2 1.25e-08
 LQ1Pad1_Q1Pad2 net_Q1Pad1 net_Q1Pad2 1.25e-08
-RFL 0 net_FL 50
-RFR 0 net_FR 50
 RR0Pad1_R0Pad2 net_R0Pad1 Port1 0
 TR1Pad1_R1Pad2 net_R1Pad1 0 net_R1Pad2 0 Z0=50 TD=7.875e-11
 TFL_F0 net_FL 0 net_F0 0 Z0=50 TD=3.813077291797825e-11

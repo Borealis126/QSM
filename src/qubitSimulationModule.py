@@ -17,6 +17,7 @@ from polylineFunctions import rectanglePolyline, multiplyPolyline
 from qSysObjects import *
 from quantumStateFunctions import stateFromHeader, baseRepresentation, H_Header
 from constants import *
+from pprint import pprint
 
 
 def generateSystemParametersFile(folder):
@@ -784,16 +785,15 @@ class QubitSystem:
             for readoutResonatorIndex, readoutResonator in chip.readoutResonatorDict.items():
                 readoutResonator.geometryParamsDict = readSingleRowData(fileLines, readoutResonator.name)
                 geoms = readoutResonator.geometryParamsDict
+                pad1Node = readoutResonator.pad1.node
+                pad2Node = readoutResonator.pad2.node
                 # Z values
-                for resonatorPadNode in [readoutResonator.pad1.node, readoutResonator.pad2.node]:
+                for resonatorPadNode in [pad1Node, pad2Node]:
                     if chipIndex == 0:
                         resonatorPadNode.Z = self.chipDict[0].substrate.node.height
                     elif chipIndex == 1:
                         resonatorPadNode.Z = self.chipDict[1].substrate.node.Z - resonatorPadNode.height
-                        # Mesh boundary
-                pad1Node = readoutResonator.pad1.node
-                pad2Node = readoutResonator.pad2.node
-
+                # Mesh boundary
                 pad1Node.polylineShapeParams["Mesh Boundary"] = self.sysParams["Anti-Vortex Mesh Boundary"]
                 pad2Node.polylineShapeParams["Mesh Boundary"] = self.sysParams["Anti-Vortex Mesh Boundary"]
                 # Meanders
@@ -1239,10 +1239,9 @@ class QubitSystem:
         if self.sysParams["Flip Chip?"] == "Yes":
             self.updateBumpsDict()
 
-    """# Contains the feedline model. Adds 50ohm resistors to feedline if simulation doesn't call for ports there, 
-    but otherwise simulation-independent."""
-
     def generateNetlistComponents(self, circuitSim):
+        """# Contains the feedline model. Adds 50ohm resistors to feedline if simulation doesn't call for ports there,
+            but otherwise simulation-independent."""
         netlistComponents = {
             "Capacitances": dict(),
             "Inductors": dict(),
@@ -1639,7 +1638,7 @@ class QubitSystem:
                 Assumes they were initialized when the Ansys file was created."""
                 self.copyAnsysFile(q3dSim["Ansys"])
                 # Generate and run the Ansys simulator file
-                lines = ansysSimulatorPreamb
+                lines = ansysSimulatorPreamb.copy()
                 lines += [
                     ansysSetActiveProjectLine(q3dSimName),
                     ansysInsertQ3DExtractorLine(q3dSimName),
@@ -1656,20 +1655,21 @@ class QubitSystem:
             for hfssSimName, hfssSim in self.simFiles[simType]["HFSS Simulations"].items():
                 self.copyAnsysFile(hfssSim["Ansys"])
                 # Generate and run the Ansys simulator file
-                lines = ansysSimulatorPreamb
+                lines = ansysSimulatorPreamb.copy()
                 lines += [
                     ansysSetActiveProjectLine(hfssSimName),
                     ansysInsertHFSSDesignLine(hfssSimName),
                     ansysSetActiveDesignLine(hfssSimName)
                 ]
                 # Insert model generation lines here.
-                lines += HFSSAnalysisLines
+                lines += HFSSAnalysisLines.copy()
                 lines.append(ansysSaveLine)
                 simulatorFileInstance = open(hfssSim["Simulator"], "w+", newline='')
                 simulatorFileInstance.writelines(lines)
                 simulatorFileInstance.close()
                 self.runAnsysSimulator(hfssSim["Ansys"], hfssSim["Simulator"], self.simFiles[simType]["Directory"], 90)
             for circuitSimName, circuitSim in self.simFiles[simType]["Circuit Simulations"].items():
+                print(circuitSimName)
                 """"Initialize all circuit simulations for the given simulation."""
                 self.copyAnsysFile(circuitSim["Ansys"])
                 # Generate the netlist file and load it into the AEDT
@@ -1686,13 +1686,14 @@ class QubitSystem:
                 writeFile.close()
                 loadNetlistFile(circuitSim["Ansys"], circuitSim["Netlist"])
                 # Generate and run the ansysRunSimulator file
-                lines = ansysSimulatorPreamb
+                lines = ansysSimulatorPreamb.copy()
                 lines += [
                     "oProject = oDesktop.SetActiveProject(\"" + str(circuitSim["Ansys"]).split("/")[-1][0:-5] + "\")\n",
                     "oDesign = oProject.SetActiveDesign(\"" + "Netlist" + "\")\n",
                     "oModuleReport = oDesign.GetModule(\"ReportSetup\")\n",
                     "oDesign.AnalyzeAll()\n"
                 ]
+
                 # S21 circuit simulations
                 if circuitSimName == "fullS21":
                     lines += [
