@@ -61,8 +61,19 @@ qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder)  # Once s
 #     ECQSimulation(qSys,qubitIndex).initialize()
 #     ECQSimulation(qSys,qubitIndex).postProcess()
 
+# qSys.loadDesignFiles()
+# for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.items():
+#     ECRSimulation(qSys,readoutResonatorIndex).initialize()
+#     ECRSimulation(qSys,readoutResonatorIndex).postProcess()
+
+
+
 # Quantize(qSys).initialize()
 Quantize(qSys).postProcess()
+
+# ZZQSimulation(qSys,0,1).initialize()
+
+# ZZQSimulation(qSys,0,1).postProcess()
 
 # qSys.simulationCommand(["simulation","quantize","postProcess"])
 # qSys.simulationCommand(["simulation","zzQ0-1","postProcess"])

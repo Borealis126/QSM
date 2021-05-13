@@ -52,7 +52,7 @@ class Qubit:
 
     @property
     def quantizeIndex(self):
-        return simulations.Quantize(self.qSys).quantizeIndex(self)
+        return simulations.Quantize(self.qSys).quantizeIndex(self.name)
 
     @property
     def EcVal(self):
@@ -210,7 +210,6 @@ class CPWResonator:
     def __init__(self, qSys, index):
         self.qSys = qSys
         self.index = index
-        self.quantizeIndex = 0  # Assigned and used in quantizeSimulation
         self.name = "R" + str(self.index)
 
         self.pad1 = ComponentPad(componentName=self.name, padIndex=1)
@@ -230,6 +229,10 @@ class CPWResonator:
         self.LSym = symbols("L_R" + str(self.index))
         self.omegaEffVal = 0
         self.omegaVal = 0
+
+    @property
+    def quantizeIndex(self):
+        return simulations.Quantize(self.qSys).quantizeIndex(self.name)
 
     @property
     def equivC(self):

@@ -1,0 +1,47 @@
+#!/bin/sh 
+#SBATCH --time=00:03:00
+#SBATCH --nodes=1
+#SBATCH -n 16
+#SBATCH -A 2006240353
+#SBATCH --export=ALL
+## -p is the partition or group name of the nodes to run on compute is the common nodes
+#SBATCH -p compute
+## You can run --overcommit to have the other CPUs on the node available to users
+## or you can run --exclusive allowing only on job.
+#SBATCH --exclusive
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=joelhoward@mymail.mines.edu
+
+# See slurm.JOBID.out for results of these commands
+echo $SLURM_JOBID
+export SLURM_JOB_NAME=ansys.$SLURM_JOBID
+echo Starting SLURM job $SLURM_JOB_NAME
+echo Number of NODES:$SLURM_NNODES
+echo Number of Processors:$SLURM_NPROCS
+
+cd $SLURM_SUBMIT_DIR
+# makes a unique directory to store output files in
+# If re-runing script comment out these 4 lines and run sbatch script.JOBID to try again
+#mkdir $SLURM_JOB_NAME
+#cd $SLURM_JOB_NAME
+#mv $SLURM_SUBMIT_DIR/$ANSYSSIMULATORFILE ./$SLURM_JOB_NAME.py
+#cp $SLURM_SUBMIT_DIR/*.c $SLURM_SUBMIT_DIR/$SLURM_JOB_NAME/.
+#ln -s ../*.cas.gz ./.
+
+
+# Outputs this script to a file
+cat $0 > script.$SLURM_JOBID
+
+#Counts the number of hosts and calculates the total number of CPUs to use
+export ncpus=`/sw/utility/local/expands $SLURM_JOB_NODELIST | wc -l`
+echo nodelist found this many CPUs:$ncpus
+
+# create a list of nodes in the file nodes. First listed is the Fluent host node
+/sw/utility/local/expands $SLURM_JOB_NODELIST > nodes
+
+# added -slurm for job scheduler
+# add -mpitest for network connect test and will NOT run .jou file
+
+ml apps/ansys/v211ansysEM
+ansysedt -UseElectronicsPPE -features=beta -ng -runscriptandexit /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR1/YRestR1_ansysRunSimulator.py /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR1/YRestR1.aedt 
+

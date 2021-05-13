@@ -1495,14 +1495,7 @@ class QubitSystem:
             elif self.sysParams["Compute Location"] == "Cluster":
                 subprocess.call("rm -r " + fileName, shell=True)
 
-    def stateList(self, excitationList):
-        """Excitation list is of the form [[i,n],[j,m],...]
-        where i,j are component indices, and m,n are the excitations."""
-        numComponents = len(self.HComponentOrder)
-        s = [0] * numComponents
-        for i in excitationList:
-            s[i[0]] = i[1]
-        return s
+
 
     def componentFromName(self, componentName):
         if componentName[0] == "Q":
