@@ -2,50 +2,18 @@
 ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
 Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
 Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/capMat/q3dExtractor_Simulator.py
-Starting Batch Run: 1:34:45 AM  May 12, 2021
+Starting Batch Run: 5:23:22 PM  May 12, 2021
 A new installation of your ANSYS product has been detected.  
 The library directories have been reset to those of the newly installed libraries.  
 To change this, go to Tools/Options/General Options.
 Temp directory: /tmp
 Project directory: /u/eu/an/joelhoward/Ansoft
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c043 (1:35:49 AM  May 12, 2021)
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c043 (1:35:52 AM  May 12, 2021)
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c043 (1:35:55 AM  May 12, 2021)
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c043 (1:36:00 AM  May 12, 2021)
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c043 (1:36:05 AM  May 12, 2021)
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c043 (1:36:13 AM  May 12, 2021)
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c043 (1:36:25 AM  May 12, 2021)
-[info] Project:q3dExtractor, Design:q3dExtractor, Normal completion of simulation on server: c043. (1:37:18 AM  May 12, 2021)
-Stopping Batch Run: 1:37:19 AM  May 12, 2021
- 
-ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
-Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
-Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/capMat/q3dExtractor_Simulator.py
-Starting Batch Run: 11:20:46 AM  May 12, 2021
-Temp directory: /tmp
-Project directory: /u/eu/an/joelhoward/Ansoft
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c068 (11:21:56 AM  May 12, 2021)
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c068 (11:21:59 AM  May 12, 2021)
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c068 (11:22:02 AM  May 12, 2021)
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c068 (11:22:07 AM  May 12, 2021)
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c068 (11:22:12 AM  May 12, 2021)
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c068 (11:22:20 AM  May 12, 2021)
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c068 (11:22:33 AM  May 12, 2021)
-[info] Project:q3dExtractor, Design:q3dExtractor, Normal completion of simulation on server: c068. (11:23:27 AM  May 12, 2021)
-Stopping Batch Run: 11:23:30 AM  May 12, 2021
- 
-ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
-Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
-Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/capMat/q3dExtractor_Simulator.py
-Starting Batch Run: 12:22:30 PM  May 12, 2021
-Temp directory: /tmp
-Project directory: /u/eu/an/joelhoward/Ansoft
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c031 (12:23:24 PM  May 12, 2021)
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c031 (12:23:26 PM  May 12, 2021)
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c031 (12:23:30 PM  May 12, 2021)
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c031 (12:23:35 PM  May 12, 2021)
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c031 (12:23:40 PM  May 12, 2021)
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c031 (12:23:48 PM  May 12, 2021)
-[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c031 (12:24:02 PM  May 12, 2021)
-[info] Project:q3dExtractor, Design:q3dExtractor, Normal completion of simulation on server: c031. (12:24:54 PM  May 12, 2021)
-Stopping Batch Run: 12:24:56 PM  May 12, 2021
+[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c047 (5:24:18 PM  May 12, 2021)
+[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c047 (5:24:21 PM  May 12, 2021)
+[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c047 (5:24:24 PM  May 12, 2021)
+[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c047 (5:24:30 PM  May 12, 2021)
+[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c047 (5:24:34 PM  May 12, 2021)
+[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c047 (5:24:42 PM  May 12, 2021)
+[warning] Project:q3dExtractor, Design:q3dExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c047 (5:24:54 PM  May 12, 2021)
+[info] Project:q3dExtractor, Design:q3dExtractor, Normal completion of simulation on server: c047. (5:25:42 PM  May 12, 2021)
+Stopping Batch Run: 5:25:44 PM  May 12, 2021

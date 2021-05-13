@@ -17,7 +17,7 @@ from polylineFunctions import rectanglePolyline, multiplyPolyline
 from qSysObjects import *
 from quantumStateFunctions import stateFromHeader, baseRepresentation, H_Header
 from constants import *
-from pprint import pprint
+from simulations import *
 
 
 def generateSystemParametersFile(folder):
@@ -61,6 +61,7 @@ def loadSystemParametersFile(projectFolder, computeLocation, QSMSourceFolder):
     return QubitSystem(sysParams=systemParams)
 
 
+
 class QubitSystem:
     def __init__(self, sysParams):
         # ---independent of flip chip
@@ -97,52 +98,51 @@ class QubitSystem:
         self.CPW = CPW()  # Substantiated in loadGeometries.
 
         # ---Simulation files---
-        self.simFiles = dict()  # populated in loadComponentParametersFile
-        self.addToSimFiles(simType="quantize", q3dSims=[], hfssSims=[], circuitSims=[])
-        self.addToSimFiles(simType="CPW", q3dSims=[], hfssSims=["portSweep"], circuitSims=[])
-        self.addToSimFiles(simType="capMat", q3dSims=["q3dExtractor"], hfssSims=[], circuitSims=[])
-        self.addToSimFiles(simType="capMatGE", q3dSims=[], hfssSims=[], circuitSims=[])
+
+        # self.addToSimFiles(simType="quantize", q3dSims=[], hfssSims=[], circuitSims=[])
+        # self.addToSimFiles(simType="CPW", q3dSims=[], hfssSims=["portSweep"], circuitSims=[])
+        # self.addToSimFiles(simType="capMatGE", q3dSims=[], hfssSims=[], circuitSims=[])
         # Populate the available circuit simulation types.
-        self.addToSimFiles(simType="fullS21", q3dSims=[], hfssSims=[], circuitSims=["fullS21"])
-        for qubit1Index in range(self.sysParams["Number of Qubits"]):
-            self.addToSimFiles(simType="circFreqQ" + str(qubit1Index), q3dSims=[], hfssSims=[],
-                               circuitSims=["Y11Q" + str(qubit1Index)])
-            self.addToSimFiles(simType="decayQ" + str(qubit1Index), q3dSims=[], hfssSims=[],
-                               circuitSims=["Y11Q" + str(qubit1Index)])
-            self.addToSimFiles(simType="ECQ" + str(qubit1Index), q3dSims=[], hfssSims=[],
-                               circuitSims=[])  # E_C calculated from the capacitance matrix.
-            self.addToSimFiles(simType="anharmonicityQ" + str(qubit1Index), q3dSims=[], hfssSims=[], circuitSims=[])
-            self.addToSimFiles(simType="quantFreqQ" + str(qubit1Index), q3dSims=[], hfssSims=[], circuitSims=[])
-            self.addToSimFiles(simType="L_iQ" + str(qubit1Index), q3dSims=[], hfssSims=[], circuitSims=[])
-            for qubit2Index in range(self.sysParams["Number of Qubits"]):
-                if qubit2Index > qubit1Index:
-                    self.addToSimFiles(simType="exchQ" + str(qubit1Index) + "-" + str(qubit2Index), q3dSims=[],
-                                       hfssSims=[], circuitSims=["Z21Q" + str(qubit1Index) + "-" + str(qubit2Index)])
-                    self.addToSimFiles(simType="zzQ" + str(qubit1Index) + "-" + str(qubit2Index), q3dSims=[],
-                                       hfssSims=[], circuitSims=[])
-        for readoutResonatorIndex in range(self.sysParams["Number of Readout Resonators"]):
-            self.addToSimFiles(simType="ECR" + str(readoutResonatorIndex), q3dSims=[], hfssSims=[],
-                               circuitSims=[])  # E_C calculated from the capacitance matrix.
-            self.addToSimFiles(simType="circFreqR" + str(readoutResonatorIndex), q3dSims=[], hfssSims=[],
-                               circuitSims=["Y11R" + str(readoutResonatorIndex)])  # Resonator frequency simulations
-            self.addToSimFiles(simType="lumpedR" + str(readoutResonatorIndex), q3dSims=[], hfssSims=[],
-                               circuitSims=["Y11R" + str(readoutResonatorIndex),
-                                            "YRestR" + str(readoutResonatorIndex)])  # Lumped resonator simulations
-            self.addToSimFiles(simType="freqLumpedR" + str(readoutResonatorIndex), q3dSims=[], hfssSims=[],
-                               circuitSims=["Y11LumpedR" + str(
-                                   readoutResonatorIndex)])  # Frequency after substitution of lumped elements.
-            self.addToSimFiles(simType="quantFreqR" + str(readoutResonatorIndex), q3dSims=[], hfssSims=[],
-                               circuitSims=[])
-            self.addToSimFiles(simType="feedlineCouplingR" + str(readoutResonatorIndex), q3dSims=[], hfssSims=[],
-                               circuitSims=["Y11R" + str(readoutResonatorIndex)])
-            self.addToSimFiles(simType="dispersiveShiftR" + str(readoutResonatorIndex), q3dSims=[], hfssSims=[],
-                               circuitSims=[])
-        for PTCIndex in range(self.sysParams["Number of PTCs"]):
-            self.addToSimFiles(simType="freqPTC" + str(PTCIndex), q3dSims=[], hfssSims=[],
-                               circuitSims=["Y11PTC" + str(PTCIndex)])  # Resonator frequency simulations
-        for straightBusCouplerIndex in range(self.sysParams["Number of Straight Bus Couplers"]):
-            self.addToSimFiles(simType="freqBC" + str(straightBusCouplerIndex), q3dSims=[], hfssSims=[],
-                               circuitSims=["Y11BC" + str(straightBusCouplerIndex)])  # Qubit frequency simulations
+        # self.addToSimFiles(simType="fullS21", q3dSims=[], hfssSims=[], circuitSims=["fullS21"])
+        # for qubit1Index in range(self.sysParams["Number of Qubits"]):
+        #     self.addToSimFiles(simType="circFreqQ" + str(qubit1Index), q3dSims=[], hfssSims=[],
+        #                        circuitSims=["Y11Q" + str(qubit1Index)])
+        #     self.addToSimFiles(simType="decayQ" + str(qubit1Index), q3dSims=[], hfssSims=[],
+        #                        circuitSims=["Y11Q" + str(qubit1Index)])
+        #     self.addToSimFiles(simType="ECQ" + str(qubit1Index), q3dSims=[], hfssSims=[],
+        #                        circuitSims=[])  # E_C calculated from the capacitance matrix.
+        #     self.addToSimFiles(simType="anharmonicityQ" + str(qubit1Index), q3dSims=[], hfssSims=[], circuitSims=[])
+        #     self.addToSimFiles(simType="quantFreqQ" + str(qubit1Index), q3dSims=[], hfssSims=[], circuitSims=[])
+        #     self.addToSimFiles(simType="L_iQ" + str(qubit1Index), q3dSims=[], hfssSims=[], circuitSims=[])
+        #     for qubit2Index in range(self.sysParams["Number of Qubits"]):
+        #         if qubit2Index > qubit1Index:
+        #             self.addToSimFiles(simType="exchQ" + str(qubit1Index) + "-" + str(qubit2Index), q3dSims=[],
+        #                                hfssSims=[], circuitSims=["Z21Q" + str(qubit1Index) + "-" + str(qubit2Index)])
+        #             self.addToSimFiles(simType="zzQ" + str(qubit1Index) + "-" + str(qubit2Index), q3dSims=[],
+        #                                hfssSims=[], circuitSims=[])
+        # for readoutResonatorIndex in range(self.sysParams["Number of Readout Resonators"]):
+        #     self.addToSimFiles(simType="ECR" + str(readoutResonatorIndex), q3dSims=[], hfssSims=[],
+        #                        circuitSims=[])  # E_C calculated from the capacitance matrix.
+        #     self.addToSimFiles(simType="circFreqR" + str(readoutResonatorIndex), q3dSims=[], hfssSims=[],
+        #                        circuitSims=["Y11R" + str(readoutResonatorIndex)])  # Resonator frequency simulations
+        #     self.addToSimFiles(simType="lumpedR" + str(readoutResonatorIndex), q3dSims=[], hfssSims=[],
+        #                        circuitSims=["Y11R" + str(readoutResonatorIndex),
+        #                                     "YRestR" + str(readoutResonatorIndex)])  # Lumped resonator simulations
+        #     self.addToSimFiles(simType="freqLumpedR" + str(readoutResonatorIndex), q3dSims=[], hfssSims=[],
+        #                        circuitSims=["Y11LumpedR" + str(
+        #                            readoutResonatorIndex)])  # Frequency after substitution of lumped elements.
+        #     self.addToSimFiles(simType="quantFreqR" + str(readoutResonatorIndex), q3dSims=[], hfssSims=[],
+        #                        circuitSims=[])
+        #     self.addToSimFiles(simType="feedlineCouplingR" + str(readoutResonatorIndex), q3dSims=[], hfssSims=[],
+        #                        circuitSims=["Y11R" + str(readoutResonatorIndex)])
+        #     self.addToSimFiles(simType="dispersiveShiftR" + str(readoutResonatorIndex), q3dSims=[], hfssSims=[],
+        #                        circuitSims=[])
+        # for PTCIndex in range(self.sysParams["Number of PTCs"]):
+        #     self.addToSimFiles(simType="freqPTC" + str(PTCIndex), q3dSims=[], hfssSims=[],
+        #                        circuitSims=["Y11PTC" + str(PTCIndex)])  # Resonator frequency simulations
+        # for straightBusCouplerIndex in range(self.sysParams["Number of Straight Bus Couplers"]):
+        #     self.addToSimFiles(simType="freqBC" + str(straightBusCouplerIndex), q3dSims=[], hfssSims=[],
+        #                        circuitSims=["Y11BC" + str(straightBusCouplerIndex)])  # Qubit frequency simulations
 
     def generateFile(self, fileType):
         if fileType == "componentParams":
@@ -1374,7 +1374,13 @@ class QubitSystem:
                 "TD": self.CPW.TD(length)
             }
 
+
+
+
+
+
             # Circuit simulation - specific modifications
+
         # Add matching resistors to feedline if there are no ports on either end
         if circuitSim[0:4] == ("Y11Q" or
                                circuitSim[0:5] == "Y11BC" or
@@ -1394,6 +1400,8 @@ class QubitSystem:
             }
         """If YRestR circuitSim of lumpedR simulation, set shunt capacitances to 0 and short transmission line. 
         See Junling's thesis Fig.4.13 and surrounding discussion."""
+
+
         if circuitSim[0:6] == "YRestR":
             readoutResonatorIndex = int(circuitSim[6:])
             resIndexStr = str(readoutResonatorIndex)
@@ -1573,431 +1581,425 @@ class QubitSystem:
                             + " " + str(portIndex) + " RPort" + str(portIndex) + "\n")]
         return portsLines
 
-    def copyAnsysFile(self, ansysFile):
-        if os.path.exists(ansysFile):
-            self.deleteFile(str(ansysFile))
+    def copyAnsysFile(self, ansysPath):
+        if os.path.exists(str(ansysPath)):
+            self.deleteFile(str(ansysPath))
         copyAEDTTemplateCommand = ""
         if self.sysParams["Compute Location"] == "Windows":
             copyAEDTTemplateCommand = (
                     "copy "
                     + str(self.sysParams["QSM Source Folder"] / "helperFiles" / "template.aedt")
-                    + " " + str(ansysFile)
+                    + " " + str(ansysPath)
             )
         if self.sysParams["Compute Location"] == "Cluster":
             copyAEDTTemplateCommand = (
                     "cp " + str(self.sysParams["QSM Source Folder"] / "helperFiles" / "template.aedt")
-                    + " " + str(ansysFile)
+                    + " " + str(ansysPath)
             )
         subprocess.call(copyAEDTTemplateCommand, shell=True)
 
-    def loadAllData(self):
+    def loadDesignFiles(self):
         self.loadComponentParametersFile()
         self.loadGeometriesFile()
         self.CPW.vp = self.CPW.generalParamsDict["Phase Velocity(um/s)"]
-        for simTypeName, simTypeDict in self.simFiles.items():  # capMat and quantize will be loaded here, among others.
-            if os.path.exists(simTypeDict["ResultsFile"]):
-                self.loadSimResults(simTypeName)
+        # for simTypeName, simTypeDict in self.simFiles.items():  # capMat and quantize will be loaded here, among others.
+        #     if os.path.exists(simTypeDict["ResultsFile"]):
+        #         self.loadSimResults(simTypeName)
 
-    def simulation(self, command):  # Contains simulation-specific info
-        simType = command[1]
-        simStage = command[2]
-        simParams = dict()
-        if simStage == "init":
-            # Create the directory if it doesn't yet exist.
-            if self.sysParams["Compute Location"] == "Windows":
-                bashCommand = "if not exist " + str(self.simFiles[simType]["Directory"]) + " mkdir " + str(
-                    self.simFiles[simType]["Directory"])
-                subprocess.call(bashCommand, shell=True)
-            elif self.sysParams["Compute Location"] == "Cluster":
-                subprocess.call("rm -rf " + str(self.simFiles[simType]["Directory"]), shell=True)
-                bashCommand = "mkdir -p " + str(self.simFiles[simType]["Directory"])
-                subprocess.call(bashCommand, shell=True)
-            self.generateSimulationParametersFile(simType)
-        else:
-            simParams = self.loadSimulationParametersFile(simType)
-        if simStage == "run":
-            # Delete previous run files
-            if self.sysParams["Compute Location"] == "Cluster":
-                subprocess.call("rm -f " + str(self.simFiles[simType]["Directory"] / "/*slurm*"), shell=True)
-                subprocess.call("rm -f " + str(self.simFiles[simType]["Directory"] / "/*script.*"), shell=True)
-                subprocess.call("rm -f " + str(self.simFiles[simType]["Directory"] / "/nodes"), shell=True)
-                subprocess.call("rm -f " + str(self.simFiles[simType]["Directory"] / "/*.log*"), shell=True)
-                subprocess.call("rm -f " + str(self.simFiles[simType]["Directory"] / "/*Results*"), shell=True)
+    def initSimulation(self, simType):
+        # Create the directory if it doesn't yet exist.
+        if self.sysParams["Compute Location"] == "Windows":
+            bashCommand = "if not exist " + str(self.simFiles[simType]["Directory"]) + " mkdir " + str(
+                self.simFiles[simType]["Directory"])
+            subprocess.call(bashCommand, shell=True)
+        elif self.sysParams["Compute Location"] == "Cluster":
+            subprocess.call("rm -rf " + str(self.simFiles[simType]["Directory"]), shell=True)
+            bashCommand = "mkdir -p " + str(self.simFiles[simType]["Directory"])
+            subprocess.call(bashCommand, shell=True)
+        self.generateSimulationParametersFile(simType)
 
-            if simType == "quantize":
-                copyQuantizeQubitSimulatorCommand = (
-                        "cp "
-                        + str(self.sysParams["QSM Source Folder"] / "helperFiles" / "quantizeQubitSimulator.py")
-                        + " "
-                        + self.simFiles[simType]["Directory"]
-                )
-                subprocess.call(copyQuantizeQubitSimulatorCommand, shell=True)
-                self.runQuantizeSimulator(self.simFiles[simType]["Directory"], 120)
-            for q3dSimName, q3dSim in self.simFiles[simType]["Q3D Simulations"].items():
-                """Run all Q3D simulations for the given simulation. 
-                Assumes they were initialized when the Ansys file was created."""
-                self.copyAnsysFile(q3dSim["Ansys"])
-                # Generate and run the Ansys simulator file
-                lines = ansysSimulatorPreamb.copy()
+    def runSimulation(self, simType):
+        simParams = self.loadSimulationParametersFile(simType)
+        # Delete previous run files
+        if self.sysParams["Compute Location"] == "Cluster":
+            subprocess.call("rm -f " + str(self.simFiles[simType]["Directory"] / "/*slurm*"), shell=True)
+            subprocess.call("rm -f " + str(self.simFiles[simType]["Directory"] / "/*script.*"), shell=True)
+            subprocess.call("rm -f " + str(self.simFiles[simType]["Directory"] / "/nodes"), shell=True)
+            subprocess.call("rm -f " + str(self.simFiles[simType]["Directory"] / "/*.log*"), shell=True)
+            subprocess.call("rm -f " + str(self.simFiles[simType]["Directory"] / "/*Results*"), shell=True)
+        if simType == "quantize":
+            copyQuantizeQubitSimulatorCommand = (
+                    "cp "
+                    + str(self.sysParams["QSM Source Folder"] / "helperFiles" / "quantizeQubitSimulator.py")
+                    + " "
+                    + self.simFiles[simType]["Directory"]
+            )
+            subprocess.call(copyQuantizeQubitSimulatorCommand, shell=True)
+            self.runQuantizeSimulator(self.simFiles[simType]["Directory"], 120)
+        for q3dSimName, q3dSim in self.simFiles[simType]["Q3D Simulations"].items():
+            """Run all Q3D simulations for the given simulation. 
+            Assumes they were initialized when the Ansys file was created."""
+            self.copyAnsysFile(q3dSim["Ansys"])
+            # Generate and run the Ansys simulator file
+            lines = ansysSimulatorPreamb.copy()
+            lines += [
+                ansysSetActiveProjectLine(q3dSimName),
+                ansysInsertQ3DExtractorLine(q3dSimName),
+                ansysSetActiveDesignLine(q3dSimName)
+            ]
+            if simType == "capMat":
+                lines += self.capMatLayout_Lines()
+            lines += capMatAnalysisLines(simParams["MaxPass"], simParams["PerRefine"], q3dSim["ResultsFile"])
+            lines.append(ansysSaveLine)
+            simulatorFileInstance = open(q3dSim["Simulator"], "w+", newline='')
+            simulatorFileInstance.writelines(lines)
+            simulatorFileInstance.close()
+            self.runAnsysSimulator(q3dSim["Ansys"], q3dSim["Simulator"], self.simFiles[simType]["Directory"], 60)
+        for hfssSimName, hfssSim in self.simFiles[simType]["HFSS Simulations"].items():
+            self.copyAnsysFile(hfssSim["Ansys"])
+            # Generate and run the Ansys simulator file
+            lines = ansysSimulatorPreamb.copy()
+            lines += [
+                ansysSetActiveProjectLine(hfssSimName),
+                ansysInsertHFSSDesignLine(hfssSimName),
+                ansysSetActiveDesignLine(hfssSimName)
+            ]
+            # Insert model generation lines here.
+            lines += HFSSAnalysisLines.copy()
+            lines.append(ansysSaveLine)
+            simulatorFileInstance = open(hfssSim["Simulator"], "w+", newline='')
+            simulatorFileInstance.writelines(lines)
+            simulatorFileInstance.close()
+            self.runAnsysSimulator(hfssSim["Ansys"], hfssSim["Simulator"], self.simFiles[simType]["Directory"], 90)
+        for circuitSimName, circuitSim in self.simFiles[simType]["Circuit Simulations"].items():
+            print(circuitSimName)
+            """"Initialize all circuit simulations for the given simulation."""
+            self.copyAnsysFile(circuitSim["Ansys"])
+            # Generate the netlist file and load it into the AEDT
+            netlistComponents = self.generateNetlistComponents(circuitSimName)
+            writeFile = open(circuitSim["Netlist"], "w")
+            writeFile.writelines(netlistHeaderLines())
+            writeFile.write("\n")
+            writeFile.writelines(netlistCircuitLines(netlistComponents))
+            writeFile.writelines(self.netlistPortsLines(circuitSimName))
+            writeFile.write("\n")
+            writeFile.writelines(netlistSimulationLines(simType, simParams))
+            writeFile.write("\n")
+            writeFile.write(".end")
+            writeFile.close()
+            loadNetlistFile(circuitSim["Ansys"], circuitSim["Netlist"])
+            # Generate and run the ansysRunSimulator file
+            lines = ansysSimulatorPreamb.copy()
+            lines += [
+                "oProject = oDesktop.SetActiveProject(\"" + str(circuitSim["Ansys"]).split("/")[-1][0:-5] + "\")\n",
+                "oDesign = oProject.SetActiveDesign(\"" + "Netlist" + "\")\n",
+                "oModuleReport = oDesign.GetModule(\"ReportSetup\")\n",
+                "oDesign.AnalyzeAll()\n"
+            ]
+
+            # S21 circuit simulations
+            if circuitSimName == "fullS21":
                 lines += [
-                    ansysSetActiveProjectLine(q3dSimName),
-                    ansysInsertQ3DExtractorLine(q3dSimName),
-                    ansysSetActiveDesignLine(q3dSimName)
+                    "oModuleReport.CreateReport(\"S Parameter Table 1\", \"Standard\", \"Data Table\", \"LNA\",\n",
+                    "    [\n",
+                    "        \"NAME:Context\",\n",
+                    "        \"SimValueContext:=\"	, [3,0,2,0,False,False,-1,1,0,1,1,\"\",0,0]\n",
+                    "    ],\n",
+                    "    [\n",
+                    "        \"F:=\"			, [\"All\"]\n",
+                    "    ],\n",
+                    "    [\n",
+                    "        \"X Component:=\"		, \"F\",\n",
+                    "        \"Y Component:=\"		, [\"S(2,1)\"]\n",
+                    "    ], [])\n",
+                    "oModuleReport.ExportToFile(\"S Parameter Table 1\", \"" + str(
+                        circuitSim["ResultsFile"]) + "\", False)\n"
                 ]
-                if simType == "capMat":
-                    lines += self.capMatLayout_Lines()
-                lines += capMatAnalysisLines(simParams["MaxPass"], simParams["PerRefine"], q3dSim["ResultsFile"])
-                lines.append(ansysSaveLine)
-                simulatorFileInstance = open(q3dSim["Simulator"], "w+", newline='')
-                simulatorFileInstance.writelines(lines)
-                simulatorFileInstance.close()
-                self.runAnsysSimulator(q3dSim["Ansys"], q3dSim["Simulator"], self.simFiles[simType]["Directory"], 60)
-            for hfssSimName, hfssSim in self.simFiles[simType]["HFSS Simulations"].items():
-                self.copyAnsysFile(hfssSim["Ansys"])
-                # Generate and run the Ansys simulator file
-                lines = ansysSimulatorPreamb.copy()
+            # Y11 circuit simulations
+            elif (circuitSimName[0:4] in ["Y11R", "Y11Q"]
+                  or circuitSimName[0:5] == "Y11BC"
+                  or circuitSimName[0:6] == "YRestR" or circuitSimName[0:10] == "Y11LumpedR"):
                 lines += [
-                    ansysSetActiveProjectLine(hfssSimName),
-                    ansysInsertHFSSDesignLine(hfssSimName),
-                    ansysSetActiveDesignLine(hfssSimName)
+                    "oModuleReport.CreateReport(\"Y Parameter Table 1\", \"Standard\", \"Data Table\", \"LNA\",\n",
+                    "    [\n",
+                    "        \"NAME:Context\",\n",
+                    "        \"SimValueContext:=\"	, [3,0,2,0,False,False,-1,1,0,1,1,\"\",0,0]\n",
+                    "    ],\n",
+                    "    [\n",
+                    "        \"F:=\"			, [\"All\"]\n",
+                    "    ],\n",
+                    "    [\n",
+                    "        \"X Component:=\"		, \"F\",\n",
+                    "        \"Y Component:=\"		, [\"Y(1,1)\"]\n",
+                    "    ], [])\n",
+                    (
+                            "oModuleReport.ExportToFile(\"Y Parameter Table 1\", \""
+                            + str(circuitSim["ResultsFile"])
+                            + "\", False)\n"
+                    )
                 ]
-                # Insert model generation lines here.
-                lines += HFSSAnalysisLines.copy()
-                lines.append(ansysSaveLine)
-                simulatorFileInstance = open(hfssSim["Simulator"], "w+", newline='')
-                simulatorFileInstance.writelines(lines)
-                simulatorFileInstance.close()
-                self.runAnsysSimulator(hfssSim["Ansys"], hfssSim["Simulator"], self.simFiles[simType]["Directory"], 90)
-            for circuitSimName, circuitSim in self.simFiles[simType]["Circuit Simulations"].items():
-                print(circuitSimName)
-                """"Initialize all circuit simulations for the given simulation."""
-                self.copyAnsysFile(circuitSim["Ansys"])
-                # Generate the netlist file and load it into the AEDT
-                netlistComponents = self.generateNetlistComponents(circuitSimName)
-                writeFile = open(circuitSim["Netlist"], "w")
-                writeFile.writelines(netlistHeaderLines())
-                writeFile.write("\n")
-                writeFile.writelines(netlistCircuitLines(netlistComponents))
-                writeFile.writelines(self.netlistPortsLines(circuitSimName))
-                writeFile.write("\n")
-                writeFile.writelines(netlistSimulationLines(simType, simParams))
-                writeFile.write("\n")
-                writeFile.write(".end")
-                writeFile.close()
-                loadNetlistFile(circuitSim["Ansys"], circuitSim["Netlist"])
-                # Generate and run the ansysRunSimulator file
-                lines = ansysSimulatorPreamb.copy()
+            elif circuitSimName[0:4] == "Z21Q":
                 lines += [
-                    "oProject = oDesktop.SetActiveProject(\"" + str(circuitSim["Ansys"]).split("/")[-1][0:-5] + "\")\n",
-                    "oDesign = oProject.SetActiveDesign(\"" + "Netlist" + "\")\n",
-                    "oModuleReport = oDesign.GetModule(\"ReportSetup\")\n",
-                    "oDesign.AnalyzeAll()\n"
+                    "oModuleReport.CreateReport(\"Z Parameter Table 1\", \"Standard\", \"Data Table\", \"LNA\",\n",
+                    "    [\n",
+                    "        \"NAME:Context\",\n",
+                    "        \"SimValueContext:=\"	, [3,0,2,0,False,False,-1,1,0,1,1,\"\",0,0]\n",
+                    "    ],\n",
+                    "    [\n",
+                    "        \"F:=\"			, [\"All\"]\n",
+                    "    ],\n",
+                    "    [\n",
+                    "        \"X Component:=\"		, \"F\",\n",
+                    "        \"Y Component:=\"		, [\"Z(2,1)\"]\n",
+                    "    ], [])\n",
+                    (
+                            "oModuleReport.ExportToFile(\"Z Parameter Table 1\", \""
+                            + str(circuitSim["ResultsFile"])
+                            + "\", False)\n"
+                    )
                 ]
+            lines.append(ansysSaveLine)
+            simulatorFileInstance = open(circuitSim["ansysRunSimulator"], "w+", newline='')
+            simulatorFileInstance.writelines(lines)
+            simulatorFileInstance.close()
+            self.runAnsysSimulator(circuitSim["Ansys"], circuitSim["ansysRunSimulator"],
+                                   self.simFiles[simType]["Directory"], 3)  # Circuit simulations are quite fast
 
-                # S21 circuit simulations
-                if circuitSimName == "fullS21":
-                    lines += [
-                        "oModuleReport.CreateReport(\"S Parameter Table 1\", \"Standard\", \"Data Table\", \"LNA\",\n",
-                        "    [\n",
-                        "        \"NAME:Context\",\n",
-                        "        \"SimValueContext:=\"	, [3,0,2,0,False,False,-1,1,0,1,1,\"\",0,0]\n",
-                        "    ],\n",
-                        "    [\n",
-                        "        \"F:=\"			, [\"All\"]\n",
-                        "    ],\n",
-                        "    [\n",
-                        "        \"X Component:=\"		, \"F\",\n",
-                        "        \"Y Component:=\"		, [\"S(2,1)\"]\n",
-                        "    ], [])\n",
-                        "oModuleReport.ExportToFile(\"S Parameter Table 1\", \"" + str(
-                            circuitSim["ResultsFile"]) + "\", False)\n"
-                    ]
-                # Y11 circuit simulations
-                elif (circuitSimName[0:4] in ["Y11R", "Y11Q"]
-                      or circuitSimName[0:5] == "Y11BC"
-                      or circuitSimName[0:6] == "YRestR" or circuitSimName[0:10] == "Y11LumpedR"):
-                    lines += [
-                        "oModuleReport.CreateReport(\"Y Parameter Table 1\", \"Standard\", \"Data Table\", \"LNA\",\n",
-                        "    [\n",
-                        "        \"NAME:Context\",\n",
-                        "        \"SimValueContext:=\"	, [3,0,2,0,False,False,-1,1,0,1,1,\"\",0,0]\n",
-                        "    ],\n",
-                        "    [\n",
-                        "        \"F:=\"			, [\"All\"]\n",
-                        "    ],\n",
-                        "    [\n",
-                        "        \"X Component:=\"		, \"F\",\n",
-                        "        \"Y Component:=\"		, [\"Y(1,1)\"]\n",
-                        "    ], [])\n",
-                        (
-                                "oModuleReport.ExportToFile(\"Y Parameter Table 1\", \""
-                                + str(circuitSim["ResultsFile"])
-                                + "\", False)\n"
-                        )
-                    ]
-                elif circuitSimName[0:4] == "Z21Q":
-                    lines += [
-                        "oModuleReport.CreateReport(\"Z Parameter Table 1\", \"Standard\", \"Data Table\", \"LNA\",\n",
-                        "    [\n",
-                        "        \"NAME:Context\",\n",
-                        "        \"SimValueContext:=\"	, [3,0,2,0,False,False,-1,1,0,1,1,\"\",0,0]\n",
-                        "    ],\n",
-                        "    [\n",
-                        "        \"F:=\"			, [\"All\"]\n",
-                        "    ],\n",
-                        "    [\n",
-                        "        \"X Component:=\"		, \"F\",\n",
-                        "        \"Y Component:=\"		, [\"Z(2,1)\"]\n",
-                        "    ], [])\n",
-                        (
-                                "oModuleReport.ExportToFile(\"Z Parameter Table 1\", \""
-                                + str(circuitSim["ResultsFile"])
-                                + "\", False)\n"
-                        )
-                    ]
-                lines.append(ansysSaveLine)
-                simulatorFileInstance = open(circuitSim["ansysRunSimulator"], "w+", newline='')
-                simulatorFileInstance.writelines(lines)
-                simulatorFileInstance.close()
-                self.runAnsysSimulator(circuitSim["Ansys"], circuitSim["ansysRunSimulator"],
-                                       self.simFiles[simType]["Directory"], 3)  # Circuit simulations are quite fast
-        elif simStage == "postProcess":
-            # All calculations after the simulations
-            # Only proceed once all simulations have completed.
-            if self.sysParams["Compute Location"] == "Cluster":
-                proceed = False
-                while not proceed:
-                    proceed = True
-                    for q3dSimName, q3dSim in self.simFiles[simType]["Q3D Simulations"].items():
-                        if not os.path.exists(q3dSim["ResultsFile"]):
-                            proceed = False
-                    for hfssSimName, hfssSim in self.simFiles[simType]["HFSS Simulations"].items():
-                        if not os.path.exists(hfssSim["ResultsFile"]):
-                            proceed = False
-                    for circuitSimName, circuitSim in self.simFiles[simType]["Circuit Simulations"].items():
-                        if not os.path.exists(circuitSim["ResultsFile"]):
-                            proceed = False
-            time.sleep(1)
-            # Delete all Ansys results folders (~90MB for capmat)
-            for q3dSimName, q3dSim in self.simFiles[simType]["Q3D Simulations"].items():
-                self.deleteFolder(str(q3dSim["ResultsFolder"]))
-            for circuitSimName, circuitSim in self.simFiles[simType]["Circuit Simulations"].items():
-                resultsFolder = str(circuitSim["ResultsFolder"])
-                if os.path.exists(resultsFolder):
-                    self.deleteFolder(str(circuitSim["ResultsFolder"]))
+    def postProcessSimulation(self, simType):
+        # All calculations after the simulations
+        # Only proceed once all simulations have completed.
+        simParams = self.loadSimulationParametersFile(simType)
+        if self.sysParams["Compute Location"] == "Cluster":
+            proceed = False
+            while not proceed:
+                proceed = True
+                for q3dSimName, q3dSim in self.simFiles[simType]["Q3D Simulations"].items():
+                    if not os.path.exists(q3dSim["ResultsFile"]):
+                        proceed = False
+                for hfssSimName, hfssSim in self.simFiles[simType]["HFSS Simulations"].items():
+                    if not os.path.exists(hfssSim["ResultsFile"]):
+                        proceed = False
+                for circuitSimName, circuitSim in self.simFiles[simType]["Circuit Simulations"].items():
+                    if not os.path.exists(circuitSim["ResultsFile"]):
+                        proceed = False
+        time.sleep(1)
+        # Delete all Ansys results folders (~90MB for capMat)
+        for q3dSimName, q3dSim in self.simFiles[simType]["Q3D Simulations"].items():
+            self.deleteFolder(str(q3dSim["ResultsFolder"]))
+        for circuitSimName, circuitSim in self.simFiles[simType]["Circuit Simulations"].items():
+            resultsFolder = str(circuitSim["ResultsFolder"])
+            if os.path.exists(resultsFolder):
+                self.deleteFolder(str(circuitSim["ResultsFolder"]))
 
-            if simType == "fullS21":
-                freq, S21, S21interpFunc = readS21Data(
-                    self.simFiles[simType]["Circuit Simulations"]["fullS21"]["ResultsFile"])
-                plt.plot([i * omegaToGHz for i in freq], [S21TodB(i) for i in S21])
-                plt.xlabel('Freq (GHz)')
-                plt.ylabel('S21(dB)')
-                plt.savefig(self.simFiles[simType]["Directory"] + "/S21dB.png")
-            elif simType[0:3] == "ECQ":  # Requires running capMatGE first.
-                qubitIndex = int(simType[3:])
-                qubitObj = self.allQubitsDict[qubitIndex]
-                qubitColumnIndex = self.postGEComponentList.index(qubitObj)
-                cInv = np.linalg.inv(self.capMatGE)
-                cSum = 1 / cInv[qubitColumnIndex, qubitColumnIndex]
+        if simType == "fullS21":
+            freq, S21, S21interpFunc = readS21Data(
+                self.simFiles[simType]["Circuit Simulations"]["fullS21"]["ResultsFile"])
+            plt.plot([i * omegaToGHz for i in freq], [S21TodB(i) for i in S21])
+            plt.xlabel('Freq (GHz)')
+            plt.ylabel('S21(dB)')
+            plt.savefig(self.simFiles[simType]["Directory"] + "/S21dB.png")
+        elif simType[0:3] == "ECQ":  # Requires running capMatGE first.
+            qubitIndex = int(simType[3:])
+            qubitObj = self.allQubitsDict[qubitIndex]
+            qubitColumnIndex = self.postGEComponentList.index(qubitObj)
+            cInv = np.linalg.inv(self.capMatGE)
+            cSum = 1 / cInv[qubitColumnIndex, qubitColumnIndex]
 
-                E_C = eConst ** 2 / (2 * cSum)  # In Joules
-                EJ = self.allQubitsDict[qubitIndex].EJ
-                print(qubitObj.name + "EC (GHz): " + str(E_C * Joules_To_GHz))
-                print(qubitObj.name + "EJ (GHz): " + str(EJ * Joules_To_GHz))
-                print(qubitObj.name + "EJ/EC: " + str(EJ / E_C))
-                resultsLines = [["EC", str(E_C)], ["EJ/EC", str(EJ / E_C)]]
-                csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
+            E_C = eConst ** 2 / (2 * cSum)  # In Joules
+            EJ = self.allQubitsDict[qubitIndex].EJ
+            print(qubitObj.name + "EC (GHz): " + str(E_C * Joules_To_GHz))
+            print(qubitObj.name + "EJ (GHz): " + str(EJ * Joules_To_GHz))
+            print(qubitObj.name + "EJ/EC: " + str(EJ / E_C))
+            resultsLines = [["EC", str(E_C)], ["EJ/EC", str(EJ / E_C)]]
+            csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
+        elif simType[0:3] == "zzQ":  # Depends on results of quantizeSimulation
+            qubitIndices = zzQIndices(simType)
+            quantizeIndices = [self.allQubitsDict[i].quantizeIndex for i in qubitIndices]
 
-            elif simType[0:3] == "zzQ":  # Depends on results of quantizeSimulation
-                qubitIndices = zzQIndices(simType)
-                quantizeIndices = [self.allQubitsDict[i].quantizeIndex for i in qubitIndices]
+            stateList01 = self.stateList([[quantizeIndices[1], 1]])
+            stateList10 = self.stateList([[quantizeIndices[0], 1]])
+            stateList11 = self.stateList([[quantizeIndices[0], 1], [quantizeIndices[1], 1]])
 
-                stateList01 = self.stateList([[quantizeIndices[1], 1]])
-                stateList10 = self.stateList([[quantizeIndices[0], 1]])
-                stateList11 = self.stateList([[quantizeIndices[0], 1], [quantizeIndices[1], 1]])
+            E11 = self.HEval(stateList11)
+            E10 = self.HEval(stateList10)
+            E01 = self.HEval(stateList01)
 
-                E11 = self.HEval(stateList11)
-                E10 = self.HEval(stateList10)
-                E01 = self.HEval(stateList01)
+            print("E11 (GHz):", E11)
+            print("E10 (GHz):", E10)
+            print("E01 (GHz):", E01)
 
-                print("E11 (GHz):", E11)
-                print("E10 (GHz):", E10)
-                print("E01 (GHz):", E01)
+            gz = E11 - E01 - E10
 
-                gz = E11 - E01 - E10
+            print("gz" + str(qubitIndices[0]) + "-" + str(qubitIndices[1]) + "(MHz): ", gz * 1000)
 
-                print("gz" + str(qubitIndices[0]) + "-" + str(qubitIndices[1]) + "(MHz): ", gz * 1000)
+            resultsLines = [["g_z (MHz):", str(gz * 1000)]]
+            csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
+        elif simType[0:14] == "anharmonicityQ":
+            qubitIndex = int(simType[14:])
+            quantizeIndex = self.allQubitsDict[qubitIndex].quantizeIndex
 
-                resultsLines = [["g_z (MHz):", str(gz * 1000)]]
-                csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
-            elif simType[0:14] == "anharmonicityQ":
-                qubitIndex = int(simType[14:])
-                quantizeIndex = self.allQubitsDict[qubitIndex].quantizeIndex
+            stateList1 = self.stateList([[quantizeIndex, 1]])
+            stateList2 = self.stateList([[quantizeIndex, 2]])
 
-                stateList1 = self.stateList([[quantizeIndex, 1]])
-                stateList2 = self.stateList([[quantizeIndex, 2]])
+            E1 = self.HEval(stateList1)
+            E2 = self.HEval(stateList2)
 
-                E1 = self.HEval(stateList1)
-                E2 = self.HEval(stateList2)
+            anharmonicity = (E2 - 2 * E1) * 1000  # In MHz
+            print("anharmonicityQ" + str(qubitIndex) + " (MHz):", anharmonicity)
+            resultsLines = [["anharmonicity (MHz):", str(anharmonicity)]]
+            csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
+        elif simType[0:10] == "quantFreqQ":
+            qubitIndex = int(simType[10:])
+            quantizeIndex = self.allQubitsDict[qubitIndex].quantizeIndex
 
-                anharmonicity = (E2 - 2 * E1) * 1000  # In MHz
-                print("anharmonicityQ" + str(qubitIndex) + " (MHz):", anharmonicity)
-                resultsLines = [["anharmonicity (MHz):", str(anharmonicity)]]
-                csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
-            elif simType[0:10] == "quantFreqQ":
-                qubitIndex = int(simType[10:])
-                quantizeIndex = self.allQubitsDict[qubitIndex].quantizeIndex
+            stateList1 = self.stateList([[quantizeIndex, 1]])
 
-                stateList1 = self.stateList([[quantizeIndex, 1]])
+            E1 = self.HEval(stateList1)
+            print("quantFreqQ" + str(qubitIndex) + " (GHz):", E1)
+            resultsLines = [["Frequency (GHz):", str(E1)]]
+            csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
+        elif simType[0:10] == "quantFreqR":
+            readoutResonatorIndex = int(simType[10:])
+            quantizeIndex = self.allReadoutResonatorsDict[readoutResonatorIndex].quantizeIndex
 
-                E1 = self.HEval(stateList1)
-                print("quantFreqQ" + str(qubitIndex) + " (GHz):", E1)
-                resultsLines = [["Frequency (GHz):", str(E1)]]
-                csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
+            stateList1 = self.stateList([[quantizeIndex, 1]])
 
-            elif simType[0:10] == "quantFreqR":
-                readoutResonatorIndex = int(simType[10:])
-                quantizeIndex = self.allReadoutResonatorsDict[readoutResonatorIndex].quantizeIndex
+            E1 = self.HEval(stateList1)
+            print("quantFreqR" + str(readoutResonatorIndex) + " (GHz):", E1)
+            resultsLines = [["Frequency (GHz):", str(E1)]]
+            csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
+        elif simType[0:4] == "L_iQ":
+            qubitIndex = int(simType[4:])
+            calculatedL_i = self.allQubitsDict[qubitIndex].L_i_calculated
+            resultsLines = [["L_i(calculated):", calculatedL_i]]
+            csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
+            print("L_iQ" + str(qubitIndex) + ":", calculatedL_i)
+        elif simType[0:9] == "circFreqQ":
+            qubitIndex = int(simType[9:])
+            freqGHz = self.calculateQubitFrequency(index=qubitIndex) * omegaToGHz
+            resultsLines = [["Frequency (GHz):", freqGHz]]
+            csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
+        elif simType[0:6] == "decayQ":
+            qubitIndex = int(simType[6:])
+            qubit = self.allQubitsDict[qubitIndex]
+            qubitFreq = qubit.freq * GHzToOmega
+            freq, Y11, Y11InterpFunc = readY11Data(
+                self.simFiles[simType]["Circuit Simulations"]["Y11Q" + str(qubitIndex)]["ResultsFile"])
+            derivativeResolution = np.abs(freq[1] - freq[0])
+            resultsLines = []
+            T1 = (np.imag(derivative(Y11InterpFunc, qubitFreq, derivativeResolution))
+                  / (2 * np.real(Y11InterpFunc(qubitFreq))))
+            resultsLines.append(["T1 (s):", T1])
+            csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
+        elif simType[0:9] == "circFreqR":
+            readoutResonatorIndex = int(simType[9:])
+            freqGHz = self.calculateResonatorFrequency(index=readoutResonatorIndex) * omegaToGHz
+            resultsLines = [["Frequency (GHz):", freqGHz]]
+            csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
+        elif simType[0:17] == "feedlineCouplingR":
+            readoutResonatorIndex = int(simType[17:])
+            readoutResonator = self.allReadoutResonatorsDict[readoutResonatorIndex]
+            resonatorFreq = readoutResonator.freq * GHzToOmega
+            freq, Y11, Y11InterpFunc = readY11Data(
+                self.simFiles[simType]["Circuit Simulations"]["Y11R" + str(readoutResonatorIndex)]["ResultsFile"])
+            # derivativeResolution=np.abs(freq[1]-freq[0])*1e-6
+            derivativeResolution = 1
+            resultsLines = []
+            tau = (np.imag(derivative(Y11InterpFunc, resonatorFreq, derivativeResolution))
+                   / (2 * np.real(Y11InterpFunc(resonatorFreq))))
+            resultsLines.append(["Tau (s):", tau])
+            Qc = resonatorFreq * tau
+            print("Qc:" + str(Qc))
+            resultsLines.append(["Qc:", Qc])
+            csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
+        elif simType[0:7] == "lumpedR":
+            readoutResonatorIndex = int(simType[7:])
+            equivL, equivC = self.calculateLumpedResonator(index=readoutResonatorIndex)
+            resultsLines = [["equivL(H):", equivL], ["equivC(F):", equivC]]
+            csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
+            print("equivL(H):" + str(equivC))
+            print("equivC(C):" + str(equivL))
+        elif simType[0:11] == "freqLumpedR":
+            readoutResonatorIndex = int(simType[11:])
+            print("Resonator " + str(readoutResonatorIndex) + " dressed frequency:" + str(
+                self.calculateResonatorFrequency(index=readoutResonatorIndex) * omegaToGHz) + " GHz")
+            print("Lumped resonator " + str(readoutResonatorIndex) + " dressed frequency:" + str(
+                self.calculateLumpedFrequency(index=readoutResonatorIndex) * omegaToGHz) + " GHz")
+        elif simType[0:3] == "ECR":  # Requires running capMatGE first.
+            readoutResonatorIndex = int(simType[3:])
+            readoutResonatorObj = self.allReadoutResonatorsDict[readoutResonatorIndex]
+            resonatorColumnIndex = self.postGEComponentList.index(readoutResonatorObj)
+            cInv = np.linalg.inv(self.capMatGE)
+            cSum = 1 / cInv[resonatorColumnIndex, resonatorColumnIndex]
 
-                stateList1 = self.stateList([[quantizeIndex, 1]])
+            E_C = eConst ** 2 / (2 * cSum)  # In Joules
+            resultsLines = [["EC", str(E_C)]]
+            csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
+        elif simType[0:16] == "dispersiveShiftR":
+            readoutResonatorIndex = int(simType[16:])
+            resonatorQuantizeIndex = self.allReadoutResonatorsDict[readoutResonatorIndex].quantizeIndex
 
-                E1 = self.HEval(stateList1)
-                print("quantFreqR" + str(readoutResonatorIndex) + " (GHz):", E1)
-                resultsLines = [["Frequency (GHz):", str(E1)]]
-                csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
+            qubitIndex = readoutResonatorIndex  # Dependent on qubit/resonator pair convention!!!!
+            qubitQuantizeIndex = self.allQubitsDict[qubitIndex].quantizeIndex
 
-            elif simType[0:4] == "L_iQ":
-                qubitIndex = int(simType[4:])
-                calculatedL_i = self.allQubitsDict[qubitIndex].L_i_calculated
-                resultsLines = [["L_i(calculated):", calculatedL_i]]
-                csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
-                print("L_iQ" + str(qubitIndex) + ":", calculatedL_i)
-            elif simType[0:9] == "circFreqQ":
-                qubitIndex = int(simType[9:])
-                freqGHz = self.calculateQubitFrequency(index=qubitIndex) * omegaToGHz
-                resultsLines = [["Frequency (GHz):", freqGHz]]
-                csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
-            elif simType[0:6] == "decayQ":
-                qubitIndex = int(simType[6:])
-                qubit = self.allQubitsDict[qubitIndex]
-                qubitFreq = qubit.freq * GHzToOmega
-                freq, Y11, Y11InterpFunc = readY11Data(
-                    self.simFiles[simType]["Circuit Simulations"]["Y11Q" + str(qubitIndex)]["ResultsFile"])
-                derivativeResolution = np.abs(freq[1] - freq[0])
-                resultsLines = []
-                T1 = (np.imag(derivative(Y11InterpFunc, qubitFreq, derivativeResolution))
-                      / (2 * np.real(Y11InterpFunc(qubitFreq))))
-                resultsLines.append(["T1 (s):", T1])
-                csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
-            elif simType[0:9] == "circFreqR":
-                readoutResonatorIndex = int(simType[9:])
-                freqGHz = self.calculateResonatorFrequency(index=readoutResonatorIndex) * omegaToGHz
-                resultsLines = [["Frequency (GHz):", freqGHz]]
-                csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
-            elif simType[0:17] == "feedlineCouplingR":
-                readoutResonatorIndex = int(simType[17:])
-                readoutResonator = self.allReadoutResonatorsDict[readoutResonatorIndex]
-                resonatorFreq = readoutResonator.freq * GHzToOmega
-                freq, Y11, Y11InterpFunc = readY11Data(
-                    self.simFiles[simType]["Circuit Simulations"]["Y11R" + str(readoutResonatorIndex)]["ResultsFile"])
-                # derivativeResolution=np.abs(freq[1]-freq[0])*1e-6
-                derivativeResolution = 1
-                resultsLines = []
-                tau = (np.imag(derivative(Y11InterpFunc, resonatorFreq, derivativeResolution))
-                       / (2 * np.real(Y11InterpFunc(resonatorFreq))))
-                resultsLines.append(["Tau (s):", tau])
-                Qc = resonatorFreq * tau
-                print("Qc:" + str(Qc))
-                resultsLines.append(["Qc:", Qc])
-                csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
-            elif simType[0:7] == "lumpedR":
-                readoutResonatorIndex = int(simType[7:])
-                equivL, equivC = self.calculateLumpedResonator(index=readoutResonatorIndex)
-                resultsLines = [["equivL(H):", equivL], ["equivC(F):", equivC]]
-                csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
-                print("equivL(H):" + str(equivC))
-                print("equivC(C):" + str(equivL))
-            elif simType[0:11] == "freqLumpedR":
-                readoutResonatorIndex = int(simType[11:])
-                print("Resonator " + str(readoutResonatorIndex) + " dressed frequency:" + str(
-                    self.calculateResonatorFrequency(index=readoutResonatorIndex) * omegaToGHz) + " GHz")
-                print("Lumped resonator " + str(readoutResonatorIndex) + " dressed frequency:" + str(
-                    self.calculateLumpedFrequency(index=readoutResonatorIndex) * omegaToGHz) + " GHz")
-            elif simType[0:3] == "ECR":  # Requires running capMatGE first.
-                readoutResonatorIndex = int(simType[3:])
-                readoutResonatorObj = self.allReadoutResonatorsDict[readoutResonatorIndex]
-                resonatorColumnIndex = self.postGEComponentList.index(readoutResonatorObj)
-                cInv = np.linalg.inv(self.capMatGE)
-                cSum = 1 / cInv[resonatorColumnIndex, resonatorColumnIndex]
+            stateList01 = self.stateList([[qubitQuantizeIndex, 0], [resonatorQuantizeIndex, 1]])
+            stateList10 = self.stateList([[qubitQuantizeIndex, 1], [resonatorQuantizeIndex, 0]])
+            stateList11 = self.stateList([[qubitQuantizeIndex, 1], [resonatorQuantizeIndex, 1]])
 
-                E_C = eConst ** 2 / (2 * cSum)  # In Joules
-                resultsLines = [["EC", str(E_C)]]
-                csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
-            elif simType[0:16] == "dispersiveShiftR":
-                readoutResonatorIndex = int(simType[16:])
-                resonatorQuantizeIndex = self.allReadoutResonatorsDict[readoutResonatorIndex].quantizeIndex
+            E00 = 0
+            E01 = self.HEval(stateList01)
+            E10 = self.HEval(stateList10)
+            E11 = self.HEval(stateList11)
 
-                qubitIndex = readoutResonatorIndex  # Dependent on qubit/resonator pair convention!!!!
-                qubitQuantizeIndex = self.allQubitsDict[qubitIndex].quantizeIndex
+            print(E11, E10, E01)
 
-                stateList01 = self.stateList([[qubitQuantizeIndex, 0], [resonatorQuantizeIndex, 1]])
-                stateList10 = self.stateList([[qubitQuantizeIndex, 1], [resonatorQuantizeIndex, 0]])
-                stateList11 = self.stateList([[qubitQuantizeIndex, 1], [resonatorQuantizeIndex, 1]])
+            dispersiveShift = ((E11 - E10) - (E01 - E00)) * 1000  # MHz
+            print("dispersiveShiftR" + str(readoutResonatorIndex) + " (MHz):", dispersiveShift)
 
-                E00 = 0
-                E01 = self.HEval(stateList01)
-                E10 = self.HEval(stateList10)
-                E11 = self.HEval(stateList11)
+            resultsLines = [["Dispersive Shift (MHz):", str(dispersiveShift)]]
+            csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
 
-                print(E11, E10, E01)
+        elif simType == "quantize":
+            self.quantizeSimulation(simParams)
+        elif simType == "capMat":
+            capMatResultsFileLines = csvRead(
+                self.simFiles["capMat"]["Q3D Simulations"]["q3dExtractor"]["ResultsFile"])
+            capMatHeaderLineIndex = 0
+            for index, line in enumerate(capMatResultsFileLines):
+                if line != [] and line[0] == "Capacitance Matrix":
+                    capMatHeaderLineIndex = index + 1
+            unitsMultiplier = self.capMatUnitsToF
+            self.ansysCapMatHeaders = arrayNoBlanks(capMatResultsFileLines[capMatHeaderLineIndex])
+            numNodes = len(self.ansysCapMatHeaders)
+            capMat = np.zeros((numNodes, numNodes))
+            capMatStartLineIndex = capMatHeaderLineIndex + 1
+            for index1, header1 in enumerate(self.ansysCapMatHeaders):
+                for index2, header2 in enumerate(self.ansysCapMatHeaders):
+                    matRow = capMatStartLineIndex + index1
+                    matCol = 1 + index2
+                    capacitanceValue = float(capMatResultsFileLines[matRow][matCol]) * unitsMultiplier
+                    capMat[index1, index2] = capacitanceValue
 
-                dispersiveShift = ((E11 - E10) - (E01 - E00)) * 1000  # MHz
-                print("dispersiveShiftR" + str(readoutResonatorIndex) + " (MHz):", dispersiveShift)
+            lines = [["Capacitance (F)"], [""] + self.ansysCapMatHeaders]
+            for rowIndex in range(numNodes):
+                lines.append([self.ansysCapMatHeaders[rowIndex]] + list(capMat[rowIndex, :]))
+            lines.append([""])
+            lines.append(["Capacitance To Ground (F)"])
+            for rowIndex in range(numNodes):
+                lines.append([self.ansysCapMatHeaders[rowIndex]] + [str(sum(capMat[rowIndex, :]))])
 
-                resultsLines = [["Dispersive Shift (MHz):", str(dispersiveShift)]]
-                csvWrite(self.simFiles[simType]["ResultsFile"], resultsLines)
-
-            elif simType == "quantize":
-                self.quantizeSimulation(simParams)
-            elif simType == "capMat":
-                capMatResultsFileLines = csvRead(
-                    self.simFiles["capMat"]["Q3D Simulations"]["q3dExtractor"]["ResultsFile"])
-                capMatHeaderLineIndex = 0
-                for index, line in enumerate(capMatResultsFileLines):
-                    if line != [] and line[0] == "Capacitance Matrix":
-                        capMatHeaderLineIndex = index + 1
-                unitsMultiplier = self.capMatUnitsToF
-                self.ansysCapMatHeaders = arrayNoBlanks(capMatResultsFileLines[capMatHeaderLineIndex])
-                numNodes = len(self.ansysCapMatHeaders)
-                capMat = np.zeros((numNodes, numNodes))
-                capMatStartLineIndex = capMatHeaderLineIndex + 1
-                for index1, header1 in enumerate(self.ansysCapMatHeaders):
-                    for index2, header2 in enumerate(self.ansysCapMatHeaders):
-                        matRow = capMatStartLineIndex + index1
-                        matCol = 1 + index2
-                        capacitanceValue = float(capMatResultsFileLines[matRow][matCol]) * unitsMultiplier
-                        capMat[index1, index2] = capacitanceValue
-
-                lines = [["Capacitance (F)"], [""] + self.ansysCapMatHeaders]
-                for rowIndex in range(numNodes):
-                    lines.append([self.ansysCapMatHeaders[rowIndex]] + list(capMat[rowIndex, :]))
-                lines.append([""])
-                lines.append(["Capacitance To Ground (F)"])
-                for rowIndex in range(numNodes):
-                    lines.append([self.ansysCapMatHeaders[rowIndex]] + [str(sum(capMat[rowIndex, :]))])
-
-                csvWrite(self.simFiles[simType]["ResultsFile"], lines)
-            elif simType == "capMatGE":  # includes the lumped resonator capacitances.
-                lines = [["Capacitance (F)"], [""] + [component.name for component in self.postGEComponentList]]
-                capMat_preGE = self.capMatForGE()
-                capMat_GE, phiMat, RHS = self.gaussianElimination(capMat_preGE)
-                numNodes = len(self.postGEComponentList)
-                for rowIndex in range(numNodes):
-                    lines.append([self.postGEComponentList[rowIndex].name] + list(capMat_GE[rowIndex, :]))
-                csvWrite(self.simFiles[simType]["ResultsFile"], lines)
+            csvWrite(self.simFiles[simType]["ResultsFile"], lines)
+        elif simType == "capMatGE":  # includes the lumped resonator capacitances.
+            lines = [["Capacitance (F)"], [""] + [component.name for component in self.postGEComponentList]]
+            capMat_preGE = self.capMatForGE()
+            capMat_GE, phiMat, RHS = self.gaussianElimination(capMat_preGE)
+            numNodes = len(self.postGEComponentList)
+            for rowIndex in range(numNodes):
+                lines.append([self.postGEComponentList[rowIndex].name] + list(capMat_GE[rowIndex, :]))
+            csvWrite(self.simFiles[simType]["ResultsFile"], lines)
 
     def simulationCommand(self, command):
-        self.loadAllData()
+        self.loadDesignFiles()
         # Resolve the simulation command
         if command[0] == "simulation":
             self.simulation(command)
@@ -2022,7 +2024,7 @@ class QubitSystem:
             self.AllDispersiveShiftR()
 
     def printCommand(self, command):
-        self.loadAllData()
+        self.loadDesignFiles()
         if command == "frequencies":
             print("FREQUENCIES")
             for qubitIndex, qubit in self.allQubitsDict.items():
@@ -2091,7 +2093,7 @@ class QubitSystem:
         capMatGE_quant = self.capMatGE[rows[:, np.newaxis], columns]
 
         dim = numPhotons + 2
-        qObjDim = [dim]*numComponents
+        qObjDim = [dim] * numComponents
         Cinv = np.linalg.inv(capMatGE_quant)
 
         # Assemble the Hamiltonian. H is in units of radians (H/hbar). Calculates 1/2*Q.T*Cinv*Q.
@@ -2191,7 +2193,7 @@ class QubitSystem:
             manifoldNums = [i for i in allNumsBase if sum(i) == photonManifold]  # Remove numbers outside the manifold
             manifoldNums.reverse()
             outputStatesList = outputStatesList + manifoldNums
-        zeroStateList = [0]*numComponents
+        zeroStateList = [0] * numComponents
         outputStatesList = [zeroStateList] + outputStatesList
 
         H_output_headers = [H_Header(i) for i in outputStatesList]
@@ -2291,8 +2293,8 @@ class QubitSystem:
                     shiftX = self.chipDict[1].substrate.geometryParamsDict["Width"] / 2 * unitChange
                     shiftY = self.chipDict[1].substrate.geometryParamsDict["Length"] / 2 * unitChange
 
-                markerCorners = [gdspy.copy(marker)]*4
-                markerCornerPeripheries = [gdspy.copy(periphery)]*4
+                markerCorners = [gdspy.copy(marker)] * 4
+                markerCornerPeripheries = [gdspy.copy(periphery)] * 4
 
                 buffer = 250 * unitChange
 
@@ -2307,7 +2309,7 @@ class QubitSystem:
                 markerCornerPeripheries[3].translate(-shiftX + buffer, -shiftY + buffer)
 
                 for markerIndex, markerCorner in enumerate(markerCorners):
-                    markerCorner.layers = [chip.index]*len(markerCorner.layers)
+                    markerCorner.layers = [chip.index] * len(markerCorner.layers)
                     marker_cell = gdspy.Cell("Marker" + str(markerIndex) + "Chip" + str(chip.index))
                     subtractFromGround.append(markerCornerPeripheries[markerIndex])
                     marker_cell.add(markerCorners[markerIndex])
@@ -2318,7 +2320,7 @@ class QubitSystem:
                 for obj in [nist_logo, nist_logo_periphery]:
                     obj.translate(self.chipDict[chip.index].nistLogoCenter[0] * unitChange,
                                   self.chipDict[chip.index].nistLogoCenter[1] * unitChange)
-                nist_logo.layers = [chip.index]*77
+                nist_logo.layers = [chip.index] * 77
                 NIST_logo_cell = gdspy.Cell('NIST logo')
                 subtractFromGround.append(nist_logo_periphery)
                 NIST_logo_cell.add(nist_logo)
@@ -2423,7 +2425,7 @@ class QubitSystem:
                 "Ansys": self.simFiles[simType]["Directory"] / (circuitSim + ".aedt"),
                 "Netlist": self.simFiles[simType]["Directory"] / (circuitSim + "_" + "Netlist.txt"),
                 "ansysInitSimulator": self.simFiles[simType]["Directory"] / (
-                            circuitSim + "_" + "ansysInitSimulator.py"),
+                        circuitSim + "_" + "ansysInitSimulator.py"),
                 "ansysRunSimulator": self.simFiles[simType]["Directory"] / (circuitSim + "_" + "ansysRunSimulator.py"),
                 "Log": self.simFiles[simType]["Directory"] / (circuitSim + "_" + "Simulator.log"),
                 "ResultsFile": self.simFiles[simType]["Directory"] / (circuitSim + "_" + "Results.csv"),
@@ -2692,14 +2694,7 @@ class QubitSystem:
                     allNodes.append(launchPad)
         return allNodes
 
-    @property
-    def capMatUnitsToF(self):
-        capMatResultsFileLines = csvRead(self.simFiles["capMat"]["Q3D Simulations"]["q3dExtractor"]["ResultsFile"])
-        reportedUnits = capMatResultsFileLines[2][0][8:]  # "C Units:pF"->"pF"
-        unitsMultiplier = 1
-        if reportedUnits == "pF":
-            unitsMultiplier = 1e-12
-        return unitsMultiplier
+
 
     def capMatForGE(self):
         dimPreGEQuant = len(self.preGECapMatHeaders)

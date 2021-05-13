@@ -3,6 +3,7 @@ from pathlib import Path
 import subprocess
 import os
 
+
 computeLocation = "Cluster"  # Edit this based on where the QSM is being run. Users at NIST should use "68707Max"
 QSMSourceFolder = ""
 if computeLocation == "Windows":
@@ -11,10 +12,10 @@ elif computeLocation == "Cluster":
     QSMSourceFolder = Path("/beegfs/scratch/joelhoward/QSMSimulations/QSMSource/src")
 sys.path.append(str(QSMSourceFolder))
 import qubitSimulationModule as QSM
+from simulations import CapMatSimulation
 
 projectFolder = Path(os.path.dirname(os.path.abspath(__file__)))
 copyDir = projectFolder / ".." / "TwoQubit_filesToCopy"
-
 
 def copyFile(sourceFile, destinationFile):
     copyCommand = ""
@@ -24,11 +25,13 @@ def copyFile(sourceFile, destinationFile):
         copyCommand = "cp " + str(Path(sourceFile)) + " " + str(Path(destinationFile))
     subprocess.call(copyCommand, shell=True)
 
-
 #QSM.generateSystemParametersFile(projectFolder)  # Run this command to generate the systemParameters file.
 # copyFile(copyDir / "systemParametersFile.csv", projectFolder / "systemParametersFile.csv")
-#
+
 qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder)  # Once systemParameters is available and filled out, ALWAYS run this command first.
+
+CapMatSimulation(qSys).run()
+
 
 # qSys.generateFile("componentParams")#Run this command to generate layout files. "componentParams" --> "geometries" --> "GDS"
 # copyFile(copyDir/"componentParametersFile.csv",projectFolder/"componentParametersFile.csv")
@@ -42,7 +45,7 @@ qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder)  # Once s
 # copyFile(copyDir/"capMat"/"SimulationParameters.csv",projectFolder/"capMat"/"SimulationParameters.csv")
 #
 # qSys.simulationCommand(["simulation","capMat","run"])
-qSys.simulationCommand(["simulation","capMat","postProcess"])
+#qSys.simulationCommand(["simulation","capMat","postProcess"])
 #
 #qSys.loadAllData()
 # qSys.simulationCommand(["simulation", "lumpedR0", "run"])
