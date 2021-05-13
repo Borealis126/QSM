@@ -7,7 +7,7 @@ from meanderFunctions import meanderNodeGen
 from node import Node
 from polylineFunctions import launchPadPolylines
 from pointToLine import pnt2line
-
+import simulations
 
 class JJGDS:
     def __init__(self, patchGDS, topElectrodeGDS, bottomElectrodeGDS, connectionsGDS):
@@ -30,9 +30,9 @@ class ComponentPad:
 
 
 class Qubit:
-    def __init__(self, index):
+    def __init__(self, qSys, index):
+        self.qSys = qSys
         self.index = index
-        self.quantizeIndex = None  # Assigned and used in quantizeSimulation
         self.name = "Q" + str(self.index)
 
         self.pad1 = ComponentPad(componentName=self.name, padIndex=1)
@@ -46,14 +46,17 @@ class Qubit:
         self.generalParamsDict = {"Chip": 0}  # Chip 1 unless flip chip overwrites.
         self.geometryParamsDict = dict()
 
-        self.freq = 0  # Updated when sims results are loaded.
-        self.anharmonicity = 0  # Updated when sims results are loaded.
-        self.T1 = 0
-        self.EcVal = 0
-
         self.omegaSym = symbols("omega_Q" + str(self.index))
         self.omegaEffSym = symbols("omega_effQ" + str(self.index))  # Used for quantization RWA
         self.omegaEffVal = 0
+
+    @property
+    def quantizeIndex(self):
+        return simulations.Quantize(self.qSys).quantizeIndex(self)
+
+    @property
+    def EcVal(self):
+        return simulations.ECQSimulation(self.qSys, self.index).EC
 
     def QSym(self, dim, numComponents):
         return MatrixSymbol("Q_Q" + str(self.index), dim ** numComponents, dim ** numComponents)
@@ -105,14 +108,14 @@ class Qubit:
 
 
 class FloatingQubit(Qubit):
-    def __init__(self, index):
-        super().__init__(index)
+    def __init__(self, qSys, index):
+        super(FloatingQubit, self).__init__(qSys, index)
         self.padList = [self.pad1, self.pad2]
 
 
 class GroundedQubit(Qubit):
-    def __init__(self, index):
-        super().__init__(index)
+    def __init__(self, qSys, index):
+        super().__init__(qSys, index)
         self.padList = [self.pad1]
 
 
@@ -204,7 +207,8 @@ class ControlLine:  # Similar to node, except netlist name is a function of qubi
 
 
 class CPWResonator:
-    def __init__(self, index):
+    def __init__(self, qSys, index):
+        self.qSys = qSys
         self.index = index
         self.quantizeIndex = 0  # Assigned and used in quantizeSimulation
         self.name = "R" + str(self.index)
@@ -226,10 +230,18 @@ class CPWResonator:
         self.LSym = symbols("L_R" + str(self.index))
         self.omegaEffVal = 0
         self.omegaVal = 0
-        self.equivL = 0
-        self.equivC = 0
 
-        self.EcVal = 0
+    @property
+    def equivC(self):
+        return simulations.LumpedRSimulation(self.qSys, self.index).equivC
+
+    @property
+    def equivL(self):
+        return simulations.LumpedRSimulation(self.qSys, self.index).equivL
+
+    @property
+    def EcVal(self):
+        return simulations.ECRSimulation(self.qSys, self.index).EC
 
     def QSym(self, dim, numComponents):
         return MatrixSymbol("Q_R" + str(self.index), dim ** numComponents, dim ** numComponents)
@@ -289,13 +301,13 @@ class CPWResonator:
 
 
 class ReadoutResonator(CPWResonator):
-    def __init__(self, index):
-        super().__init__(index)
+    def __init__(self, qSys, index):
+        super().__init__(qSys, index)
 
 
 class ResonatorBusCoupler(CPWResonator):
-    def __init__(self, index):
-        super().__init__(index)
+    def __init__(self, qSys, index):
+        super().__init__(qSys, index)
 
 
 class StraightBusCoupler:

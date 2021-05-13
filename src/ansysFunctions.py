@@ -128,12 +128,7 @@ def ansysSignalLine_Lines(node):
     ]
 
 
-def netlistHeaderLines():  # Not currently a function of simulation. Not sure if it will ever need to be.
-    return [
-        ".option PARHIER=\'local\'\n",
-        ".option max_messages=1\n",
-        ".option num_threads=4\n"
-    ]
+
 
 
 def ansysUniteNodes(nodeList):
@@ -166,21 +161,7 @@ def aedtEdit(line):
     return returnLine
 
 
-def netlistSimulationLines(simType, simParams):  # Contains simulation-specific info
-    if simType == "fullS21" or \
-            simType[0:9] == "circFreqQ" or \
-            simType[0:9] == "circFreqR" or \
-            simType[0:7] == "lumpedR" or \
-            simType[0:11] == "freqLumpedR" or \
-            simType[0:6] == "decayQ" or \
-            simType[0:5] == "exchQ" or \
-            simType[0:17] == "feedlineCouplingR":
-        return [
-            ".LNA\n",
-            "+ LIN " + str(simParams["LNA_counts"]) + " " + str(simParams["LNA_start (GHz)"] * 1e9)
-            + " " + str(simParams["LNA_stop (GHz)"] * 1e9) + "\n",
-            "+ FLAG=\'LNA\'\n"
-        ]
+
 
 
 def ansysOutputToComplex(complexString):
@@ -369,50 +350,7 @@ def ansysTrench(componentNode, trench, chip):
     return addTrenchNodeLines, subtractTrenchPeripheryLines, makeTrenchComponent3DLines
 
 
-def netlistCircuitLines(netlistComponents):
-    lines = []
-    # Capacitors
-    for capacitanceName, capacitance in netlistComponents["Capacitances"].items():
-        lines.append(capacitanceName + " " + capacitance["node1NetlistName"] + " "
-                     + capacitance["node2NetlistName"] + " " + str(capacitance["C"]) + "\n")
-    # Inductors
-    for inductorName, inductor in netlistComponents["Inductors"].items():
-        lines.append(inductorName + " " + inductor["node1NetlistName"] + " "
-                     + inductor["node2NetlistName"] + " " + str(inductor["L"]) + "\n")
-    # Resistors
-    for resistorName, resistor in netlistComponents["Resistors"].items():
-        lines.append(resistorName + " " + resistor["node1NetlistName"] + " "
-                     + resistor["node2NetlistName"] + " " + str(resistor["R"]) + "\n")
-    # Transmission Lines
-    for transmissionLineName, transmissionLine in netlistComponents["Transmission Lines"].items():
-        lines.append(transmissionLineName + " " + transmissionLine["node1NetlistName"] + " 0 "
-                     + transmissionLine["node2NetlistName"] + " 0 "
-                     + "Z0=50 TD=" + str(transmissionLine["TD"]) + "\n")
-    return lines
 
-
-def loadNetlistFile(ansysFile, netlistFile):
-    """I hate this method, but it's the only way I know of to load the netlist into the aedt project."""
-    netlistFile = open(netlistFile, 'r')
-    netlistFileLines = netlistFile.readlines()
-    netlistFileLinesAedtEdit = [aedtEdit(i) for i in netlistFileLines]
-
-    ansysProjectFile = open(ansysFile, 'r')
-    ansysProjectFileLines = ansysProjectFile.readlines()
-
-    startLineIndex = ansysProjectFileLines.index("\t\t$begin \'Netlist\'\n")
-    endLineIndex = ansysProjectFileLines.index("\t\t$end \'Netlist\'\n")
-
-    beforeLines = ansysProjectFileLines[0:startLineIndex + 1]
-    afterLines = ansysProjectFileLines[endLineIndex:]
-    betweenLines = ["\t\t\tText=\'" + netlistFileLinesAedtEdit[0][0:-1] + "\\\n"]
-    for line in netlistFileLinesAedtEdit[1:-1]:
-        betweenLines.append(line[0:-1] + "\\\n")
-    betweenLines.append(netlistFileLinesAedtEdit[-1] + "\'\n")  # No \n to remove at end of line!
-
-    ansysProjectFileInstance = open(ansysFile, "w+", newline='')  # Overwrites aedt file to insert netlist
-    ansysProjectFileInstance.writelines(beforeLines + betweenLines + afterLines)  # Initialization lines.
-    ansysProjectFileInstance.close()
 
 
 def ansysQ3DMake3D(simType, node):

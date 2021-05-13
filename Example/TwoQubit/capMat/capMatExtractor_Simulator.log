@@ -1,0 +1,16 @@
+ 
+ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
+Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
+Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/capMat/capMatExtractor_Simulator.py
+Starting Batch Run: 3:32:08 AM  May 13, 2021
+Temp directory: /tmp
+Project directory: /u/eu/an/joelhoward/Ansoft
+[warning] Project:capMatExtractor, Design:capMatExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c010 (3:32:57 AM  May 13, 2021)
+[warning] Project:capMatExtractor, Design:capMatExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c010 (3:32:59 AM  May 13, 2021)
+[warning] Project:capMatExtractor, Design:capMatExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c010 (3:33:02 AM  May 13, 2021)
+[warning] Project:capMatExtractor, Design:capMatExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c010 (3:33:07 AM  May 13, 2021)
+[warning] Project:capMatExtractor, Design:capMatExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c010 (3:33:12 AM  May 13, 2021)
+[warning] Project:capMatExtractor, Design:capMatExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c010 (3:33:20 AM  May 13, 2021)
+[warning] Project:capMatExtractor, Design:capMatExtractor, Bad quality triangles found in mesh. -- Simulating on machine: c010 (3:33:33 AM  May 13, 2021)
+[info] Project:capMatExtractor, Design:capMatExtractor, Normal completion of simulation on server: c010. (3:34:27 AM  May 13, 2021)
+Stopping Batch Run: 3:34:30 AM  May 13, 2021

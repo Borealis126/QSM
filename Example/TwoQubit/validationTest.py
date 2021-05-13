@@ -12,7 +12,7 @@ elif computeLocation == "Cluster":
     QSMSourceFolder = Path("/beegfs/scratch/joelhoward/QSMSimulations/QSMSource/src")
 sys.path.append(str(QSMSourceFolder))
 import qubitSimulationModule as QSM
-from simulations import CapMatSimulation
+from simulations import *
 
 projectFolder = Path(os.path.dirname(os.path.abspath(__file__)))
 copyDir = projectFolder / ".." / "TwoQubit_filesToCopy"
@@ -25,41 +25,45 @@ def copyFile(sourceFile, destinationFile):
         copyCommand = "cp " + str(Path(sourceFile)) + " " + str(Path(destinationFile))
     subprocess.call(copyCommand, shell=True)
 
-#QSM.generateSystemParametersFile(projectFolder)  # Run this command to generate the systemParameters file.
-# copyFile(copyDir / "systemParametersFile.csv", projectFolder / "systemParametersFile.csv")
+QSM.generateSystemParametersFile(projectFolder)  # Run this command to generate the systemParameters file.
+copyFile(copyDir / "systemParametersFile.csv", projectFolder / "systemParametersFile.csv")
 
 qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder)  # Once systemParameters is available and filled out, ALWAYS run this command first.
 
-CapMatSimulation(qSys).run()
-
-
-# qSys.generateFile("componentParams")#Run this command to generate layout files. "componentParams" --> "geometries" --> "GDS"
+# qSys.generateComponentParams()
 # copyFile(copyDir/"componentParametersFile.csv",projectFolder/"componentParametersFile.csv")
 #
-# qSys.generateFile("geometries")#Run this command to generate layout files. "componentParams" --> "geometries" --> "GDS"
+# qSys.generateGeometries()
 # copyFile(copyDir/"componentGeometriesFile.csv",projectFolder/"componentGeometriesFile.csv")
+#
+# qSys.generateGDS()
 # #
-#qSys.generateFile("GDS")
-# #
-#qSys.simulationCommand(["simulation","capMat","init"])#All "simulations" require completed layout files.
+# CapMatSimulation(qSys).initialize()
+# CapMatSimulation(qSys).run()
+
+# CapMatSimulation(qSys).postProcess()
+
 # copyFile(copyDir/"capMat"/"SimulationParameters.csv",projectFolder/"capMat"/"SimulationParameters.csv")
-#
-# qSys.simulationCommand(["simulation","capMat","run"])
-#qSys.simulationCommand(["simulation","capMat","postProcess"])
-#
-#qSys.loadAllData()
-# qSys.simulationCommand(["simulation", "lumpedR0", "run"])
+
+
+# qSys.loadDesignFiles()
 # for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.items():
-# # #     qSys.simulationCommand(["simulation","lumpedR"+str(readoutResonatorIndex),"init"])
-#     qSys.simulationCommand(["simulation","lumpedR"+str(readoutResonatorIndex),"run"])
-#     qSys.simulationCommand(["simulation","lumpedR"+str(readoutResonatorIndex),"postProcess"])
+    # LumpedRSimulation(qSys,readoutResonatorIndex).initialize()
+    # LumpedRSimulation(qSys,readoutResonatorIndex).run()
+    # LumpedRSimulation(qSys,readoutResonatorIndex).postProcess()
 
-# qSys.simulationCommand(["simulation","capMatGE","init"])
-# qSys.simulationCommand(["simulation","capMatGE","postProcess"])
+# CapMatGESimulation(qSys).initialize()
+# CapMatGESimulation(qSys).postProcess()
 
-# qSys.simulationCommand("GEPlusAllEC")
-# qSys.simulationCommand("AllL_i")
-#
+
+# qSys.loadDesignFiles()
+# for qubitIndex,qubit in qSys.allQubitsDict.items():
+#     ECQSimulation(qSys,qubitIndex).initialize()
+#     ECQSimulation(qSys,qubitIndex).postProcess()
+
+# Quantize(qSys).initialize()
+Quantize(qSys).postProcess()
+
 # qSys.simulationCommand(["simulation","quantize","postProcess"])
 # qSys.simulationCommand(["simulation","zzQ0-1","postProcess"])
 
