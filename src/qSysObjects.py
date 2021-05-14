@@ -7,7 +7,6 @@ from meanderFunctions import meanderNodeGen
 from node import Node
 from polylineFunctions import launchPadPolylines
 from pointToLine import pnt2line
-import simulations
 
 class JJGDS:
     def __init__(self, patchGDS, topElectrodeGDS, bottomElectrodeGDS, connectionsGDS):
@@ -30,9 +29,9 @@ class ComponentPad:
 
 
 class Qubit:
-    def __init__(self, qSys, index):
-        self.qSys = qSys
+    def __init__(self, index, componentParams):
         self.index = index
+        self.componentParams = componentParams
         self.name = "Q" + str(self.index)
 
         self.pad1 = ComponentPad(componentName=self.name, padIndex=1)
@@ -42,21 +41,42 @@ class Qubit:
         self.padList = []  # These are the actually distinct pads.
 
         self.JJGDSs = []
-        self.fingers = dict()  # Only used if the qubit pads have fingers
-        self.generalParamsDict = {"Chip": 0}  # Chip 1 unless flip chip overwrites.
-        self.geometryParamsDict = dict()
+
+        self.geometryParams = dict()
 
         self.omegaSym = symbols("omega_Q" + str(self.index))
         self.omegaEffSym = symbols("omega_effQ" + str(self.index))  # Used for quantization RWA
         self.omegaEffVal = 0
 
     @property
-    def quantizeIndex(self):
-        return simulations.Quantize(self.qSys).quantizeIndex(self.name)
+    def fingers(self):
+        fingersDict=dict()
+        fingersStrings = [i for i in self.qubitType.split("-") if "Fingers" in i]
+        for fingersString in fingersStrings:  # Allowing both pads to have fingers
+            padIndex = int([i for i in fingersString.split("_") if "Pad" in i][0][3:])
+            numFingers = int([i for i in fingersString.split("_") if "Num" in i][0][3:])
+            fingersDict[padIndex] = numFingers
+        return fingersDict
 
     @property
-    def EcVal(self):
-        return simulations.ECQSimulation(self.qSys, self.index).EC
+    def qubitType(self):
+        return self.componentParams["Type"]
+
+    @property
+    def L_i_fixed(self):
+        return self.componentParams["L_I(H)"]
+
+    @property
+    def L_i_fixed(self):
+        return self.componentParams["L_J(H)"]
+
+    @property
+    def quantizeIndex(QuantizeObj):
+        return QuantizeObj.quantizeIndex(self.name)
+
+    @property
+    def EcVal(ECQSimulationObj):
+        return ECQSimulationObj.EC
 
     def QSym(self, dim, numComponents):
         return MatrixSymbol("Q_Q" + str(self.index), dim ** numComponents, dim ** numComponents)
@@ -69,14 +89,6 @@ class Qubit:
 
     def PhisecondQuant(self, dim, numComponents):  # Returns a Qobj matrix. Already divided out hbar.
         return np.sqrt(1 * self.Z / 2) * (self.aDagger(dim, numComponents) + self.a(dim, numComponents))
-
-    @property
-    def LJ(self):
-        return self.generalParamsDict["L_J(H)"]
-
-    @property
-    def L_i_fixed(self):
-        return self.generalParamsDict["L_I(H)"]
 
     @property
     def L_i_calculated(self):
@@ -108,25 +120,29 @@ class Qubit:
 
 
 class FloatingQubit(Qubit):
-    def __init__(self, qSys, index):
-        super(FloatingQubit, self).__init__(qSys, index)
+    def __init__(self, index, componentParams):
+        super(FloatingQubit, self).__init__(index,componentParams)
         self.padList = [self.pad1, self.pad2]
 
 
 class GroundedQubit(Qubit):
-    def __init__(self, qSys, index):
-        super().__init__(qSys, index)
+    def __init__(self, index,componentParams):
+        super().__init__(index,componentParams)
         self.padList = [self.pad1]
 
 
 class ControlLine:  # Similar to node, except netlist name is a function of qubit index.
-    def __init__(self, index):
+    def __init__(self, index, componentParams):
         self.index = index
+        self.componentParams=componentParams
         self.name = "CL" + str(self.index)
-        self.generalParamsDict = dict()
-        self.geometryParamsDict = dict()
+        self.geometryParams = dict()
         self.lineNode = Node(name=self.name + "lineNode")
         self.launchPadNodeDict = dict()
+
+    @property
+    def lineType(self):
+        return self.componentParams["Type"]
 
     def pathLengthFromStartToPoint(self, point):
         leftLine = self.lineNode.polyline[0:int(len(self.lineNode.polyline) / 2)]
@@ -178,8 +194,8 @@ class ControlLine:  # Similar to node, except netlist name is a function of qubi
         startAngle = self.lineNode.polylineShapeParams["Start Angle"]
         endPoint = self.lineNode.endPoint
         endAngle = self.lineNode.endAngle
-        if (self.generalParamsDict["Type"] == "fluxBias" or self.generalParamsDict["Type"] == "feedline" or
-                self.generalParamsDict["Type"] == "drive"):
+        if (self.lineType == "fluxBias" or self.lineType == "feedline" or
+                self.lineType == "drive"):
             launchPad1, launchPadPeriphery1, launchPadMeshPeriphery1 = launchPadPolylines(
                 startPoint, startAngle,
                 self.lineNode.polylineShapeParams["CPW"], self.lineNode.polylineShapeParams["Mesh Boundary"]
@@ -191,7 +207,7 @@ class ControlLine:  # Similar to node, except netlist name is a function of qubi
             launchPad1Node.Z = self.lineNode.Z
             launchPad1Node.height = self.lineNode.height
             self.launchPadNodeDict[launchPad1Node.name] = launchPad1Node
-        if self.generalParamsDict["Type"] == "feedline":
+        if self.lineType == "feedline":
             launchPad2, launchPadPeriphery2, launchPadMeshPeriphery2 = launchPadPolylines(
                 endPoint, endAngle + np.pi,
                 self.lineNode.polylineShapeParams["CPW"],
@@ -207,9 +223,9 @@ class ControlLine:  # Similar to node, except netlist name is a function of qubi
 
 
 class CPWResonator:
-    def __init__(self, qSys, index):
-        self.qSys = qSys
+    def __init__(self, index, componentParams):
         self.index = index
+        self.componentParams = componentParams
         self.name = "R" + str(self.index)
 
         self.pad1 = ComponentPad(componentName=self.name, padIndex=1)
@@ -221,8 +237,7 @@ class CPWResonator:
         self.meanderEndPoint = []
         self.meanderEndAngle = 0
 
-        self.generalParamsDict = {"Chip": 0}  # Chip 1 unless flip chip overwrites.
-        self.geometryParamsDict = dict()
+        self.geometryParams = dict()
 
         self.omegaSym = symbols("omega_R" + str(self.index))
         self.omegaEffSym = symbols("omega_effR" + str(self.index))
@@ -230,21 +245,24 @@ class CPWResonator:
         self.omegaEffVal = 0
         self.omegaVal = 0
 
-    @property
-    def quantizeIndex(self):
-        return simulations.Quantize(self.qSys).quantizeIndex(self.name)
+    def padType(self,N):
+        return self.componentParams["Pad "+str(N)+" Type"]
 
     @property
-    def equivC(self):
-        return simulations.LumpedRSimulation(self.qSys, self.index).equivC
+    def quantizeIndex(QuantizeObj):
+        return QuantizeObj.quantizeIndex(self.name)
 
     @property
-    def equivL(self):
-        return simulations.LumpedRSimulation(self.qSys, self.index).equivL
+    def equivC(LumpedRSimulationObj):
+        return LumpedRSimulationObj.equivC
 
     @property
-    def EcVal(self):
-        return simulations.ECRSimulation(self.qSys, self.index).EC
+    def equivL(LumpedRSimulationObj):
+        return LumpedRSimulationObj.equivL
+
+    @property
+    def EcVal(ECRSimulationObj):
+        return ECRSimulationObj.EC
 
     def QSym(self, dim, numComponents):
         return MatrixSymbol("Q_R" + str(self.index), dim ** numComponents, dim ** numComponents)
@@ -263,25 +281,25 @@ class CPWResonator:
         return np.sqrt(1 * self.Z / 2) * (self.aDagger(dim, numComponents) + self.a(dim, numComponents))
 
     def updateMeanderNode(self, CPW_obj):
-        endAngles = [self.geometryParamsDict["Pad 1 Curve Angle"], self.geometryParamsDict["Pad 2 Curve Angle"]]
+        endAngles = [self.geometryParams["Pad 1 Curve Angle"], self.geometryParams["Pad 2 Curve Angle"]]
         self.meanderNode, self.meanderStartPoint, self.meanderStartAngle, self.meanderEndPoint, self.meanderEndAngle = \
             meanderNodeGen(
                 name=self.name + "Meander",
-                turnRadius=self.geometryParamsDict["Meander Turn Radius"],
-                length=(self.geometryParamsDict["Length"] -
-                        self.geometryParamsDict["Pad 1 Length"] -
-                        self.geometryParamsDict["Pad 2 Length"] - 2 *
-                        self.geometryParamsDict["Pad T Stem Length"]),
-                endSeparation=(self.geometryParamsDict["Pad Separation"]
-                               - self.geometryParamsDict["Pad 1 Length"] / 2
-                               - self.geometryParamsDict["Pad 2 Length"] / 2
-                               - 2 * self.geometryParamsDict["Pad T Stem Length"]),
-                meanderToEndMinDist=self.geometryParamsDict["Meander To Pad Minimum Distance"],
+                turnRadius=self.geometryParams["Meander Turn Radius"],
+                length=(self.geometryParams["Length"] -
+                        self.geometryParams["Pad 1 Length"] -
+                        self.geometryParams["Pad 2 Length"] - 2 *
+                        self.geometryParams["Pad T Stem Length"]),
+                endSeparation=(self.geometryParams["Pad Separation"]
+                               - self.geometryParams["Pad 1 Length"] / 2
+                               - self.geometryParams["Pad 2 Length"] / 2
+                               - 2 * self.geometryParams["Pad T Stem Length"]),
+                meanderToEndMinDist=self.geometryParams["Meander To Pad Minimum Distance"],
                 endAngles=endAngles,
-                angle=self.geometryParamsDict["Angle"],
-                centerX=self.geometryParamsDict["Center X"],
-                centerY=self.geometryParamsDict["Center Y"],
-                height=self.geometryParamsDict["Pad 1 Height"],
+                angle=self.geometryParams["Angle"],
+                centerX=self.geometryParams["Center X"],
+                centerY=self.geometryParams["Center Y"],
+                height=self.geometryParams["Pad 1 Height"],
                 Z=self.pad1.node.Z,
                 meshBoundary=self.pad1.node.polylineShapeParams["Mesh Boundary"],
                 CPWObj=CPW_obj
@@ -304,148 +322,22 @@ class CPWResonator:
 
 
 class ReadoutResonator(CPWResonator):
-    def __init__(self, qSys, index):
-        super().__init__(qSys, index)
-
-
-class ResonatorBusCoupler(CPWResonator):
-    def __init__(self, qSys, index):
-        super().__init__(qSys, index)
-
-
-class StraightBusCoupler:
-    def __init__(self, index):
-        self.index = index
-        self.quantizeIndex = None  # Assigned and used in quantizeSimulation
-        self.name = "bC" + str(self.index)
-
-        self.pad1 = ComponentPad(componentName=self.name, padIndex=1)
-        self.pad2 = ComponentPad(componentName=self.name, padIndex=2)
-        self.padListGeom = [self.pad1,
-                            self.pad2]  # Even for grounded qubits there are two pads, one is just shorted to ground.
-        self.padList = []  # These are the actually distinct pads.
-
-        self.JJGDSs = []
-        self.fingers = dict()  # Only used if the qubit pads have fingers
-        self.generalParamsDict = {"Chip": 0}  # Chip 1 unless flip chip overwrites.
-        self.geometryParamsDict = dict()
-
-        self.freq = 0  # Updated when sims results are loaded.
-        self.anharmonicity = 0  # Updated when sims results are loaded.
-        self.T1 = 0
-        self.EcVal = 0
-
-        self.omegaSym = symbols("omega_bC" + str(self.index))
-        self.omegaEffSym = symbols("omega_effbC" + str(self.index))  # Used for quantization RWA
-        self.omegaEffVal = 0
-
-    def QSym(self, dim, numComponents):
-        return MatrixSymbol("Q_bC" + str(self.index), dim ** numComponents, dim ** numComponents)
-
-    def PhiSym(self, dim, numComponents):
-        return MatrixSymbol("Phi_bC" + str(self.index), dim ** numComponents, dim ** numComponents)
-
-    def QsecondQuant(self, dim, numComponents):  # Returns a Qobj matrix. Already divided out hbar.
-        return 1j * np.sqrt(1 / (2 * self.Z)) * (self.aDagger(dim, numComponents) - self.a(dim, numComponents))
-
-    def PhisecondQuant(self, dim, numComponents):  # Returns a Qobj matrix. Already divided out hbar.
-        return np.sqrt(1 * self.Z / 2) * (self.aDagger(dim, numComponents) + self.a(dim, numComponents))
+    def __init__(self, index, componentParams):
+        super().__init__(index,componentParams)
 
     @property
-    def LJ(self):
-        return self.generalParamsDict["L_J(H)"]
+    def capacitanceToFeedline(self):
+        return self.componentParams["Capacitance to Feedline (F)"]
 
     @property
-    def L_i_fixed(self):
-        return self.generalParamsDict["L_I(H)"]
-
-    @property
-    def L_i_calculated(self):
-        return 1 / (self.omega_i ** 2 * eConst ** 2 / (2 * self.EcVal))
-
-    @property
-    def EJ(self):
-        return (Phi_0Const / (2 * np.pi)) ** 2 / self.LJ
-
-    @property
-    def omega_J(self):
-        return 1 / np.sqrt(self.LJ * eConst ** 2 / (2 * self.EcVal))
-
-    @property
-    def omega_i(self):
-        return self.omega_J - (self.EcVal / hbarConst) / (1 - self.EcVal / (hbarConst * self.omega_J))
-
-    @property
-    def Z(self):
-        return self.omega_J * self.LJ
-
-    def a(self, dim, numComponents):
-        tensorState = [qeye(dim)] * numComponents
-        tensorState[self.quantizeIndex] = destroy(N=dim)
-        return tensor(tensorState)
-
-    def aDagger(self, dim, numComponents):
-        return self.a(dim, numComponents).dag()
-
-
-class PTCClass:
-    def __init__(self, index):
-        self.index = index
-        self.quantizeIndex = None  # Assigned and used in quantizeSimulation
-        self.name = "PTC" + str(self.index)
-
-        self.pad1 = ComponentPad(componentName=self.name, padIndex=1)
-        self.pad2 = ComponentPad(componentName=self.name, padIndex=2)
-        self.padListGeom = [self.pad1,
-                            self.pad2]  # Even for grounded qubits there are two pads, one is just shorted to ground.
-        self.padList = []  # These are the actually distinct pads.
-
-        self.JJGDSs = []
-        self.fingers = dict()  # Only used if the qubit pads have fingers
-        self.generalParamsDict = {"Chip": 0}  # Chip 1 unless flip chip overwrites.
-        self.geometryParamsDict = dict()
-
-        self.freq = 0  # Updated when sims results are loaded.
-        self.anharmonicity = 0  # Updated when sims results are loaded.
-        self.T1 = 0
-        self.EcVal = 0
-
-        self.omegaSym = symbols("omega_PTC" + str(self.index))
-        self.omegaEffSym = symbols("omega_effPTC" + str(self.index))  # Used for quantization RWA
-        self.omegaEffVal = 0
-        self.meanderNode = None
-        self.meanderStartPoint = None
-        self.meanderStartAngle = None
-        self.meanderEndPoint = None
-        self.meanderEndAngle = None
-
-    def updateMeanderNode(self, CPW_obj):
-        self.meanderNode, self.meanderStartPoint, self.meanderStartAngle, self.meanderEndPoint, self.meanderEndAngle = \
-            meanderNodeGen(
-                name=self.name + "Meander",
-                turnRadius=self.geometryParamsDict["Meander Turn Radius"],
-                length=self.geometryParamsDict["Length"],
-                endSeparation=self.geometryParamsDict["End Separation"],
-                meanderToEndMinDist=self.geometryParamsDict["Meander To End Minimum Distance"],
-                endAngles=[0, 0],
-                angle=self.geometryParamsDict["Angle"],
-                centerX=self.geometryParamsDict["Center X"],
-                centerY=self.geometryParamsDict["Center Y"],
-                height=self.pad1.node.height,
-                Z=self.pad1.node.Z,
-                meshBoundary=self.pad1.node.polylineShapeParams["Mesh Boundary"],
-                CPWObj=CPW_obj
-            )
-
-    @property
-    def TD(self):
-        return self.geometryParamsDict["Length"] / self.generalParamsDict["Phase Velocity (um/s)"]
+    def feedlineCapacitanceToGround(self):
+        return self.componentParams["Feedline Pad Capacitance to Ground (F)"]
 
 
 class CPW:
     def __init__(self):
-        self.generalParamsDict = dict()  # Contains "Phase Velocity(um/s)"
-        self.geometryParamsDict = dict()  # Overwritten in loadGeometries
+        self.componentParams = dict()  # Contains "Phase Velocity(um/s)"
+        self.geometryParams = dict()  # Overwritten in loadGeometries
         self.vp = 0
 
     def TD(self, length):
@@ -458,7 +350,7 @@ class Substrate:
         self.name = "S" + str(self.index)
         self.node = Node(name=self.name)
         self.node.color = "(143 175 143)"
-        self.geometryParamsDict = dict()
+        self.geometryParams = dict()
 
 
 class Ground:

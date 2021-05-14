@@ -23,7 +23,7 @@ def meanderNodeGen(name, turnRadius, length, endSeparation, meanderToEndMinDist,
     eqn = totalLengthEq - endSeparationEq
     """totalLengthEq-endSeparationEq gives us a single equation for numLeftHumps and width.
     We want it to be as narrow as possible while satisfying numLeftHumps>=1 and 
-    meanderToPadSolved>self.geometryParamsDict["Meander To Pad Minimum Distance"].
+    meanderToPadSolved>self.geometryParams["Meander To Pad Minimum Distance"].
     So simply iterate upwards from numLeftHumps=1 until width no longer satisfies width>=4R or meanderToPad<0"""
     numLeftHumpsIter = 1
     solvedWidthIter = solve(eqn.subs(numLeftHumps, numLeftHumpsIter), width)[0]
@@ -48,10 +48,10 @@ def meanderNodeGen(name, turnRadius, length, endSeparation, meanderToEndMinDist,
     lengthToPad = meanderToPadSolved
 
     # Now draw the meander
-    peripheryWidth = CPWObj.geometryParamsDict["Width"] + 2 * CPWObj.geometryParamsDict["Gap"]
+    peripheryWidth = CPWObj.geometryParams["Width"] + 2 * CPWObj.geometryParams["Gap"]
     meshPeripheryWidth = peripheryWidth + 2 * meshBoundary
 
-    traceWidth = CPWObj.geometryParamsDict["Width"]
+    traceWidth = CPWObj.geometryParams["Width"]
 
     """Addition of 3*pi/2 is because we think of the resonators as oriented along the y-axis pre-rotation, 
     and it starts moving downward."""

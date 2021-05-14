@@ -268,9 +268,9 @@ class Node:  # A Node is any 3D element.
                 diameter=shapeParams["Diameter"] + shapeParams["Mesh Boundary"] / 2)
             )
         if self.polylineShape == "path":
-            width = shapeParams["CPW"].geometryParamsDict["Width"]
-            peripheryWidth = (shapeParams["CPW"].geometryParamsDict["Width"] + 2 *
-                              shapeParams["CPW"].geometryParamsDict["Gap"])
+            width = shapeParams["CPW"].geometryParams["Width"]
+            peripheryWidth = (shapeParams["CPW"].geometryParams["Width"] + 2 *
+                              shapeParams["CPW"].geometryParams["Gap"])
 
             polyline, endPoint, endAngle = pathPolyline(
                 width=width,

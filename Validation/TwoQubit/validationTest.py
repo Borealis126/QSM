@@ -25,18 +25,20 @@ def copyFile(sourceFile, destinationFile):
         copyCommand = "cp " + str(Path(sourceFile)) + " " + str(Path(destinationFile))
     subprocess.call(copyCommand, shell=True)
 
-QSM.generateSystemParametersFile(projectFolder)  # Run this command to generate the systemParameters file.
-copyFile(copyDir / "systemParametersFile.csv", projectFolder / "systemParametersFile.csv")
-
+# QSM.generateSystemParametersFile(projectFolder)  # Run this command to generate the systemParameters file.
+# copyFile(copyDir / "systemParametersFile.csv", projectFolder / "systemParametersFile.csv")
+#
 qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder)  # Once systemParameters is available and filled out, ALWAYS run this command first.
+# qSys.loadGeometries()
 
 # qSys.generateComponentParams()
 # copyFile(copyDir/"componentParametersFile.csv",projectFolder/"componentParametersFile.csv")
 #
 # qSys.generateGeometries()
 # copyFile(copyDir/"componentGeometriesFile.csv",projectFolder/"componentGeometriesFile.csv")
-#
-# qSys.generateGDS()
+
+
+qSys.generateGDS()
 # #
 # CapMatSimulation(qSys).initialize()
 # CapMatSimulation(qSys).run()
@@ -69,7 +71,7 @@ qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder)  # Once s
 
 
 # Quantize(qSys).initialize()
-Quantize(qSys).postProcess()
+# Quantize(qSys).postProcess()
 
 # ZZQSimulation(qSys,0,1).initialize()
 

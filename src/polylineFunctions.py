@@ -9,24 +9,24 @@ def launchPadPolylines(tipPoint, angle, CPW, meshPeriphery):  # startPoint is th
         [-100, -100],
         [-100, 100],
         [100, 100],
-        [300, CPW.geometryParamsDict["Width"] / 2],
-        [300, -CPW.geometryParamsDict["Width"] / 2],
+        [300, CPW.geometryParams["Width"] / 2],
+        [300, -CPW.geometryParams["Width"] / 2],
         [100, -100]
     ]
     peripherySeed = [
         [-260, -260],
         [-260, 260],
         [100, 260],
-        [300, CPW.geometryParamsDict["Width"] / 2 + CPW.geometryParamsDict["Gap"]],
-        [300, -CPW.geometryParamsDict["Width"] / 2 - CPW.geometryParamsDict["Gap"]],
+        [300, CPW.geometryParams["Width"] / 2 + CPW.geometryParams["Gap"]],
+        [300, -CPW.geometryParams["Width"] / 2 - CPW.geometryParams["Gap"]],
         [100, -260]
     ]
     meshPeripherySeed = [
         [-260 - meshPeriphery, -260 - meshPeriphery],
         [-260 - meshPeriphery, 260 + meshPeriphery],
         [100 + meshPeriphery, 260 + meshPeriphery],
-        [300 + meshPeriphery, CPW.geometryParamsDict["Width"] / 2 + CPW.geometryParamsDict["Gap"] + meshPeriphery],
-        [300 + meshPeriphery, -CPW.geometryParamsDict["Width"] / 2 - CPW.geometryParamsDict["Gap"] - meshPeriphery],
+        [300 + meshPeriphery, CPW.geometryParams["Width"] / 2 + CPW.geometryParams["Gap"] + meshPeriphery],
+        [300 + meshPeriphery, -CPW.geometryParams["Width"] / 2 - CPW.geometryParams["Gap"] - meshPeriphery],
         [100 + meshPeriphery, -260 - meshPeriphery]
     ]
 
