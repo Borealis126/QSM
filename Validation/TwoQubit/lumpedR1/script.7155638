@@ -43,5 +43,5 @@ echo nodelist found this many CPUs:$ncpus
 # add -mpitest for network connect test and will NOT run .jou file
 
 ml apps/ansys/v211ansysEM
-ansysedt -UseElectronicsPPE -features=beta -ng -runscriptandexit /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR1/YRestR1_ansysRunSimulator.py /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR1/YRestR1.aedt 
+ansysedt -UseElectronicsPPE -features=beta -ng -runscriptandexit /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Validation/TwoQubit/lumpedR1/YRestR1_ansysRunSimulator.py /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Validation/TwoQubit/lumpedR1/YRestR1.aedt 
 

@@ -1,6 +1,7 @@
 import simulations
 import qSysObjects
 from ansysFunctions import aedtEdit
+from copy import deepcopy
 
 
 class CircuitSim:  # Y11R, YRest are CircuitSims.
@@ -16,30 +17,29 @@ class CircuitSim:  # Y11R, YRest are CircuitSims.
         self.aedtFolderPath = simDirectory / (circuitSimName + ".aedtresults")
 
     # Takes as argument a netlistName function of one of its children.
-    def generateNetlistComponents(self, netlistName):
+    @property
+    def generalNetlistComponents(self):
         netlistComponents = {
             "Capacitances": dict(),
             "Inductors": dict(),
             "Resistors": dict(),
             "Transmission Lines": dict(),
-            "PTCs": dict(),
             "Feedline Sections": dict()
         }
         # Everything that doesn't involve the feedline.
         ansysCapMatHeaders = simulations.CapMatSimulation(self.qSys).ansysCapMatHeaders
         capMat = simulations.CapMatSimulation(self.qSys).capMat
         for index1, node1Name in enumerate(ansysCapMatHeaders):  # Iterate through the capacitance matrix
-            for index2, node2Name in enumerate(ansysCapMatHeaders):  # So it's like (0,0),(0,1),(0,2),(1,1),(1,2),(2,2).
+            for node2Name in ansysCapMatHeaders[index1:]:  # So it's like (0,0),(0,1),(0,2),(1,1),(1,2),(2,2).
                 if "CL0" not in node1Name and "CL0" not in node2Name:
-                    node1NetlistName = netlistName(node1Name)
-                    if index1 == index2:  # Capacitance to ground
+                    node1NetlistName = self.netlistName(node1Name)
+                    if node1Name == node2Name:  # Capacitance to ground
                         capVal = sum(capMat[index1])
                         node2Name = "G"
-                        node2NetlistName = netlistName(node2Name)
+                        node2NetlistName = self.netlistName(node2Name)
                     else:
-                        capVal = -capMat[index1][index2]
-                        node2Name = ansysCapMatHeaders[index2]
-                        node2NetlistName = netlistName(node2Name)
+                        capVal = -capMat[index1][ansysCapMatHeaders.index(node2Name)]
+                        node2NetlistName = self.netlistName(node2Name)
                     capacitanceName = "C" + node1Name + "_" + node2Name
                     netlistComponents["Capacitances"][capacitanceName] = {
                         "node1NetlistName": node1NetlistName,
@@ -50,15 +50,15 @@ class CircuitSim:  # Y11R, YRest are CircuitSims.
         for readoutResonatorIndex, readoutResonator in self.qSys.allReadoutResonatorsDict.items():
             capVal = 0
             node1Name = readoutResonator.pad1.node.name
-            node1NetlistName = netlistName(node1Name)
+            node1NetlistName = self.netlistName(node1Name)
             node2Name = "F" + str(readoutResonatorIndex)
-            node2NetlistName = netlistName(node2Name)
+            node2NetlistName = self.netlistName(node2Name)
             if self.qSys.sysParams["Simulate Feedline?"] == "Yes":
                 index1 = ansysCapMatHeaders.index(node1Name)
                 index2 = ansysCapMatHeaders.index(self.qSys.allControlLinesDict[0].lineNode.name)
                 capVal = -capMat[index1][index2]
             elif self.qSys.sysParams["Simulate Feedline?"] == "No":
-                capVal = readoutResonator.generalParamsDict["Capacitance to Feedline (F)"]
+                capVal = readoutResonator.componentParams["Capacitance to Feedline (F)"]
             capacitanceName = "C" + node1Name + "_" + node2Name
             netlistComponents["Capacitances"][capacitanceName] = {
                 "node1NetlistName": node1NetlistName,
@@ -68,12 +68,12 @@ class CircuitSim:  # Y11R, YRest are CircuitSims.
         # Qubit inductances
         for qubitIndex, qubit in self.qSys.allQubitsDict.items():
             node1Name = qubit.pad1.node.name
-            node1NetlistName = netlistName(node1Name)
+            node1NetlistName = self.netlistName(node1Name)
             node2Name = qubit.pad2.node.name
-            node2NetlistName = netlistName(node2Name)
+            node2NetlistName = self.netlistName(node2Name)
             if isinstance(qubit, qSysObjects.GroundedQubit):
                 node2Name = "G"
-                node2NetlistName = netlistName(node2Name)
+                node2NetlistName = self.netlistName(node2Name)
 
             inductorName = "L" + node1Name + "_" + node2Name
 
@@ -85,33 +85,14 @@ class CircuitSim:  # Y11R, YRest are CircuitSims.
         # Readout Resonators
         for readoutResonatorIndex, readoutResonator in self.qSys.allReadoutResonatorsDict.items():
             node1Name = readoutResonator.pad1.node.name
-            node1NetlistName = netlistName(node1Name)
+            node1NetlistName = self.netlistName(node1Name)
             node2Name = readoutResonator.pad2.node.name
-            node2NetlistName = netlistName(node2Name)
+            node2NetlistName = self.netlistName(node2Name)
             resonatorName = "T" + node1Name + "_" + node2Name
             netlistComponents["Transmission Lines"][resonatorName] = {
                 "node1NetlistName": node1NetlistName,
                 "node2NetlistName": node2NetlistName,
-                "TD": self.qSys.CPW.TD(readoutResonator.geometryParamsDict["Length"])
-            }
-        # PTCs
-        for PTCIndex, PTC in self.qSys.allPTCsDict.items():
-            node1Name = PTC.pad1.node.name
-            node1NetlistName = netlistName(node1Name)
-            node2Name = PTC.pad2.node.name
-            node2NetlistName = netlistName(node2Name)
-            inductorName = "L" + node1Name + "_" + node2Name
-
-            netlistComponents["Transmission Lines"]["T" + node1Name + "_G"] = {
-                "node1NetlistName": node1NetlistName,
-                "node2NetlistName": "G",
-                "TD": PTC.TD
-            }
-
-            netlistComponents["Inductors"][inductorName] = {
-                "node1NetlistName": node1NetlistName,
-                "node2NetlistName": node2NetlistName,
-                "L": PTC.generalParamsDict["SQUID Inductance(H)"]
+                "TD": self.qSys.CPW.TD(readoutResonator.geometryParams["Length"])
             }
         # Feedline--------------------------------------------------------------------------------------------------------------------
         """There are always N+1 feedline sections corresponding to segments between the nodes FL,F1,F2,...FN,FR"""
@@ -122,9 +103,9 @@ class CircuitSim:  # Y11R, YRest are CircuitSims.
         """-1 since there are one fewer segments than nodes. Should be number of qubits+1"""
         for index, node1Name in enumerate(feedlineNodes[:-1]):
             node1Name = feedlineNodes[index]
-            node1NetlistName = netlistName(node1Name)
+            node1NetlistName = self.netlistName(node1Name)
             node2Name = feedlineNodes[index + 1]
-            node2NetlistName = netlistName(node2Name)
+            node2NetlistName = self.netlistName(node2Name)
             feedlineSectionName = "T" + node1Name + "_" + node2Name
             feedline = self.qSys.chipDict[0].controlLineDict[0]
             firstResonator = self.qSys.allReadoutResonatorsDict[0]
@@ -149,6 +130,9 @@ class CircuitSim:  # Y11R, YRest are CircuitSims.
             }
         return netlistComponents
 
+    @property
+    def netlistComponentsLines(self):
+        return netlistCircuitLines(self.netlistComponents)
 
 
 class Y11RSimulation(CircuitSim):
@@ -158,7 +142,7 @@ class Y11RSimulation(CircuitSim):
 
     @property
     def netlistComponents(self):
-        netlistComponents = super(Y11RSimulation, self).generateNetlistComponents(self.netlistName)
+        netlistComponents = deepcopy(self.generalNetlistComponents)
 
         # Add matching resistors to feedline if there are no ports on either end
         netlistComponents["Resistors"]["RFL"] = {
@@ -193,10 +177,6 @@ class Y11RSimulation(CircuitSim):
                             + " " + str(portIndex) + " RPort" + str(portIndex) + "\n")]
         return portsLines
 
-    @property
-    def reportLines(self):
-        return YReportLines(self.resultsFilePath)
-
     def netlistSimulationLines(self, simParams):  # Contains simulation-specific info
         return [
             ".LNA\n",
@@ -205,6 +185,11 @@ class Y11RSimulation(CircuitSim):
             "+ FLAG=\'LNA\'\n"
         ]
 
+    @property
+    def reportLines(self):
+        return YReportLines(self.resultsFilePath)
+
+
 class YRestRSimulation(CircuitSim):
     def __init__(self, circuitSimName, simDirectory, qSys, index):
         super(YRestRSimulation, self).__init__(circuitSimName, simDirectory, qSys)
@@ -212,7 +197,7 @@ class YRestRSimulation(CircuitSim):
 
     @property
     def netlistComponents(self):
-        netlistComponents = super(YRestRSimulation, self).generateNetlistComponents(self.netlistName)
+        netlistComponents = deepcopy(self.generalNetlistComponents)
 
         # Add matching resistors to feedline if there are no ports on either end
         netlistComponents["Resistors"]["RFL"] = {
@@ -228,20 +213,17 @@ class YRestRSimulation(CircuitSim):
 
         readoutResonator = self.qSys.allReadoutResonatorsDict[self.index]
         node1Name = readoutResonator.pad1.node.name
-        node1NetlistName = self.netlistName(node1Name)
         node2Name = readoutResonator.pad2.node.name
-        node2NetlistName = self.netlistName(node2Name)
         resonatorName = "T" + node1Name + "_" + node2Name
         netlistComponents["Transmission Lines"].pop(resonatorName)  # Remove the resonator as per Junling's procedure.
         netlistComponents["Capacitances"]["CR" + str(self.index) + "Pad1_G"]["C"] = 0
         netlistComponents["Capacitances"]["CR" + str(self.index) + "Pad2_G"]["C"] = 0
-        netlistComponents["Capacitances"]["CR" + str(self.index) + "Pad1_F" + str(self.index)][
-            "C"] = 0  # Remove capacitance to feedline.
+        netlistComponents["Capacitances"]["CR" + str(self.index) + "Pad1_F" + str(self.index)]["C"] = 0
 
         netlistComponents["Resistors"][
             "RR" + str(self.index) + "Pad1_R" + str(self.index) + "Pad2"] = {
-            "node1NetlistName": self.netlistName(readoutResonator.pad1.node.name),
-            "node2NetlistName": self.netlistName(readoutResonator.pad2.node.name),
+            "node1NetlistName": self.netlistName(node1Name),
+            "node2NetlistName": self.netlistName(node2Name),
             "R": 0
         }  # Short the two resonator fingers
 
@@ -267,10 +249,6 @@ class YRestRSimulation(CircuitSim):
                             + " " + str(portIndex) + " RPort" + str(portIndex) + "\n")]
         return portsLines
 
-    @property
-    def reportLines(self):
-        return YReportLines(self.resultsFilePath)
-
     def netlistSimulationLines(self, simParams):  # Contains simulation-specific info
         return [
             ".LNA\n",
@@ -279,13 +257,11 @@ class YRestRSimulation(CircuitSim):
             "+ FLAG=\'LNA\'\n"
         ]
 
-def S21_params(simName):
-    return [
-        ["Type", simName],
-        ["LNA_start (GHz)", "4"],
-        ["LNA_stop (GHz)", "7"],
-        ["LNA_counts", "200"]
-    ]
+    @property
+    def reportLines(self):
+        return YReportLines(self.resultsFilePath)
+
+S21_params = {"LNA_start (GHz)": 4, "LNA_stop (GHz)": 7, "LNA_counts": 200}
 
 
 netlistHeaderLines = [
@@ -315,8 +291,6 @@ def netlistCircuitLines(netlistComponents):
                      + transmissionLine["node2NetlistName"] + " 0 "
                      + "Z0=50 TD=" + str(transmissionLine["TD"]) + "\n")
     return lines
-
-
 
 
 def loadNetlistFile(ansysFile, netlistFile):

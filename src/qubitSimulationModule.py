@@ -3,14 +3,13 @@ import numpy as np
 import os
 import gdspy
 from ChipElements import OtherComponents
-from ansysFunctions import *
 from basicGeometryFunctions import pointInPolyline, rotate, translate
 from node import Node
 from polylineFunctions import rectanglePolyline, multiplyPolyline
 from qSysObjects import *
 from constants import *
-from simulations import *
 import json
+from csvFunctions import jsonRead, jsonWrite
 
 
 def generateSystemParametersFile(folder):
@@ -21,7 +20,7 @@ def generateSystemParametersFile(folder):
                      "Simulate Feedline?": "No",
                      "Add Mesh to GDS?": "No", "Invert GDS?": "No",
                      "Anti-Vortex Mesh Boundary": 40, "Anti-Vortex Mesh Spacing": 50, "Anti-Vortex Mesh Size": 5}
-    jsonWrite(folder / "systemParametersFile.json",sysParamsDict)
+    jsonWrite(folder / "systemParametersFile.json", sysParamsDict)
 
 
 def initialize(projectFolder, computeLocation, QSMSourceFolder):
@@ -31,24 +30,12 @@ def initialize(projectFolder, computeLocation, QSMSourceFolder):
 
 def loadSystemParametersFile(projectFolder, computeLocation, QSMSourceFolder):
     """Returns qubitSystem object based on data in systemParametersFile"""
-    sysParams = dict()
     with open(projectFolder / "systemParametersFile.json", "r") as read_file:
         sysParams = json.load(read_file)
     sysParams["Project Folder"] = projectFolder
     sysParams["Compute Location"] = computeLocation
     sysParams["QSM Source Folder"] = QSMSourceFolder
     return QubitSystem(sysParams)
-
-
-def jsonRead(file):
-    with open(file, "r") as read_file:
-        readDict = json.load(read_file)
-    return readDict
-
-
-def jsonWrite(file, writeDict):
-    with open(file, "w") as write_file:
-        json.dump(writeDict, write_file, indent=1)
 
 
 class QubitSystem:
@@ -77,7 +64,6 @@ class QubitSystem:
         readoutResonatorParams = ["Pad 1 Type", "Pad 2 Type"]
 
         controlLineParams = ["Type"]
-        bumpsParams = []
         if self.sysParams["Flip Chip?"] == "Yes":
             for paramsList in [qubitParams, readoutResonatorParams, controlLineParams]:
                 paramsList.append("Chip")
@@ -99,7 +85,7 @@ class QubitSystem:
             for controlLineIndex in range(self.sysParams["Number of Control Lines"]):
                 componentsDict["Control Lines"][controlLineIndex] = {param: None for param in controlLineParams}
 
-        jsonWrite(self.componentParametersFile,componentsDict)
+        jsonWrite(self.componentParametersFile, componentsDict)
 
     def loadComponentParams(self):
         componentsDict = jsonRead(self.componentParametersFile)
@@ -107,20 +93,22 @@ class QubitSystem:
         # Qubits
         if self.sysParams["Number of Qubits"] != 0:
             paramsDict = componentsDict["Qubits"]
-            for qubitIndex, params in paramsDict.items():
+            for qubitIndexStr, params in paramsDict.items():
                 qubit = None
+                qubitIndex=int(qubitIndexStr)
                 if "Floating" in params["Type"]:
                     qubit = FloatingQubit(qubitIndex, params)
                 elif "Grounded" in params["Type"]:
                     qubit = GroundedQubit(qubitIndex, params)
                 chipIndex = 0
                 if self.sysParams["Flip Chip?"] == "Yes":
-                    chipIndex = qubitDict["Chip"]
+                    chipIndex = params["Chip"]
                 self.chipDict[chipIndex].qubitDict[qubitIndex] = qubit
         # Readout Resonators
         if self.sysParams["Number of Readout Resonators"] != 0:
             paramsDict = componentsDict["Readout Resonators"]
-            for index, params in paramsDict.items():
+            for indexStr, params in paramsDict.items():
+                index = int(indexStr)
                 readoutResonator = ReadoutResonator(index, params)
                 chipIndex = 0
                 if self.sysParams["Flip Chip?"] == "Yes":
@@ -129,7 +117,8 @@ class QubitSystem:
         # Control Lines
         if self.sysParams["Number of Control Lines"] != 0:
             controlLinesDict = componentsDict["Control Lines"]
-            for index, params in controlLinesDict.items():
+            for indexStr, params in controlLinesDict.items():
+                index=int(indexStr)
                 controlLine = ControlLine(index, params)
                 controlLineChipIndex = 0
                 if self.sysParams["Flip Chip?"] == "Yes":
@@ -139,32 +128,13 @@ class QubitSystem:
         self.CPW.componentParams = componentsDict["CPW"]
         # Load bumps info
         if self.sysParams["Flip Chip?"] == "Yes":
-            self.bumpsDict = compoenntsDict["Bumps"]
-
-        # Components ordering
-        nonGECapMatIndex = 0
-        self.preGECapMatHeaders = []
-        self.postGEComponentList = []
-        for qubitIndex, qubit in self.allQubitsDict.items():
-            qubit.pad1.quantCapMatIndex = nonGECapMatIndex
-            self.preGECapMatHeaders.append(qubit.pad1.name)
-            nonGECapMatIndex += 1
-            if isinstance(qubit, FloatingQubit):
-                qubit.pad2.quantCapMatIndex = nonGECapMatIndex
-                nonGECapMatIndex += 1
-                self.preGECapMatHeaders.append(qubit.pad2.name)
-            self.postGEComponentList.append(qubit)
-        for readoutResonatorIndex, readoutResonator in self.allReadoutResonatorsDict.items():
-            readoutResonator.pad2.quantCapMatIndex = nonGECapMatIndex  # Only pad2 is included in quantization
-            self.preGECapMatHeaders.append(readoutResonator.pad2.node.name)
-            self.postGEComponentList.append(readoutResonator)
-            nonGECapMatIndex += 1
+            self.bumpsDict = componentsDict["Bumps"]
 
     def generateGeometries(self):
         geometriesDict = {}
         self.loadComponentParams()
         """For flip chip the polylines for the nodes, substrate, etc. are relative to looking top-down on the assembly,
-        which is centered on the origin. The chip furthest from the viewer is chip 1."""
+        which is centered on the origin. The chip furthest from the viewer is chip 0."""
         # Qubits
         geometriesDict["Qubits"] = dict()
         for qubitIndex, qubit in self.allQubitsDict.items():
@@ -224,12 +194,12 @@ class QubitSystem:
             params = ["Start X", "Start Y", "Start Angle", "Section Code"]
             if controlLine.lineType == "fluxBias":
                 params += ["loop" + i for i in ["Thickness", "Seg1Length", "Seg2Length", "Seg3Length", "Seg1Boundary",
-                                                "Seg2Boundary","Seg3Boundary"]]
+                                                "Seg2Boundary", "Seg3Boundary"]]
             if controlLine.componentParams["Type"] == "drive":
                 params += ["End Gap"]
             geometriesDict["Control Lines"][controlLineIndex] = {param: None for param in params}
         # CPW.
-        geometriesDict["CPW"]={"Width": 10, "Gap": 6, "Trench": 0.1, "Height": 0.1}
+        geometriesDict["CPW"] = {"Width": 10, "Gap": 6, "Trench": 0.1, "Height": 0.1}
 
         # Prompt for the ground/substrate
         geometriesDict["Ground(s)"] = dict()
@@ -237,17 +207,17 @@ class QubitSystem:
         for chipIndex, chip in self.chipDict.items():
             groundParams = {"Height": 0.1}
             geometriesDict["Ground(s)"][chipIndex] = groundParams
-            substrateParams=params = {"Material": "silicon", "Thickness": 500, "Width": 9500, "Length": 7500}
+            substrateParams = {"Material": "silicon", "Thickness": 500, "Width": 9500, "Length": 7500}
             geometriesDict["Substrate(s)"][chipIndex] = substrateParams
 
         # NIST logo
         geometriesDict["NIST Logo"] = {"Center X": 2000, "Center Y": -3000}
         # Chip description
-        geometriesDict["Chip Description"]={"Start X":1500, "Start Y": -2500}
+        geometriesDict["Chip Description"] = {"Start X": 1500, "Start Y": -2500}
 
         # If flip chip, prompt for chip spacing
         if self.sysParams["Flip Chip?"] == "Yes":
-            geometriesDict["Flip Chip"]={"Chip Spacing": 1000}
+            geometriesDict["Flip Chip"] = {"Chip Spacing": 1000}
 
         jsonWrite(self.componentGeometriesFile, geometriesDict)
 
@@ -837,14 +807,10 @@ class QubitSystem:
         # Add bumps if flip chip
         if self.sysParams["Flip Chip?"] == "Yes":
             for bump in self.bumpsDict["Bumps"]:
-                Main.add(gdspy.Polygon(multiplyPolyline(bump.underBumpBottomNode.polyline, unitChange),
-                                       layer=3))  # Bottom chip underbump
-                Main.add(gdspy.Polygon(multiplyPolyline(bump.bumpMetalBottomNode.polyline, unitChange),
-                                       layer=4))  # Bottom chip bump metal
-                Main.add(gdspy.Polygon(multiplyPolyline(bump.bumpMetalTopNode.polyline, unitChange),
-                                       layer=5))  # Top chip bump metal
-                Main.add(gdspy.Polygon(multiplyPolyline(bump.underBumpTopNode.polyline, unitChange),
-                                       layer=6))  # Top chip underbump
+                Main.add(gdspy.Polygon(multiplyPolyline(bump.underBumpBottomNode.polyline, unitChange), layer=3))
+                Main.add(gdspy.Polygon(multiplyPolyline(bump.bumpMetalBottomNode.polyline, unitChange), layer=4))
+                Main.add(gdspy.Polygon(multiplyPolyline(bump.bumpMetalTopNode.polyline, unitChange), layer=5))
+                Main.add(gdspy.Polygon(multiplyPolyline(bump.underBumpTopNode.polyline, unitChange), layer=6))
 
         gdspy.write_gds(self.gdspyFile, unit=1.0e-6, precision=1.0e-11)
 
@@ -950,7 +916,6 @@ class QubitSystem:
                 allReadoutResonators[readoutResonatorIndex] = readoutResonator
         return allReadoutResonators
 
-
     @property
     def allControlLinesDict(self):
         allControlLines = dict()
@@ -971,18 +936,7 @@ class QubitSystem:
                 allNodes.append(launchPad)
         return allNodes
 
-    def getChipNNodes_CapMat(self, N):
-        allNodes = []
-        for qubitIndex, qubit in self.chipDict[N].qubitDict.items():
-            allNodes += [pad.node for pad in qubit.padListGeom]
-        for readoutResonatorIndex, readoutResonator in self.chipDict[N].readoutResonatorDict.items():
-            allNodes += [readoutResonator.pad1.node, readoutResonator.pad2.node]
-        for controlLineIndex, controlLine in self.chipDict[N].controlLineDict.items():
-            if controlLine.componentParams["Type"] == "feedline" and self.sysParams["Simulate Feedline?"] == "Yes":
-                allNodes.append(controlLine.lineNode)
-                for launchPadName, launchPad in controlLine.launchPadNodeDict.items():
-                    allNodes.append(launchPad)
-        return allNodes
+
 
     def deleteFile(self, fileName):
         if self.sysParams["Compute Location"] == "Windows":
@@ -1002,3 +956,14 @@ class QubitSystem:
             return self.allQubitsDict[int(componentName[1:])]
         elif componentName[0] == "R":
             return self.allReadoutResonatorsDict[int(componentName[1:])]
+
+
+def readJJLocation(JJLocationCode):
+    """JJLocationCode is in the form [10:-20] corresponding to a shift 10um to the right and 20um down."""
+    JJLoc = [float(i) for i in JJLocationCode[1:-1].split(":")]
+    return JJLoc[0], JJLoc[1]
+
+
+def updateqSys(qSys, simulationList):
+    for simulation in simulationList:
+        simulation(qSys).updateqSys()

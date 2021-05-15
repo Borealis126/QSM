@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import time
-from csvFunctions import *
+from csvFunctions import jsonRead, jsonWrite, csvRead, arrayNoBlanks, readY11Data
 from ansysFunctions import *
 import subprocess
 from q3dSimulations import Q3DExtractor
@@ -12,9 +12,8 @@ from analysisFunctions import *
 from quantumStateFunctions import stateFromHeader, baseRepresentation, H_Header
 from scipy.misc import derivative
 from sympy import zeros, Matrix, zeros, sin
-import qSysObjects
+from qSysObjects import GroundedQubit, FloatingQubit, ReadoutResonator
 from qutip import state_number_index, qzero, ket, bra
-
 
 class Simulation:
     def __init__(self, qSys, simName):
@@ -27,18 +26,12 @@ class Simulation:
 
         self.directoryPath = self.qSys.sysParams["Project Folder"] / self.simName
 
-        self.paramsPath = self.directoryPath / "SimulationParameters.csv"
-        self.resultsFilePath = self.directoryPath / "Results.csv"
-
-        self.simParamsLines = []
+        self.paramsPath = self.directoryPath / "SimulationParameters.json"
+        self.resultsFilePath = self.directoryPath / "Results.json"
 
     @property
-    def simParamsDict(self):
-        simParamsFileLines = csvRead(self.paramsPath)
-        simParams = dict()
-        for line in simParamsFileLines:
-            simParams[line[0]] = returnCorrectType(line[1])
-        return simParams
+    def simParams(self):
+        return jsonRead(self.paramsPath)
 
     def runAnsysSimulator(self, aedtFile, simulatorFile, maxRunTime):
         simulateCommand = ""
@@ -52,7 +45,7 @@ class Simulation:
                                + str(self.directoryPath) + " " + str(maxRunTime))
         subprocess.call(simulateCommand, shell=True)
 
-    def initialize(self):
+    def createDirectory(self):
         # Create the directory if it doesn't yet exist.
         if self.qSys.sysParams["Compute Location"] == "Windows":
             bashCommand = "if not exist " + str(self.directoryPath) + " mkdir " + str(
@@ -62,9 +55,12 @@ class Simulation:
             subprocess.call("rm -rf " + str(self.directoryPath), shell=True)
             bashCommand = "mkdir -p " + str(self.directoryPath)
             subprocess.call(bashCommand, shell=True)
-        csvWrite(self.paramsPath, self.simParamsLines)
 
-    def run(self):  # Specifically reserved for Ansys simulations.
+    def generateParams(self, simParamsDict):
+        self.createDirectory()
+        jsonWrite(self.paramsPath, simParamsDict)
+
+    def runAllSims(self):  # Specifically reserved for Ansys simulations.
         # Delete previous run files
         if self.qSys.sysParams["Compute Location"] == "Cluster":
             subprocess.call("rm -f " + str(self.directoryPath / "/*slurm*"), shell=True)
@@ -84,14 +80,13 @@ class Simulation:
             """"Initialize all circuit simulations for the given simulation."""
             self.copyAnsysFile(circuitSim.aedtPath)
             # Generate the netlist file and load it into the AEDT
-            netlistComponents = circuitSim.netlistComponents
             writeFile = open(circuitSim.netlistPath, "w")
             writeFile.writelines(netlistHeaderLines)
             writeFile.write("\n")
-            writeFile.writelines(netlistCircuitLines(netlistComponents))
+            writeFile.writelines(circuitSim.netlistComponentsLines)
             writeFile.writelines(circuitSim.netlistPortsLines)
             writeFile.write("\n")
-            writeFile.writelines(circuitSim.netlistSimulationLines(self.simParamsDict))
+            writeFile.writelines(circuitSim.netlistSimulationLines(self.simParams))
             writeFile.write("\n")
             writeFile.write(".end")
             writeFile.close()
@@ -112,7 +107,7 @@ class Simulation:
             simulatorFileInstance.close()
             self.runAnsysSimulator(circuitSim.aedtPath, circuitSim.ansysRunSimulatorPath, 3)  # CircuitSims are fast.
 
-    def postProcess(self):
+    def deleteUnneededFiles(self):
         # Check if all simulations have completed. Delete Ansys folders.
         if self.qSys.sysParams["Compute Location"] == "Cluster":
             proceed = False
@@ -154,35 +149,26 @@ class Simulation:
         subprocess.call(copyAEDTTemplateCommand, shell=True)
 
     @property
-    def resultsFileLines(self):
-        return csvRead(self.resultsFilePath)
-
-    @property
     def resultsDict(self):
-        returnDict = {}
-        for line in self.resultsFileLines:
-            returnDict[line[0]] = returnCorrectType(line[1])
-        return returnDict
+        return jsonRead(self.resultsFilePath)
 
 
 class CapMatSimulation(Simulation):
     def __init__(self, qSys):
         super().__init__(qSys, "capMat")
         q3dSimName = "capMatExtractor"
-        self.q3dSims = {q3dSimName: Q3DExtractor(q3dSimName, self.directoryPath, qSys)}
-
+        self.q3dSims = {q3dSimName: Q3DExtractor(q3dSimName, self.directoryPath)}
     def initialize(self):
-        self.simParamsLines = [["PerRefine", "100"], ["MaxPass", "99"]]
-        super(CapMatSimulation, self).initialize()
+        simParamsDict = {"PerRefine": "100", "MaxPass": "99"}
+        self.generateParams(simParamsDict)
 
     def run(self):
-
-        self.q3dSims["capMatExtractor"].updateLines(self.simParamsDict)
-
-        super(CapMatSimulation, self).run()
+        self.q3dSims["capMatExtractor"].updateLines(self.simParams, self.capMatLayout_Lines())
+        self.runAllSims()
 
     def postProcess(self):
-        super(CapMatSimulation, self).postProcess()
+        # Converts Ansys output data to JSON
+        self.deleteUnneededFiles()
         capMatResultsFileLines = csvRead(self.q3dSims["capMatExtractor"].resultsFilePath)
         capMatHeaderLineIndex = 0
         for index, line in enumerate(capMatResultsFileLines):
@@ -200,15 +186,117 @@ class CapMatSimulation(Simulation):
                 capacitanceValue = float(capMatResultsFileLines[matRow][matCol]) * unitsMultiplier
                 capMat[index1, index2] = capacitanceValue
 
-        lines = [["Capacitance (F)"], [""] + ansysCapMatHeaders]
-        for rowIndex in range(numNodes):
-            lines.append([ansysCapMatHeaders[rowIndex]] + list(capMat[rowIndex, :]))
-        lines.append([""])
-        lines.append(["Capacitance To Ground (F)"])
-        for rowIndex in range(numNodes):
-            lines.append([ansysCapMatHeaders[rowIndex]] + [str(sum(capMat[rowIndex, :]))])
+        resultsDict = {"Header": ansysCapMatHeaders, "capMat (F)": capMat.tolist()}
+        jsonWrite(self.resultsFilePath, resultsDict)
 
-        csvWrite(self.resultsFilePath, lines)
+    def getChipNNodes_CapMat(self, N):
+        allNodes = []
+        for qubitIndex, qubit in self.qSys.chipDict[N].qubitDict.items():
+            allNodes += [pad.node for pad in qubit.padListGeom]
+        for readoutResonatorIndex, readoutResonator in self.qSys.chipDict[N].readoutResonatorDict.items():
+            allNodes += [readoutResonator.pad1.node, readoutResonator.pad2.node]
+        for controlLineIndex, controlLine in self.qSys.chipDict[N].controlLineDict.items():
+            if controlLine.lineType == "feedline" and self.qSys.sysParams["Simulate Feedline?"] == "Yes":
+                allNodes.append(controlLine.lineNode)
+                for launchPadName, launchPad in controlLine.launchPadNodeDict.items():
+                    allNodes.append(launchPad)
+        return allNodes
+
+    def capMatLayout_Lines(self):
+        lines = ["oEditor = oDesign.SetActiveEditor(\"3D Modeler\")\n",
+                 "oModuleBoundary = oDesign.GetModule(\"BoundarySetup\")\n"]
+        for chipIndex, chip in self.qSys.chipDict.items():
+            # Draw substrate
+            lines += ansysPolyline_Lines(
+                name=chip.substrate.name,
+                color=chip.substrate.node.color,
+                material=chip.substrate.node.material,
+                polyline3D=[[point[0], point[1], chip.substrate.node.Z]
+                            for point in chip.substrate.node.polyline]
+            )
+            lines += ansysSweepAlongVector_Lines(chip.substrate.node)
+            # Draw ground(s)
+            lines += ansysPolyline_Lines(
+                name=chip.ground.outlineNode.name,
+                color=chip.ground.outlineNode.color,
+                material=chip.ground.outlineNode.material,
+                polyline3D=[[point[0], point[1], chip.ground.outlineNode.Z]
+                            for point in chip.ground.outlineNode.polyline]
+            )
+            # Draw qubits,resonators,controlLines,launchpads
+
+            for thisNode in self.getChipNNodes_CapMat(chip.index):
+                lines += ansysPolyline_Lines(
+                    name=thisNode.name,
+                    color=thisNode.color,
+                    material=thisNode.material,
+                    polyline3D=[[point[0], point[1], thisNode.Z] for point in
+                                thisNode.polyline]
+                )
+                lines += ansysQ3DMake3D(self.qSys.sysParams["Simulation"], thisNode)
+                # Trench round 1
+                addTrenchNodeLines, subtractTrenchPeripheryLines, makeTrenchComponent3DLines = ansysTrench(
+                    componentNode=thisNode, trench=self.qSys.CPW.geometryParams["Trench"], chip=chip)
+                lines += addTrenchNodeLines + subtractTrenchPeripheryLines  # Trench
+
+                lines += ansysSignalLine_Lines(thisNode)
+                """Subtract the periphery from the ground. 
+                Still subtract the launchpad peripheries so the control lines aren't shorted to ground."""
+                for index, peripheryPolyline in enumerate(thisNode.peripheryPolylines):
+                    peripheryName = thisNode.name + "periphery" + str(index)
+                    lines += ansysPolyline_Lines(
+                        name=peripheryName,
+                        color=thisNode.color,
+                        material=thisNode.material,
+                        polyline3D=[[point[0], point[1], thisNode.Z]
+                                    for point in peripheryPolyline]
+                    )  # First make the boundary
+                    """Then subtract it from ground"""
+                    lines += ansysSubtract_Lines(chip.ground.outlineNode.name, peripheryName)
+            for thisNode in self.getChipNNodes_CapMat(chip.index):  # Trench round 2.
+                addTrenchNodeLines, subtractTrenchPeripheryLines, makeTrenchComponent3DLines = ansysTrench(
+                    componentNode=thisNode, trench=self.qSys.CPW.geometryParams["Trench"], chip=chip)
+                lines += makeTrenchComponent3DLines
+            # For grounded qubits unite pad 2 with ground.
+            for qubitIndex, qubit in self.qSys.allQubitsDict.items():
+                if isinstance(qubit, qSysObjects.GroundedQubit):
+                    lines += ansysUniteNodes([chip.ground.outlineNode, qubit.pad2.node])
+            # For control lines unite trace and launchpads, also unite flux bias if applicable.
+            for controlLineIndex, controlLine in self.qSys.chipDict[chip.index].controlLineDict.items():
+                if (controlLine.lineType == "feedline"
+                        and self.qSys.sysParams["Simulate Feedline?"] == "Yes"):
+                    uniteNodeList = [controlLine.lineNode]
+                    for launchPadName, launchPadNode in controlLine.launchPadNodeDict.items():
+                        uniteNodeList.append(launchPadNode)
+                    lines += ansysUniteNodes(uniteNodeList)
+                    if controlLine.lineType == "fluxBias":
+                        lines += ansysUniteNodes([self.chipDict[0].ground.outlineNode, controlLine.lineNode])
+            # Make the ground 3D
+            lines += ansysQ3DMake3D(self.qSys.sysParams["Simulation"], chip.ground.outlineNode)
+        # Draw bumps if flip chip, and join the ground nodes via the bumps
+        if self.qSys.sysParams["Flip Chip?"] == "Yes":
+            uniteNodeList = [self.qSys.chipDict[0].ground.outlineNode, self.qSys.chipDict[1].ground.outlineNode]
+            for thisBump in self.bumpsDict["Bumps"]:
+                for thisNode in [
+                    thisBump.underBumpBottomNode,
+                    thisBump.bumpMetalBottomNode,
+                    thisBump.bumpMetalTopNode,
+                    thisBump.underBumpTopNode
+                ]:
+                    lines += ansysPolyline_Lines(
+                        name=thisNode.name,
+                        color=thisNode.color,
+                        material=thisNode.material,
+                        polyline3D=[[point[0], point[1], thisNode.Z] for point in
+                                    thisNode.polyline]
+                    )
+                    lines += ansysSweepAlongVector_Lines(thisNode)
+                    uniteNodeList.append(thisNode)
+            lines += ansysUniteNodes(uniteNodeList)  # Resulting single node is ground1
+        # Assign ground signal line (independent of flip chip)
+        lines += ansysGroundSignalLine_Lines(self.qSys.chipDict[0].ground)
+
+        return lines
 
     @property
     def capMatUnitsToF(self):
@@ -216,46 +304,31 @@ class CapMatSimulation(Simulation):
 
     @property
     def ansysCapMatHeaders(self):
-        capMatHeaderLineIndex = self.resultsFileLines.index(
-            [i for i in self.resultsFileLines if i[0] == "Capacitance (F)"][0]) + 1
-        return arrayNoBlanks(self.resultsFileLines[capMatHeaderLineIndex])
+        return jsonRead(self.resultsFilePath)["Header"]
 
     @property
     def capMat(self):
-        capMatHeaderLineIndex = self.resultsFileLines.index(
-            [i for i in self.resultsFileLines if i[0] == "Capacitance (F)"][0]) + 1
         numNodes = len(self.ansysCapMatHeaders)
-
-        capMat = np.zeros((numNodes, numNodes))
-        capMatStartLineIndex = capMatHeaderLineIndex + 1
-        for index1 in range(numNodes):
-            for index2 in range(numNodes):
-                matRow = capMatStartLineIndex + index1
-                matCol = 1 + index2
-                capacitanceValue = float(self.resultsFileLines[matRow][matCol])  # Already in units of F
-                capMat[index1, index2] = capacitanceValue
-
+        capMat = jsonRead(self.resultsFilePath)["capMat (F)"]
         """If the feedline is not simulated, add in the capacitance to the resonators."""
         if self.qSys.sysParams["Simulate Feedline?"] == "No" and self.qSys.allControlLinesDict != {}:
-            newCapMat = np.zeros((numNodes + 1, numNodes + 1))  # The feedline will be the highest index.
+            newCapMat = [i+[0] for i in capMat.copy()]  # Add a dimension for the feedline, the highest index.
+            newCapMat.append([0]*(len(capMat)+1))
+
             feedlineIndex = numNodes
             self.ansysCapMatHeaders.append(self.qSys.allControlLinesDict[0].lineNode.name)
-            # Copy capMat
-            for index1 in range(numNodes):
-                for index2 in range(numNodes):
-                    newCapMat[index1, index2] = capMat[index1, index2]
+
             # Add resonator capacitances
             for readoutResonatorIndex, readoutResonator in self.qSys.allReadoutResonatorsDict.items():
-                genParams = readoutResonator.generalParamsDict
+                componentParams = readoutResonator.componentParams
                 pad1Index = self.ansysCapMatHeaders.index(readoutResonator.pad1.node.name)
                 # Capacitance to the feedline
-                newCapMat[pad1Index, feedlineIndex] = -genParams["Capacitance to Feedline (F)"]
-                newCapMat[feedlineIndex, pad1Index] = -genParams["Capacitance to Feedline (F)"]
+                newCapMat[pad1Index][feedlineIndex] = -componentParams["Capacitance to Feedline (F)"]
+                newCapMat[feedlineIndex][pad1Index] = -componentParams["Capacitance to Feedline (F)"]
                 # Fix capacitance to ground
-                wrongCapToGround = sum(capMat[pad1Index, :])
-                correctCapToGround = genParams["Feedline Pad Capacitance to Ground (F)"]
-                newCapMat[pad1Index, pad1Index] = (capMat[pad1Index, pad1Index]
-                                                   - wrongCapToGround + correctCapToGround)
+                wrongCapToGround = sum(capMat[pad1Index])
+                correctCapToGround = componentParams["Feedline Pad Capacitance to Ground (F)"]
+                newCapMat[pad1Index][pad1Index] = capMat[pad1Index][pad1Index] - wrongCapToGround + correctCapToGround
             capMat = newCapMat
         return capMat
 
@@ -272,15 +345,17 @@ class LumpedRSimulation(Simulation):
                                                  readoutResonatorIndex)}
 
     def initialize(self):
-        self.simParamsLines = S21_params(self.simName)
-        super(LumpedRSimulation, self).initialize()
+        simParamsDict = S21_params
+        self.generateParams(simParamsDict)
+
+    def run(self):
+        self.runAllSims()
 
     def postProcess(self):
-        super(LumpedRSimulation, self).postProcess()
-        equivL_val,equivC_val=self.calculateLumpedResonator()
-
-        resultsLines = [["equivL(H):", equivL_val], ["equivC(F):", equivC_val]]
-        csvWrite(self.resultsFilePath, resultsLines)
+        self.deleteUnneededFiles()
+        equivL_val, equivC_val = self.calculateLumpedResonator()
+        resultsDict = {"equivL(H):": equivL_val, "equivC(F):": equivC_val}
+        jsonWrite(self.resultsFilePath, resultsDict)
         print("equivL(H):" + str(self.equivL))
         print("equivC(F):" + str(self.equivC))
 
@@ -311,27 +386,46 @@ class LumpedRSimulation(Simulation):
 class CapMatGESimulation(Simulation):
     def __init__(self, qSys):
         super().__init__(qSys, "capMatGE")
+        # Components ordering
+        nonGECapMatIndex = 0
+        self.preGECapMatHeaders = []
+        self.postGEComponentList = []
+        for qubitIndex, qubit in self.qSys.allQubitsDict.items():
+            qubit.pad1.quantCapMatIndex = nonGECapMatIndex
+            self.preGECapMatHeaders.append(qubit.pad1.name)
+            nonGECapMatIndex += 1
+            if isinstance(qubit, FloatingQubit):
+                qubit.pad2.quantCapMatIndex = nonGECapMatIndex
+                nonGECapMatIndex += 1
+                self.preGECapMatHeaders.append(qubit.pad2.name)
+            self.postGEComponentList.append(qubit)
+        for readoutResonatorIndex, readoutResonator in self.qSys.allReadoutResonatorsDict.items():
+            readoutResonator.pad2.quantCapMatIndex = nonGECapMatIndex  # Only pad2 is included in quantization
+            self.preGECapMatHeaders.append(readoutResonator.pad2.node.name)
+            self.postGEComponentList.append(readoutResonator)
+            nonGECapMatIndex += 1
 
     def postProcess(self):
-        super(CapMatGESimulation, self).postProcess()
-        lines = [["Capacitance (F)"], [""] + [component.name for component in self.qSys.postGEComponentList]]
+        self.deleteUnneededFiles()
+        header = [component.name for component in self.postGEComponentList]
+
         capMat_GE, phiMat, RHS = self.gaussianElimination()
-        numNodes = len(self.qSys.postGEComponentList)
-        for rowIndex in range(numNodes):
-            lines.append([self.qSys.postGEComponentList[rowIndex].name] + list(capMat_GE[rowIndex, :]))
-        csvWrite(self.resultsFilePath, lines)
+        resultsDict = {"Header": header, "capMat (F)": capMat_GE.tolist()}
+        jsonWrite(self.resultsFilePath, resultsDict)
 
     @property
     def capMatForGE(self):
-        dimPreGEQuant = len(self.qSys.preGECapMatHeaders)
+        dimPreGEQuant = len(self.preGECapMatHeaders)
         capMat_preGE = zeros(dimPreGEQuant, dimPreGEQuant)
         capMatReduced = Matrix(CapMatSimulation(self.qSys).capMat)
         ansysCapMatHeaders = CapMatSimulation(self.qSys).ansysCapMatHeaders
+
         # Alter the resonator pad 2 capacitance to ground according to the lumped resonator model.
         for readoutResonatorIndex, readoutResonator in self.qSys.allReadoutResonatorsDict.items():
+            lumpedRSim = LumpedRSimulation(self.qSys, readoutResonatorIndex)
             index = ansysCapMatHeaders.index(readoutResonator.pad2.node.name)
             capMatReduced[index, index] = capMatReduced[index, index] - sum(
-                capMatReduced.row(index)) + readoutResonator.equivC
+                capMatReduced.row(index)) + lumpedRSim.equivC
         """Remove all control lines and resonator pad1 from the capacitance matrix. This is under the assumption that
         the resonator pad1 only has a non-negligible capacitance to the feedline, 
         thereby not affecting the system Hamiltonian."""
@@ -343,9 +437,6 @@ class CapMatGESimulation(Simulation):
         for readoutResonatorIndex, readoutResonator in self.qSys.allReadoutResonatorsDict.items():
             index = ansysCapMatHeaders.index(readoutResonator.pad1.node.name)
             indicesToRemove.append(index)
-        for PTCIndex, PTC in self.qSys.allPTCsDict.items():
-            index = ansysCapMatHeaders.index(PTC.pad1.node.name)
-            indicesToRemove.append(index)
         indicesToRemove.sort(reverse=True)
 
         ansysCapMatHeadersReduced = [i for i in ansysCapMatHeaders]  # Simple copy
@@ -354,38 +445,36 @@ class CapMatGESimulation(Simulation):
             capMatReduced.col_del(i)
             del ansysCapMatHeadersReduced[i]
             # Now reorder quantCapMat to align with self.preGECapMatHeaders
-        for node1Index, node1Name in enumerate(self.qSys.preGECapMatHeaders):
-            for node2Index, node2Name in enumerate(self.qSys.preGECapMatHeaders):
+        for node1Index, node1Name in enumerate(self.preGECapMatHeaders):
+            for node2Index, node2Name in enumerate(self.preGECapMatHeaders):
                 capMat_preGE[node1Index, node2Index] = capMatReduced[ansysCapMatHeadersReduced.index(node1Name),
                                                                      ansysCapMatHeadersReduced.index(node2Name)]
         return capMat_preGE
 
     def gaussianElimination(self):
         I_c = symbols('I_c')
-        dimPreGEQuant = len(self.qSys.preGECapMatHeaders)
+        dimPreGEQuant = len(self.preGECapMatHeaders)
         # Assemble the RHS and PhiMat
         RHS = zeros(dimPreGEQuant, 1)
         phiMat = zeros(dimPreGEQuant, 1)
         t = symbols('t')
-        for component in self.qSys.postGEComponentList:
-            if isinstance(component, qSysObjects.FloatingQubit) or isinstance(component,
-                                                                              qSysObjects.StraightBusCoupler):
+        for component in self.postGEComponentList:
+            if isinstance(component, FloatingQubit):
                 RHS[component.pad1.quantCapMatIndex, 0] = I_c * sin((component.pad1.phiSym - component.pad2.phiSym)
                                                                     / Phi_0Const)
                 RHS[component.pad2.quantCapMatIndex, 0] = -RHS[component.pad1.quantCapMatIndex, 0]
                 phiMat[component.pad1.quantCapMatIndex, 0] = component.pad1.phiSym.diff(t, 2)
                 phiMat[component.pad2.quantCapMatIndex, 0] = component.pad2.phiSym.diff(t, 2)
-            elif isinstance(component, qSysObjects.GroundedQubit):
+            elif isinstance(component, GroundedQubit):
                 RHS[component.pad1.quantCapMatIndex, 0] = I_c * sin(component.pad1.phiSym / Phi_0Const)
                 phiMat[component.pad1.quantCapMatIndex, 0] = component.pad1.phiSym.diff(t, 2)
-            elif isinstance(component, qSysObjects.ReadoutResonator):
+            elif isinstance(component, ReadoutResonator):
                 RHS[component.pad2.quantCapMatIndex, 0] = component.pad2.phiSym / Phi_0Const
                 phiMat[component.pad2.quantCapMatIndex, 0] = component.pad2.phiSym.diff(t, 2)
         capMat_GE = self.capMatForGE
         # Perform the gaussian elimination on just the qubits.
-        for componentIndex, component in enumerate(self.qSys.postGEComponentList):
-            if isinstance(component, qSysObjects.FloatingQubit) or isinstance(component,
-                                                                              qSysObjects.StraightBusCoupler):
+        for componentIndex, component in enumerate(self.postGEComponentList):
+            if isinstance(component, FloatingQubit):
                 component.padToEliminate = component.pad1
                 component.padToKeep = component.pad2
                 k = component.padToEliminate.quantCapMatIndex
@@ -425,13 +514,12 @@ class CapMatGESimulation(Simulation):
                 capMat_GE = O_GE * capMatPrime
                 RHS = O_e * RHS
                 phiMat = O_c * phiMat
-        dimGE = len(self.qSys.postGEComponentList)
+        dimGE = len(self.postGEComponentList)
         """Here we go through and remove the kth rows and columns by adding the non-k elements to a new matrix, 
         first by column then by row."""
         kList = []
-        for component in self.qSys.postGEComponentList:
-            if isinstance(component, qSysObjects.FloatingQubit) or isinstance(component,
-                                                                              qSysObjects.StraightBusCoupler):
+        for component in self.postGEComponentList:
+            if isinstance(component, FloatingQubit):
                 kList.append(component.padToEliminate.quantCapMatIndex)
         """By nature of how we performed GE it's the qubit pad1 that gets eliminated, 
         but the resulting pad is not really "pad2" anymore, it's just the single qubit pad."""
@@ -458,7 +546,7 @@ class CapMatGESimulation(Simulation):
         # We now perform a change-of-variables (COV) and take phi1-phi2 to be our new phi1, etc.
         # RHS_COV=RHSReduced
         # for component in self.postGEComponentList:
-        #    if isinstance(component,qSysObjects.FloatingQubit) or isinstance(component,qSysObjects.StraightBusCoupler):
+        #    if isinstance(component,FloatingQubit):
         #        RHS_COV=RHS_COV.subs(component.pad1.phiSym-component.pad2.phiSym,component.Phi)
 
         return capMat_GE_Reduced, phiMatReduced, RHSReduced
@@ -466,7 +554,7 @@ class CapMatGESimulation(Simulation):
     @property
     def capMatGE(self):
         headerLineIndex = 1
-        numNodes = len(self.qSys.postGEComponentList)
+        numNodes = len(self.postGEComponentList)
         capMatGE = np.zeros((numNodes, numNodes))
         capMatGEStartLineIndex = headerLineIndex + 1
         for index1 in range(numNodes):
@@ -481,10 +569,11 @@ class CapMatGESimulation(Simulation):
 class Quantize(Simulation):
     def __init__(self, qSys):
         super().__init__(qSys, "quantize")
-        self.HStateOrder_calculated=None
+        self.HStateOrder_calculated = None
+
     def initialize(self):
         quantizeList = "["
-        for component in self.qSys.postGEComponentList:
+        for component in CapMatGESimulation(self.qSys).postGEComponentList:
             quantizeList += component.name + ":"
         quantizeList = quantizeList[0:-1] + "]"
         self.simParamsLines = [
@@ -501,11 +590,13 @@ class Quantize(Simulation):
         self.quantizeSimulation()
 
     def quantizeSimulation(self):
-        HComponentOrder=self.HComponentOrder
-
         print("started quantize")
-        capMatGE = CapMatGESimulation(self.qSys).capMatGE
         quantizeStartTime = time.time()
+
+        HComponentOrder = self.HComponentOrder  # So it's not reading from the CSV every time.
+        CapMatGESim = CapMatGESimulation(self.qSys)
+        capMatGE = CapMatGESim.capMatGE
+        postGEComponentList = CapMatGESim.postGEComponentList
 
         numQubitPhotons = self.simParamsDict["NumQubitPhotons"]
         numResonatorPhotons = self.simParamsDict["NumResonatorPhotons"]
@@ -514,7 +605,8 @@ class Quantize(Simulation):
         # self.capMatGE needs to be reduced based on the requested components to quantize.
 
         numComponents = len(HComponentOrder)
-        capMatGEIndicesToKeep = [[i.name for i in self.qSys.postGEComponentList].index(i) for i in [j.name for j in HComponentOrder]]
+        capMatGEIndicesToKeep = [[i.name for i in postGEComponentList].index(i)
+                                 for i in [j.name for j in HComponentOrder]]
 
         rows = np.array(capMatGEIndicesToKeep, dtype=np.intp)
         columns = np.array(capMatGEIndicesToKeep, dtype=np.intp)
@@ -551,7 +643,8 @@ class Quantize(Simulation):
                     H -= (component.EJ / hbarConst) * cosTerm
                     print("cos x^" + str(2 * i) + " term Frobenius norm: ", cosTerm.norm(norm="fro"))
             elif isinstance(component, qSysObjects.ReadoutResonator):
-                term = component.PhisecondQuant(dim, numComponents) ** 2 / (2 * component.equivL)
+                lumpedRSim=LumpedRSimulation(self.qSys,component.index)
+                term = component.PhisecondQuant(dim, numComponents) ** 2 / (2 * component.equivL(lumpedRSim))
                 H += term
         endTime = time.time()
         print("Finished adding inductance", (endTime - startTime) / 60)
@@ -668,13 +761,16 @@ class Quantize(Simulation):
         quantizeEndTime = time.time()
         print("Total time:", (quantizeEndTime - quantizeStartTime) / 60)
 
+    def readQuantizeList(quantizeList):
+        return [str(i) for i in quantizeList[1:-1].split(":")]
+
     @property
     def HIndexLineIndex(self):
         return self.resultsFileLines.index([i for i in self.resultsFileLines if i[0] == "Index Order"][0]) + 1
 
     @property
     def HComponentOrder(self):
-        quantizeComponentListNames = readQuantizeList(self.simParamsDict["QuantizeList"])
+        quantizeComponentListNames = self.readQuantizeList(self.simParamsDict["QuantizeList"])
         quantizeComponentList = [self.qSys.componentFromName(i) for i in quantizeComponentListNames]
         return quantizeComponentList
 
@@ -687,8 +783,8 @@ class Quantize(Simulation):
 
     @property
     def HStateOrder(self):
-        resultsFileLines=self.resultsFileLines
-        HStateOrder=[stateFromHeader(i) for i in arrayNoBlanks(resultsFileLines[self.headerLineIndex][1:])]
+        resultsFileLines = self.resultsFileLines
+        HStateOrder = [stateFromHeader(i) for i in arrayNoBlanks(resultsFileLines[self.headerLineIndex][1:])]
         return HStateOrder
 
     @property
@@ -715,8 +811,8 @@ class Quantize(Simulation):
         Only valid if the dressed states are close to the undressed states!"""
         diagonalComp = []
 
-        HStateOrder=self.HStateOrder
-        H=self.H
+        HStateOrder = self.HStateOrder
+        H = self.H
         for index, state in enumerate(HStateOrder):
             diagonalComp.append([state, H[index, index]])  # Pairs each state up with its diagonal element.
         diagonalCompSorted = sorted(diagonalComp, key=lambda l: l[1])  # Diagonal elements in ascending order.
@@ -735,83 +831,96 @@ class Quantize(Simulation):
         return s
 
 
-class ECQSimulation(Simulation):
-    def __init__(self, qSys, qubitIndex):
-        super(ECQSimulation, self).__init__(qSys, "ECQ" + str(qubitIndex))
-        self.index = qubitIndex
+def ECQSim(index):
+    class ECQSimulation(Simulation):
+        def __init__(self, qSys):
+            super(ECQSimulation, self).__init__(qSys, "ECQ" + str(index))
+            self.index = index
 
-    def postProcess(self):
-        super(ECQSimulation, self).postProcess()
-        qubitObj = self.qSys.allQubitsDict[self.index]
-        qubitColumnIndex = self.qSys.postGEComponentList.index(qubitObj)
-        cInv = np.linalg.inv(CapMatGESimulation(self.qSys).capMatGE)
-        cSum = 1 / cInv[qubitColumnIndex, qubitColumnIndex]
+        def postProcess(self):
+            CapMatGESim = CapMatGESimulation(self.qSys)
+            postGEComponentList = CapMatGESim.postGEComponentList
+            super(ECQSimulation, self).postProcess()
+            qubitObj = self.qSys.allQubitsDict[self.index]
+            qubitColumnIndex = postGEComponentList.index(qubitObj)
+            cInv = np.linalg.inv(CapMatGESim.capMatGE)
+            cSum = 1 / cInv[qubitColumnIndex, qubitColumnIndex]
 
-        E_C = eConst ** 2 / (2 * cSum)  # In Joules
-        EJ = self.qSys.allQubitsDict[self.index].EJ
-        print(qubitObj.name + "EC (GHz): " + str(E_C * Joules_To_GHz))
-        print(qubitObj.name + "EJ (GHz): " + str(EJ * Joules_To_GHz))
-        print(qubitObj.name + "EJ/EC: " + str(EJ / E_C))
-        lines = [["EC", str(E_C)], ["EJ/EC", str(EJ / E_C)]]
-        csvWrite(self.resultsFilePath, lines)
+            E_C = eConst ** 2 / (2 * cSum)  # In Joules
+            EJ = self.qSys.allQubitsDict[self.index].EJ
+            print(qubitObj.name + "EC (GHz): " + str(E_C * Joules_To_GHz))
+            print(qubitObj.name + "EJ (GHz): " + str(EJ * Joules_To_GHz))
+            print(qubitObj.name + "EJ/EC: " + str(EJ / E_C))
+            lines = [["EC", str(E_C)], ["EJ/EC", str(EJ / E_C)]]
+            csvWrite(self.resultsFilePath, lines)
 
-    @property
-    def EC(self):
-        return self.resultsDict["EC"]
+        @property
+        def EC(self):
+            return self.resultsDict["EC"]
 
+        def updateqSys(self):
+            qSys.allQubitsDict[self.index].EcVal = self.EC
 
-class ECRSimulation(Simulation):
-    def __init__(self, qSys, readoutResonatorIndex):
-        super(ECRSimulation, self).__init__(qSys, "ECR" + str(readoutResonatorIndex))
-        self.index = readoutResonatorIndex
-
-    def postProcess(self):
-        readoutResonatorObj = self.qSys.allReadoutResonatorsDict[self.index]
-        resonatorColumnIndex = self.qSys.postGEComponentList.index(readoutResonatorObj)
-        cInv = np.linalg.inv(CapMatGESimulation(self.qSys).capMatGE)
-        cSum = 1 / cInv[resonatorColumnIndex, resonatorColumnIndex]
-
-        E_C = eConst ** 2 / (2 * cSum)  # In Joules
-        lines = [["EC", str(E_C)]]
-        csvWrite(self.resultsFilePath, lines)
-
-    @property
-    def EC(self):
-        return self.resultsDict["EC"]
+    return ECQSimulation
 
 
-class ZZQSimulation(Simulation):
-    def __init__(self, qSys, q1Index, q2Index):
-        super(ZZQSimulation, self).__init__(qSys, "zzQ" + str(q1Index) + "-" + str(q2Index))
-        self.q1Index = q1Index
-        self.q2Index = q2Index
+def ECRSim(index):
+    class ECRSimulation(Simulation):
+        def __init__(self, qSys):
+            super(ECRSimulation, self).__init__(qSys, "ECR" + str(index))
+            self.index = index
 
-    def postProcess(self):
-        qubitIndices=[self.q1Index, self.q2Index]
-        quantizeIndices = [self.qSys.allQubitsDict[i].quantizeIndex for i in qubitIndices]
-        QuantizeObj=Quantize(self.qSys)
-        stateListFunc = QuantizeObj.stateList
+        def postProcess(self):
+            CapMatGESim = CapMatGESimulation(self.qSys)
+            postGEComponentList = CapMatGESim.postGEComponentList
+            readoutResonatorObj = self.qSys.allReadoutResonatorsDict[self.index]
+            resonatorColumnIndex = postGEComponentList.index(readoutResonatorObj)
+            cInv = np.linalg.inv(CapMatGESim.capMatGE)
+            cSum = 1 / cInv[resonatorColumnIndex, resonatorColumnIndex]
 
-        stateList01 = stateListFunc([[quantizeIndices[1], 1]])
-        stateList10 = stateListFunc([[quantizeIndices[0], 1]])
-        stateList11 = stateListFunc([[quantizeIndices[0], 1], [quantizeIndices[1], 1]])
+            E_C = eConst ** 2 / (2 * cSum)  # In Joules
+            lines = [["EC", str(E_C)]]
+            csvWrite(self.resultsFilePath, lines)
 
-        E11 = QuantizeObj.HEval(stateList11)
-        E10 = QuantizeObj.HEval(stateList10)
-        E01 = QuantizeObj.HEval(stateList01)
+        @property
+        def EC(self):
+            return self.resultsDict["EC"]
+    return ECRSimulation
 
 
-        print("E11 (GHz):", E11)
-        print("E10 (GHz):", E10)
-        print("E01 (GHz):", E01)
+def ZZQSim(q1Index,q2Index):
+    class ZZQSimulation(Simulation):
+        def __init__(self, qSys):
+            super(ZZQSimulation, self).__init__(qSys, "zzQ" + str(q1Index) + "-" + str(q2Index))
+            self.q1Index = q1Index
+            self.q2Index = q2Index
 
-        gz = E11 - E01 - E10
+        def postProcess(self):
+            qubitIndices = [self.q1Index, self.q2Index]
+            quantizeIndices = [self.qSys.allQubitsDict[i].quantizeIndex for i in qubitIndices]
+            QuantizeObj = Quantize(self.qSys)
+            stateListFunc = QuantizeObj.stateList
 
-        print("gz" + str(qubitIndices[0]) + "-" + str(qubitIndices[1]) + "(MHz): ", gz * 1000)
+            stateList01 = stateListFunc([[quantizeIndices[1], 1]])
+            stateList10 = stateListFunc([[quantizeIndices[0], 1]])
+            stateList11 = stateListFunc([[quantizeIndices[0], 1], [quantizeIndices[1], 1]])
 
-        lines = [["g_z (MHz):", str(gz * 1000)]]
-        csvWrite(self.resultsFilePath, lines)
+            E11 = QuantizeObj.HEval(stateList11)
+            E10 = QuantizeObj.HEval(stateList10)
+            E01 = QuantizeObj.HEval(stateList01)
 
-    @property
-    def gz(self):
-        return self.resultsDict["g_z (MHz):"]
+            print("E11 (GHz):", E11)
+            print("E10 (GHz):", E10)
+            print("E01 (GHz):", E01)
+
+            gz = E11 - E01 - E10
+
+            print("gz" + str(qubitIndices[0]) + "-" + str(qubitIndices[1]) + "(MHz): ", gz * 1000)
+
+            lines = [["g_z (MHz):", str(gz * 1000)]]
+            csvWrite(self.resultsFilePath, lines)
+
+        @property
+        def gz(self):
+            return self.resultsDict["g_z (MHz):"]
+    return ZZQSimulation

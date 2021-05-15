@@ -67,16 +67,12 @@ class Qubit:
         return self.componentParams["L_I(H)"]
 
     @property
-    def L_i_fixed(self):
+    def LJ(self):
         return self.componentParams["L_J(H)"]
 
     @property
-    def quantizeIndex(QuantizeObj):
+    def quantizeIndex(self, QuantizeObj):
         return QuantizeObj.quantizeIndex(self.name)
-
-    @property
-    def EcVal(ECQSimulationObj):
-        return ECQSimulationObj.EC
 
     def QSym(self, dim, numComponents):
         return MatrixSymbol("Q_Q" + str(self.index), dim ** numComponents, dim ** numComponents)
@@ -252,27 +248,14 @@ class CPWResonator:
     def quantizeIndex(QuantizeObj):
         return QuantizeObj.quantizeIndex(self.name)
 
-    @property
-    def equivC(LumpedRSimulationObj):
-        return LumpedRSimulationObj.equivC
-
-    @property
-    def equivL(LumpedRSimulationObj):
-        return LumpedRSimulationObj.equivL
-
-    @property
-    def EcVal(ECRSimulationObj):
-        return ECRSimulationObj.EC
-
     def QSym(self, dim, numComponents):
         return MatrixSymbol("Q_R" + str(self.index), dim ** numComponents, dim ** numComponents)
 
     def PhiSym(self, dim, numComponents):
         return MatrixSymbol("Phi_R" + str(self.index), dim ** numComponents, dim ** numComponents)
 
-    @property
-    def omega(self):
-        return 1 / np.sqrt(self.equivL * eConst ** 2 / (2 * self.EcVal))
+    def omega(self, LumpedRSimObj, ECRSimObj):
+        return 1 / np.sqrt(LumpedRSimObj.equivL * eConst ** 2 / (2 * ECRSimObj.EcVal))
 
     def QsecondQuant(self, dim, numComponents):  # Returns a Qobj matrix. Already divided out hbar.
         return 1j * np.sqrt(1 / (2 * self.Z)) * (self.aDagger(dim, numComponents) - self.a(dim, numComponents))
@@ -308,9 +291,8 @@ class CPWResonator:
     def bareFreq(self, CPW_obj):
         return CPW_obj.vp() / (2 * self.length)
 
-    @property
-    def Z(self):
-        return self.omega * self.equivL
+    def Z(self, lumpedRSimObj):
+        return self.omega * lumpedRSimObj.equivL
 
     def a(self, dim, numComponents):
         tensorState = [qeye(dim)] * numComponents

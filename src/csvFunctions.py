@@ -3,6 +3,7 @@ from math import floor
 from ansysFunctions import ansysOutputToComplex
 from constants import GHzToOmega
 from scipy.interpolate import interp1d
+import json
 
 
 def headerLineIndex(fileLines, sectionTitle):
@@ -20,39 +21,6 @@ def csvRead(inputFile):
         for line in csvReader:
             returnLines.append(line)
     return returnLines
-
-
-def readComponentRowData(fileLines, componentName):  # Only for components that are assigned indices instead of names.
-    componentDict = {}
-    componentHeaderLineNumber = headerLineIndex(fileLines, componentName)
-    componentHeader = fileLines[componentHeaderLineNumber]
-    componentDataLineNumber = componentHeaderLineNumber + 1
-    componentDataLine = fileLines[componentDataLineNumber]
-    while componentDataLine[1] != "":
-        componentIndex = int(componentDataLine[1])
-        componentDict[componentIndex] = {}
-        for parameterIndex in range(1, len(componentHeader)):
-            parameterName = componentHeader[parameterIndex]
-            parameterValue = componentDataLine[parameterIndex]
-            componentDict[componentIndex][parameterName] = returnCorrectType(parameterValue)
-        componentDataLineNumber += 1
-        if componentDataLineNumber >= len(fileLines):
-            break
-        componentDataLine = fileLines[componentDataLineNumber]
-    return componentDict
-
-
-def readSingleRowData(fileLines, rowTitle):
-    rowDict = dict()
-    headerLineNumber = headerLineIndex(fileLines, rowTitle)
-    header = fileLines[headerLineNumber]
-    dataLineNumber = headerLineNumber + 1
-    dataLine = fileLines[dataLineNumber]
-    for parameterIndex in range(1, len(header)):
-        parameterName = header[parameterIndex]
-        parameterValue = dataLine[parameterIndex]
-        rowDict[parameterName] = returnCorrectType(parameterValue)
-    return rowDict
 
 
 def readY11Data(file):
@@ -76,11 +44,7 @@ def readS21Data(file):
 
 
 def resultsDict(resultsFile):
-    resultsFileLines = csvRead(resultsFile)
-    returnDict = dict()
-    for line in resultsFileLines:
-        returnDict[line[0]] = returnCorrectType(line[1])
-    return returnDict
+    return jsonRead(resultsFile)
 
 
 def csvWrite(file, lines):
@@ -105,26 +69,14 @@ def returnCorrectType(x):
         return str(x)
 
 
-def readJJLocation(JJLocationCode):
-    """JJLocationCode is in the form [10:-20] corresponding to a shift 10um to the right and 20um down."""
-    JJLoc = [float(i) for i in JJLocationCode[1:-1].split(":")]
-    return JJLoc[0], JJLoc[1]
+def jsonRead(file):
+    with open(file, "r") as read_file:
+        readDict = json.load(read_file)
+    return readDict
 
 
-def readQuantizeList(quantizeList):
-    return [str(i) for i in quantizeList[1:-1].split(":")]
+def jsonWrite(file, writeDict):
+    with open(file, "w") as write_file:
+        json.dump(writeDict, write_file, indent=1)
 
 
-def exchQIndices(simName):
-    indices = [int(i) for i in simName[5:].split("-")]
-    return indices
-
-
-def zzQIndices(simName):
-    indices = [int(i) for i in simName[3:].split("-")]
-    return indices
-
-
-def Z21QIndices(simName):
-    indices = [int(i) for i in simName[4:].split("-")]
-    return indices

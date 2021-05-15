@@ -1,5 +1,5 @@
 #!/bin/sh 
-#SBATCH --time=00:60:00
+#SBATCH --time=00:03:00
 #SBATCH --nodes=1
 #SBATCH -n 16
 #SBATCH -A 2006240353
@@ -43,5 +43,5 @@ echo nodelist found this many CPUs:$ncpus
 # add -mpitest for network connect test and will NOT run .jou file
 
 ml apps/ansys/v211ansysEM
-ansysedt -UseElectronicsPPE -features=beta -ng -runscriptandexit /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/capMat/capMatExtractor_Simulator.py /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/capMat/capMatExtractor.aedt 
+ansysedt -UseElectronicsPPE -features=beta -ng -runscriptandexit /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Validation/TwoQubit/lumpedR0/YRestR0_ansysRunSimulator.py /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Validation/TwoQubit/lumpedR0/YRestR0.aedt 
 

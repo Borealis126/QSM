@@ -1,11 +1,11 @@
 $begin '$base_index$'
   $begin 'properties'
     all_levels=000000000000
-    time(year=000000002021, month=000000000005, day=000000000013, hour=000000000003, min=000000000034, sec=000000000028)
+    time(year=000000002021, month=000000000005, day=000000000014, hour=000000000015, min=000000000006, sec=000000000043)
     version=000000000000
   $end 'properties'
   $begin '$base_index$'
-    $index$(pos=000000006467, lin=000000000235, lvl=000000000000)
+    $index$(pos=000000006466, lin=000000000235, lvl=000000000000)
   $end '$base_index$'
 $end '$base_index$'
 $begin 'SolutionBlock1'
@@ -232,14 +232,14 @@ $begin 'SolutionBlock5'
 		ConvTarget='1'
 		ConvTargetConsecPasses='N/A'
 		ConvCurrentConsecPasses='N/A'
-		c(p=1, tri=655)
-		c(p=2, tri=2019, delta=6.80176)
-		c(p=3, tri=4463, delta=4.05158)
-		c(p=4, tri=9396, delta=3.65436)
-		c(p=5, tri=20211, delta=5.36103)
-		c(p=6, tri=40558, delta=2.70981)
-		c(p=7, tri=79709, delta=1.86098)
-		c(p=8, tri=149142, delta=0.709037)
+		c(p=1, tri=665)
+		c(p=2, tri=2073, delta=6.6491)
+		c(p=3, tri=4584, delta=4.29981)
+		c(p=4, tri=9582, delta=3.00741)
+		c(p=5, tri=19848, delta=4.42701)
+		c(p=6, tri=39678, delta=3.05236)
+		c(p=7, tri=76762, delta=1.72887)
+		c(p=8, tri=143178, delta=0.933914)
 	$end '56001'
 $end 'SolutionBlock5'
 $begin '$index$'
@@ -251,7 +251,7 @@ $begin '$index$'
 		SolutionBlock2(pos=1340, lin=30, lvl=0)
 		SolutionBlock1(pos=370, lin=1, lvl=0)
 		$base_index$(pos=0, lin=1, lvl=0)
-		$index$(pos=6467, lin=235, lvl=0)
+		$index$(pos=6466, lin=235, lvl=0)
 	$end '$index$'
 $end '$index$'
                                                                                                                                                                                                       

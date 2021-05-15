@@ -3,7 +3,6 @@ from pathlib import Path
 import subprocess
 import os
 
-
 computeLocation = "Cluster"  # Edit this based on where the QSM is being run. Users at NIST should use "68707Max"
 QSMSourceFolder = ""
 if computeLocation == "Windows":
@@ -29,6 +28,12 @@ def copyFile(sourceFile, destinationFile):
 # copyFile(copyDir / "systemParametersFile.csv", projectFolder / "systemParametersFile.csv")
 #
 qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder)  # Once systemParameters is available and filled out, ALWAYS run this command first.
+qSys.loadDesignFiles()
+simulationList = [ECQSim(i) for i in range(qSys.sysParams["Number of Qubits"])]
+QSM.updateqSys(qSys, simulationList)
+
+
+
 # qSys.loadGeometries()
 
 # qSys.generateComponentParams()
@@ -38,7 +43,7 @@ qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder)  # Once s
 # copyFile(copyDir/"componentGeometriesFile.csv",projectFolder/"componentGeometriesFile.csv")
 
 
-qSys.generateGDS()
+# qSys.generateGDS()
 # #
 # CapMatSimulation(qSys).initialize()
 # CapMatSimulation(qSys).run()
@@ -48,13 +53,13 @@ qSys.generateGDS()
 # copyFile(copyDir/"capMat"/"SimulationParameters.csv",projectFolder/"capMat"/"SimulationParameters.csv")
 
 
+
 # qSys.loadDesignFiles()
 # for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.items():
     # LumpedRSimulation(qSys,readoutResonatorIndex).initialize()
     # LumpedRSimulation(qSys,readoutResonatorIndex).run()
     # LumpedRSimulation(qSys,readoutResonatorIndex).postProcess()
 
-# CapMatGESimulation(qSys).initialize()
 # CapMatGESimulation(qSys).postProcess()
 
 

@@ -1,14 +1,87 @@
  
 ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
 Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
-Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Example/TwoQubit/lumpedR0/Y11R0_ansysRunSimulator.py
-Starting Batch Run: 4:27:05 AM  May 13, 2021
+Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Validation/TwoQubit/lumpedR0/Y11R0_ansysRunSimulator.py
+Starting Batch Run: 5:18:48 PM  May 14, 2021
+A new installation of your ANSYS product has been detected.  
+The library directories have been reset to those of the newly installed libraries.  
+To change this, go to Tools/Options/General Options.
 Temp directory: /tmp
 Project directory: /u/eu/an/joelhoward/Ansoft
-[info] Project:Y11R0, Design:Netlist, (info): Processing circuit for new analysis. (4:27:21 AM  May 13, 2021)
-[warning] Project:Y11R0, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (4:27:21 AM  May 13, 2021)
-[warning] Project:Y11R0, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (4:27:23 AM  May 13, 2021)
-[info] Project:Y11R0, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (4:27:23 AM  May 13, 2021)
-[info] Project:Y11R0, Design:Netlist, (info): Starting analysis type LNA. (4:27:23 AM  May 13, 2021)
-[info] Project:Y11R0, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:01 (4:27:23 AM  May 13, 2021)
-Stopping Batch Run: 4:27:25 AM  May 13, 2021
+[info] Project:Y11R0, Design:Netlist, (info): Processing circuit for new analysis. (5:19:06 PM  May 14, 2021)
+[warning] Project:Y11R0, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (5:19:06 PM  May 14, 2021)
+[warning] Project:Y11R0, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (5:19:08 PM  May 14, 2021)
+[info] Project:Y11R0, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (5:19:08 PM  May 14, 2021)
+[info] Project:Y11R0, Design:Netlist, (info): Starting analysis type LNA. (5:19:08 PM  May 14, 2021)
+[info] Project:Y11R0, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:01 (5:19:08 PM  May 14, 2021)
+Stopping Batch Run: 5:19:11 PM  May 14, 2021
+ 
+ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
+Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
+Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Validation/TwoQubit/lumpedR0/Y11R0_ansysRunSimulator.py
+Starting Batch Run: 5:33:49 PM  May 14, 2021
+Temp directory: /tmp
+Project directory: /u/eu/an/joelhoward/Ansoft
+[info] Project:Y11R0, Design:Netlist, (info): Processing circuit for new analysis. (5:34:06 PM  May 14, 2021)
+[warning] Project:Y11R0, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (5:34:06 PM  May 14, 2021)
+[warning] Project:Y11R0, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (5:34:07 PM  May 14, 2021)
+[info] Project:Y11R0, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (5:34:07 PM  May 14, 2021)
+[info] Project:Y11R0, Design:Netlist, (info): Starting analysis type LNA. (5:34:07 PM  May 14, 2021)
+[info] Project:Y11R0, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:01 (5:34:07 PM  May 14, 2021)
+Stopping Batch Run: 5:34:09 PM  May 14, 2021
+ 
+ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
+Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
+Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Validation/TwoQubit/lumpedR0/Y11R0_ansysRunSimulator.py
+Starting Batch Run: 5:37:10 PM  May 14, 2021
+Temp directory: /tmp
+Project directory: /u/eu/an/joelhoward/Ansoft
+[info] Project:Y11R0, Design:Netlist, (info): Processing circuit for new analysis. (5:37:27 PM  May 14, 2021)
+[warning] Project:Y11R0, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (5:37:27 PM  May 14, 2021)
+[warning] Project:Y11R0, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (5:37:29 PM  May 14, 2021)
+[info] Project:Y11R0, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (5:37:29 PM  May 14, 2021)
+[info] Project:Y11R0, Design:Netlist, (info): Starting analysis type LNA. (5:37:29 PM  May 14, 2021)
+[info] Project:Y11R0, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:01 (5:37:29 PM  May 14, 2021)
+Stopping Batch Run: 5:37:31 PM  May 14, 2021
+ 
+ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
+Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
+Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Validation/TwoQubit/lumpedR0/Y11R0_ansysRunSimulator.py
+Starting Batch Run: 5:41:00 PM  May 14, 2021
+Temp directory: /tmp
+Project directory: /u/eu/an/joelhoward/Ansoft
+[info] Project:Y11R0, Design:Netlist, (info): Processing circuit for new analysis. (5:41:17 PM  May 14, 2021)
+[warning] Project:Y11R0, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (5:41:17 PM  May 14, 2021)
+[warning] Project:Y11R0, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (5:41:18 PM  May 14, 2021)
+[info] Project:Y11R0, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (5:41:18 PM  May 14, 2021)
+[info] Project:Y11R0, Design:Netlist, (info): Starting analysis type LNA. (5:41:18 PM  May 14, 2021)
+[info] Project:Y11R0, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:01 (5:41:18 PM  May 14, 2021)
+Stopping Batch Run: 5:41:21 PM  May 14, 2021
+ 
+ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
+Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
+Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Validation/TwoQubit/lumpedR0/Y11R0_ansysRunSimulator.py
+Starting Batch Run: 5:47:35 PM  May 14, 2021
+Temp directory: /tmp
+Project directory: /u/eu/an/joelhoward/Ansoft
+[info] Project:Y11R0, Design:Netlist, (info): Processing circuit for new analysis. (5:47:51 PM  May 14, 2021)
+[warning] Project:Y11R0, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (5:47:51 PM  May 14, 2021)
+[warning] Project:Y11R0, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (5:47:53 PM  May 14, 2021)
+[info] Project:Y11R0, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (5:47:53 PM  May 14, 2021)
+[info] Project:Y11R0, Design:Netlist, (info): Starting analysis type LNA. (5:47:53 PM  May 14, 2021)
+[info] Project:Y11R0, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:01 (5:47:53 PM  May 14, 2021)
+Stopping Batch Run: 5:47:57 PM  May 14, 2021
+ 
+ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
+Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
+Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Validation/TwoQubit/lumpedR0/Y11R0_ansysRunSimulator.py
+Starting Batch Run: 6:00:48 PM  May 14, 2021
+Temp directory: /tmp
+Project directory: /u/eu/an/joelhoward/Ansoft
+[info] Project:Y11R0, Design:Netlist, (info): Processing circuit for new analysis. (6:01:05 PM  May 14, 2021)
+[warning] Project:Y11R0, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (6:01:05 PM  May 14, 2021)
+[warning] Project:Y11R0, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (6:01:07 PM  May 14, 2021)
+[info] Project:Y11R0, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (6:01:07 PM  May 14, 2021)
+[info] Project:Y11R0, Design:Netlist, (info): Starting analysis type LNA. (6:01:07 PM  May 14, 2021)
+[info] Project:Y11R0, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:01 (6:01:07 PM  May 14, 2021)
+Stopping Batch Run: 6:01:09 PM  May 14, 2021
