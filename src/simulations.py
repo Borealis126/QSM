@@ -12,8 +12,12 @@ from analysisFunctions import *
 from quantumStateFunctions import stateFromHeader, baseRepresentation, H_Header
 from scipy.misc import derivative
 from sympy import zeros, Matrix, zeros, sin
-from qSysObjects import GroundedQubit, FloatingQubit, ReadoutResonator
+from qSysObjects import GroundedQubit, FloatingQubit, ReadoutResonator, Qubit
 from qutip import state_number_index, qzero, ket, bra
+
+"""Simulations are anything that is saved to a folder. 
+These are anything requiring Ansys and anything with a non-trivial calculation time (matrix inversion, etc.)"""
+
 
 class Simulation:
     def __init__(self, qSys, simName):
@@ -330,57 +334,7 @@ class CapMatSimulation(Simulation):
                 correctCapToGround = componentParams["Feedline Pad Capacitance to Ground (F)"]
                 newCapMat[pad1Index][pad1Index] = capMat[pad1Index][pad1Index] - wrongCapToGround + correctCapToGround
             capMat = newCapMat
-        return capMat
-
-
-class LumpedRSimulation(Simulation):
-    def __init__(self, qSys, readoutResonatorIndex):
-        super(LumpedRSimulation, self).__init__(qSys, "lumpedR" + str(readoutResonatorIndex))
-        self.index = readoutResonatorIndex
-        self.Y11RSimName = "Y11R" + str(readoutResonatorIndex)
-        self.YRestRSimName = "YRestR" + str(readoutResonatorIndex)
-        self.circuitSims = {
-            self.Y11RSimName: Y11RSimulation(self.Y11RSimName, self.directoryPath, qSys, readoutResonatorIndex),
-            self.YRestRSimName: YRestRSimulation(self.YRestRSimName, self.directoryPath, qSys,
-                                                 readoutResonatorIndex)}
-
-    def initialize(self):
-        simParamsDict = S21_params
-        self.generateParams(simParamsDict)
-
-    def run(self):
-        self.runAllSims()
-
-    def postProcess(self):
-        self.deleteUnneededFiles()
-        equivL_val, equivC_val = self.calculateLumpedResonator()
-        resultsDict = {"equivL(H):": equivL_val, "equivC(F):": equivC_val}
-        jsonWrite(self.resultsFilePath, resultsDict)
-        print("equivL(H):" + str(self.equivL))
-        print("equivC(F):" + str(self.equivC))
-
-    def calculateLumpedResonator(self):  # Calculates from lumpedR files
-        # Load Y11,YRest data
-        Y11Freq, Y11_Y11, Y11InterpFunc = readY11Data(self.circuitSims[self.Y11RSimName].resultsFilePath)
-        YRestFreq, YRest_Y11, YRestInterpFunc = readY11Data(self.circuitSims[self.YRestRSimName].resultsFilePath)
-        derivativeResolution = np.abs(Y11Freq[1] - Y11Freq[0])
-        dressedFreq = calculateDressedFrequency(Y11Freq, Y11InterpFunc)
-        # See Junling's thesis equations 4.19
-        equivC = 1 / 2 * (np.imag(derivative(Y11InterpFunc, dressedFreq, derivativeResolution))
-                          - np.imag(derivative(YRestInterpFunc, dressedFreq, derivativeResolution))
-                          - np.imag(YRestInterpFunc(dressedFreq)) / dressedFreq)
-        equivL = 2 / (dressedFreq ** 2 * (np.imag(derivative(Y11InterpFunc, dressedFreq, derivativeResolution))
-                                          - np.imag(derivative(YRestInterpFunc, dressedFreq, derivativeResolution)))
-                      + dressedFreq * np.imag(YRestInterpFunc(dressedFreq)))
-        return equivL, equivC
-
-    @property
-    def equivC(self):
-        return self.resultsDict["equivC(F):"]
-
-    @property
-    def equivL(self):
-        return self.resultsDict["equivL(H):"]
+        return np.array(capMat)
 
 
 class CapMatGESimulation(Simulation):
@@ -410,7 +364,9 @@ class CapMatGESimulation(Simulation):
         header = [component.name for component in self.postGEComponentList]
 
         capMat_GE, phiMat, RHS = self.gaussianElimination()
-        resultsDict = {"Header": header, "capMat (F)": capMat_GE.tolist()}
+        capMat_GE_np = np.array(capMat_GE).astype(np.float64)
+        resultsDict = {"Header": header, "capMatGE (F)": capMat_GE_np.tolist()}
+
         jsonWrite(self.resultsFilePath, resultsDict)
 
     @property
@@ -424,8 +380,8 @@ class CapMatGESimulation(Simulation):
         for readoutResonatorIndex, readoutResonator in self.qSys.allReadoutResonatorsDict.items():
             lumpedRSim = LumpedRSimulation(self.qSys, readoutResonatorIndex)
             index = ansysCapMatHeaders.index(readoutResonator.pad2.node.name)
-            capMatReduced[index, index] = capMatReduced[index, index] - sum(
-                capMatReduced.row(index)) + lumpedRSim.equivC
+            capMatReduced[index, index] = (capMatReduced[index, index]
+                                           - sum(capMatReduced.row(index)) + lumpedRSim.equivC)
         """Remove all control lines and resonator pad1 from the capacitance matrix. This is under the assumption that
         the resonator pad1 only has a non-negligible capacitance to the feedline, 
         thereby not affecting the system Hamiltonian."""
@@ -553,41 +509,47 @@ class CapMatGESimulation(Simulation):
 
     @property
     def capMatGE(self):
-        headerLineIndex = 1
-        numNodes = len(self.postGEComponentList)
-        capMatGE = np.zeros((numNodes, numNodes))
-        capMatGEStartLineIndex = headerLineIndex + 1
-        for index1 in range(numNodes):
-            for index2 in range(numNodes):
-                matRow = capMatGEStartLineIndex + index1
-                matCol = 1 + index2
-                capacitanceValue = float(self.resultsFileLines[matRow][matCol])
-                capMatGE[index1, index2] = capacitanceValue
-        return capMatGE
+        return np.array(jsonRead(self.resultsFilePath)["capMatGE (F)"])
 
 
 class Quantize(Simulation):
     def __init__(self, qSys):
         super().__init__(qSys, "quantize")
-        self.HStateOrder_calculated = None
 
     def initialize(self):
         quantizeList = "["
         for component in CapMatGESimulation(self.qSys).postGEComponentList:
             quantizeList += component.name + ":"
         quantizeList = quantizeList[0:-1] + "]"
-        self.simParamsLines = [
-            ["QuantizeList", quantizeList],
-            ["NumResonatorPhotons", "5"],
-            ["NumQubitPhotons", "5"],
-            ["TrigOrder", "10"]
-        ]
-
-        super(Quantize, self).initialize()
+        simParamsDict = {"QuantizeList": quantizeList, "NumResonatorPhotons": 5, "NumQubitPhotons": 5,
+                         "TrigOrder": 10}
+        self.generateParams(simParamsDict)
 
     def postProcess(self):
-        super(Quantize, self).postProcess()
+        self.deleteUnneededFiles()
         self.quantizeSimulation()
+
+    def QsecondQuant(self, component, dim, numComponents):
+        QsecondQuant=None
+        if issubclass(type(component), Qubit):
+            EC = ECQSim(component.index)(self.qSys).EC
+            QsecondQuant = component.QsecondQuant(dim, numComponents, self.quantizeIndex(component), EC)
+        elif isinstance(component, ReadoutResonator):
+            equivL = LumpedRSim(component.index)(self.qSys).equivL
+            EC = ECRSim(component.index)(self.qSys).EC
+            QsecondQuant = component.QsecondQuant(dim, numComponents, self. quantizeIndex(component), equivL, EC)
+        return QsecondQuant
+
+    def PhisecondQuant(self, component, dim, numComponents):
+        PhisecondQuant=None
+        if issubclass(type(component), Qubit):
+            EC = ECQSim(component.index)(self.qSys).EC
+            PhisecondQuant = component.PhisecondQuant(dim, numComponents, self.quantizeIndex(component), EC)
+        elif isinstance(component, ReadoutResonator):
+            equivL = LumpedRSim(component.index)(self.qSys).equivL
+            EC = ECRSim(component.index)(self.qSys).EC
+            PhisecondQuant = component.PhisecondQuant(dim, numComponents, self. quantizeIndex(component), equivL, EC)
+        return PhisecondQuant
 
     def quantizeSimulation(self):
         print("started quantize")
@@ -598,8 +560,8 @@ class Quantize(Simulation):
         capMatGE = CapMatGESim.capMatGE
         postGEComponentList = CapMatGESim.postGEComponentList
 
-        numQubitPhotons = self.simParamsDict["NumQubitPhotons"]
-        numResonatorPhotons = self.simParamsDict["NumResonatorPhotons"]
+        numQubitPhotons = self.simParams["NumQubitPhotons"]
+        numResonatorPhotons = self.simParams["NumResonatorPhotons"]
         numPhotons = max(numQubitPhotons, numResonatorPhotons)
 
         # self.capMatGE needs to be reduced based on the requested components to quantize.
@@ -623,9 +585,9 @@ class Quantize(Simulation):
         for Cinv_rowIndex, Cinv_row in enumerate(Cinv):
             resolveRHSSum = qzero(qObjDim)
             for componentIndex, component in enumerate(HComponentOrder):
-                resolveRHSSum += Cinv_row[componentIndex] * component.QsecondQuant(dim, numComponents)
+                    resolveRHSSum += Cinv_row[componentIndex] * self.QsecondQuant(component, dim, numComponents)
             LHSComponent = HComponentOrder[Cinv_rowIndex]
-            resolveLHSSum += 1 / 2 * LHSComponent.QsecondQuant(dim, numComponents) * resolveRHSSum
+            resolveLHSSum += 1 / 2 * self.QsecondQuant(LHSComponent, dim, numComponents) * resolveRHSSum
         H = resolveLHSSum
         endTime = time.time()
         print("Finished assembling H", (endTime - startTime) / 60)
@@ -636,15 +598,15 @@ class Quantize(Simulation):
         # Add inductance terms
         for component in HComponentOrder:
             print(component.name)
-            if issubclass(type(component), qSysObjects.Qubit) or isinstance(component, qSysObjects.StraightBusCoupler):
-                x = ((2 * np.pi * np.sqrt(hbarConst) / Phi_0Const) * component.PhisecondQuant(dim, numComponents))
-                for i in range(int(self.simParamsDict["TrigOrder"] / 2) + 1):
+            if issubclass(type(component), qSysObjects.Qubit):
+                x = ((2 * np.pi * np.sqrt(hbarConst) / Phi_0Const) * self.PhisecondQuant(component, dim, numComponents))
+                for i in range(int(self.simParams["TrigOrder"] / 2) + 1):
                     cosTerm = (-1) ** i * x ** (2 * i) / np.math.factorial(2 * i)
                     H -= (component.EJ / hbarConst) * cosTerm
                     print("cos x^" + str(2 * i) + " term Frobenius norm: ", cosTerm.norm(norm="fro"))
             elif isinstance(component, qSysObjects.ReadoutResonator):
-                lumpedRSim=LumpedRSimulation(self.qSys,component.index)
-                term = component.PhisecondQuant(dim, numComponents) ** 2 / (2 * component.equivL(lumpedRSim))
+                lumpedRSim = LumpedRSim(component.index)(self.qSys)
+                term = self.PhisecondQuant(component, dim, numComponents) ** 2 / (2 * lumpedRSim.equivL)
                 H += term
         endTime = time.time()
         print("Finished adding inductance", (endTime - startTime) / 60)
@@ -697,8 +659,8 @@ class Quantize(Simulation):
         """Each element is a list of the eigenstates in fock ordering for a particular component."""
         subspaceEigenstates = []
         for component in HComponentOrder:
-            fockStates = [[n if i == self.quantizeIndex(component.name) else 0 for i in range(numComponents)] for n in
-                          range(newHDim[self.quantizeIndex(component.name)])]
+            fockStates = [[n if i == self.quantizeIndex(component) else 0 for i in range(numComponents)] for n in
+                          range(newHDim[self.quantizeIndex(component)])]
             subspaceStateIndices = [stateListHIndices[str(i)] for i in fockStates]
             componentH = H.extract_states(subspaceStateIndices)
             subspaceEigenstates.append(componentH.eigenstates()[1])
@@ -743,24 +705,15 @@ class Quantize(Simulation):
 
         # Output
         print("Starting output")
-        lines = [
-            ["Index Order"],
-            [i.name for i in HComponentOrder],
-            [""],
-            ["H (GHz)"],
-            [""] + H_output_headers
-        ]
-        for index, H_output_line in enumerate(H_output):
-            matRow = [H_output_headers[index]] + [np.real(j) for j in list(H_output_line)]
-            lines.append(matRow)
-        lines.append([""])
-        lines.append(["H_evals"])
-        lines.append(eigsRealNorm)
-        lines.append([""])
-        csvWrite(self.resultsFilePath, lines)
+
+        resultsDict = {"Index Order": [i.name for i in HComponentOrder], "Headers": H_output_headers,
+                       "H_output (GHz)": H_output.astype(str).tolist(), "Evals (GHz)": eigsRealNorm}
+        jsonWrite(self.resultsFilePath, resultsDict)
+
         quantizeEndTime = time.time()
         print("Total time:", (quantizeEndTime - quantizeStartTime) / 60)
 
+    @staticmethod
     def readQuantizeList(quantizeList):
         return [str(i) for i in quantizeList[1:-1].split(":")]
 
@@ -770,7 +723,7 @@ class Quantize(Simulation):
 
     @property
     def HComponentOrder(self):
-        quantizeComponentListNames = self.readQuantizeList(self.simParamsDict["QuantizeList"])
+        quantizeComponentListNames = self.readQuantizeList(self.simParams["QuantizeList"])
         quantizeComponentList = [self.qSys.componentFromName(i) for i in quantizeComponentListNames]
         return quantizeComponentList
 
@@ -778,33 +731,25 @@ class Quantize(Simulation):
     def headerLineIndex(self):
         return self.resultsFileLines.index([i for i in self.resultsFileLines if i[0] == "H (GHz)"][0]) + 1
 
-    def quantizeIndex(self, componentName):
-        return [self.HComponentOrder.index(i) for i in self.HComponentOrder if i.name == componentName][0]
+    def quantizeIndex(self, component):
+        return [self.HComponentOrder.index(i) for i in self.HComponentOrder if i.name == component.name][0]
 
     @property
     def HStateOrder(self):
-        resultsFileLines = self.resultsFileLines
-        HStateOrder = [stateFromHeader(i) for i in arrayNoBlanks(resultsFileLines[self.headerLineIndex][1:])]
+        HStateOrder = [stateFromHeader(i) for i in self.Headers]
         return HStateOrder
 
     @property
     def H(self):
-        HStartLineIndex = self.headerLineIndex + 1
-
-        numStates = len(self.HStateOrder)
-        H = np.zeros((numStates, numStates))
-        for index1 in range(numStates):
-            for index2 in range(numStates):
-                matRow = HStartLineIndex + index1
-                matCol = 1 + index2
-                matElem = float(self.resultsFileLines[matRow][matCol])
-                H[index1, index2] = matElem
-        return H
+        return np.array(jsonRead(self.resultsFilePath)["H_output (GHz)"]).astype(complex)
 
     @property
     def HEvals(self):
-        HEvalsIndex = self.resultsFileLines.index([i for i in self.resultsFileLines if i[0] == "H_evals"][0]) + 1
-        return [float(i) for i in arrayNoBlanks(self.resultsFileLines[HEvalsIndex])]
+        return jsonRead(self.resultsFilePath)["Evals (GHz)"]
+
+    @property
+    def Headers(self):
+        return jsonRead(self.resultsFilePath)["Headers"]
 
     def HEval(self, stateList):
         """Find the eigenvalue corresponding to the undressed energy.
@@ -831,6 +776,57 @@ class Quantize(Simulation):
         return s
 
 
+def LumpedRSim(index):
+    class LumpedRSimulation(Simulation):
+        def __init__(self, qSys):
+            super(LumpedRSimulation, self).__init__(qSys, "lumpedR" + str(index))
+            self.index = index
+            self.Y11RSimName = "Y11R" + str(self.index)
+            self.YRestRSimName = "YRestR" + str(self.index)
+            self.circuitSims = {
+                self.Y11RSimName: Y11RSimulation(self.Y11RSimName, self.directoryPath, qSys, self.index),
+                self.YRestRSimName: YRestRSimulation(self.YRestRSimName, self.directoryPath, qSys, self.index)}
+
+        def initialize(self):
+            simParamsDict = S21_params
+            self.generateParams(simParamsDict)
+
+        def run(self):
+            self.runAllSims()
+
+        def postProcess(self):
+            self.deleteUnneededFiles()
+            equivL_val, equivC_val = self.calculateLumpedResonator()
+            resultsDict = {"equivL(H):": equivL_val, "equivC(F):": equivC_val}
+            jsonWrite(self.resultsFilePath, resultsDict)
+            print("equivL(H):" + str(self.equivL))
+            print("equivC(F):" + str(self.equivC))
+
+        def calculateLumpedResonator(self):  # Calculates from lumpedR files
+            # Load Y11,YRest data
+            Y11Freq, Y11_Y11, Y11InterpFunc = readY11Data(self.circuitSims[self.Y11RSimName].resultsFilePath)
+            YRestFreq, YRest_Y11, YRestInterpFunc = readY11Data(self.circuitSims[self.YRestRSimName].resultsFilePath)
+            derivativeResolution = np.abs(Y11Freq[1] - Y11Freq[0])
+            dressedFreq = calculateDressedFrequency(Y11Freq, Y11InterpFunc)
+            # See Junling's thesis equations 4.19
+            equivC = 1 / 2 * (np.imag(derivative(Y11InterpFunc, dressedFreq, derivativeResolution))
+                              - np.imag(derivative(YRestInterpFunc, dressedFreq, derivativeResolution))
+                              - np.imag(YRestInterpFunc(dressedFreq)) / dressedFreq)
+            equivL = 2 / (dressedFreq ** 2 * (np.imag(derivative(Y11InterpFunc, dressedFreq, derivativeResolution))
+                                              - np.imag(derivative(YRestInterpFunc, dressedFreq, derivativeResolution)))
+                          + dressedFreq * np.imag(YRestInterpFunc(dressedFreq)))
+            return equivL, equivC
+
+        @property
+        def equivC(self):
+            return self.resultsDict["equivC(F):"]
+
+        @property
+        def equivL(self):
+            return self.resultsDict["equivL(H):"]
+    return LumpedRSimulation
+
+
 def ECQSim(index):
     class ECQSimulation(Simulation):
         def __init__(self, qSys):
@@ -838,9 +834,11 @@ def ECQSim(index):
             self.index = index
 
         def postProcess(self):
+            self.deleteUnneededFiles()
+
             CapMatGESim = CapMatGESimulation(self.qSys)
             postGEComponentList = CapMatGESim.postGEComponentList
-            super(ECQSimulation, self).postProcess()
+
             qubitObj = self.qSys.allQubitsDict[self.index]
             qubitColumnIndex = postGEComponentList.index(qubitObj)
             cInv = np.linalg.inv(CapMatGESim.capMatGE)
@@ -851,16 +849,14 @@ def ECQSim(index):
             print(qubitObj.name + "EC (GHz): " + str(E_C * Joules_To_GHz))
             print(qubitObj.name + "EJ (GHz): " + str(EJ * Joules_To_GHz))
             print(qubitObj.name + "EJ/EC: " + str(EJ / E_C))
-            lines = [["EC", str(E_C)], ["EJ/EC", str(EJ / E_C)]]
-            csvWrite(self.resultsFilePath, lines)
+
+            resultsDict = {"EC": E_C, "EJ/EC": EJ / E_C}
+
+            jsonWrite(self.resultsFilePath, resultsDict)
 
         @property
         def EC(self):
             return self.resultsDict["EC"]
-
-        def updateqSys(self):
-            qSys.allQubitsDict[self.index].EcVal = self.EC
-
     return ECQSimulation
 
 
@@ -879,8 +875,9 @@ def ECRSim(index):
             cSum = 1 / cInv[resonatorColumnIndex, resonatorColumnIndex]
 
             E_C = eConst ** 2 / (2 * cSum)  # In Joules
-            lines = [["EC", str(E_C)]]
-            csvWrite(self.resultsFilePath, lines)
+
+            resultsDict = {"EC": E_C}
+            jsonWrite(self.resultsFilePath, resultsDict)
 
         @property
         def EC(self):
@@ -888,39 +885,28 @@ def ECRSim(index):
     return ECRSimulation
 
 
-def ZZQSim(q1Index,q2Index):
-    class ZZQSimulation(Simulation):
-        def __init__(self, qSys):
-            super(ZZQSimulation, self).__init__(qSys, "zzQ" + str(q1Index) + "-" + str(q2Index))
-            self.q1Index = q1Index
-            self.q2Index = q2Index
+"""Everything below here is a calculation, which is not saved in a folder."""
 
-        def postProcess(self):
-            qubitIndices = [self.q1Index, self.q2Index]
-            quantizeIndices = [self.qSys.allQubitsDict[i].quantizeIndex for i in qubitIndices]
-            QuantizeObj = Quantize(self.qSys)
-            stateListFunc = QuantizeObj.stateList
 
-            stateList01 = stateListFunc([[quantizeIndices[1], 1]])
-            stateList10 = stateListFunc([[quantizeIndices[0], 1]])
-            stateList11 = stateListFunc([[quantizeIndices[0], 1], [quantizeIndices[1], 1]])
+def ZZQCalc(qSys, q1Index, q2Index):
+    QuantizeObj = Quantize(qSys)
+    q1QuantizeIndex = QuantizeObj.quantizeIndex(qSys.allQubitsDict[q1Index])
+    q2QuantizeIndex = QuantizeObj.quantizeIndex(qSys.allQubitsDict[q2Index])
 
-            E11 = QuantizeObj.HEval(stateList11)
-            E10 = QuantizeObj.HEval(stateList10)
-            E01 = QuantizeObj.HEval(stateList01)
+    stateListFunc = QuantizeObj.stateList
 
-            print("E11 (GHz):", E11)
-            print("E10 (GHz):", E10)
-            print("E01 (GHz):", E01)
+    stateList01 = stateListFunc([[q2QuantizeIndex, 1]])
+    stateList10 = stateListFunc([[q1QuantizeIndex, 1]])
+    stateList11 = stateListFunc([[q1QuantizeIndex, 1], [q2QuantizeIndex, 1]])
 
-            gz = E11 - E01 - E10
+    E11 = QuantizeObj.HEval(stateList11)
+    E10 = QuantizeObj.HEval(stateList10)
+    E01 = QuantizeObj.HEval(stateList01)
 
-            print("gz" + str(qubitIndices[0]) + "-" + str(qubitIndices[1]) + "(MHz): ", gz * 1000)
+    print("E11 (GHz):", E11)
+    print("E10 (GHz):", E10)
+    print("E01 (GHz):", E01)
 
-            lines = [["g_z (MHz):", str(gz * 1000)]]
-            csvWrite(self.resultsFilePath, lines)
+    gz = E11 - E01 - E10
 
-        @property
-        def gz(self):
-            return self.resultsDict["g_z (MHz):"]
-    return ZZQSimulation
+    print("gz" + str(q1Index) + "-" + str(q2Index) + "(MHz): ", gz * 1000)

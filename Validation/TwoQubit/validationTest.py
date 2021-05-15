@@ -29,10 +29,6 @@ def copyFile(sourceFile, destinationFile):
 #
 qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder)  # Once systemParameters is available and filled out, ALWAYS run this command first.
 qSys.loadDesignFiles()
-simulationList = [ECQSim(i) for i in range(qSys.sysParams["Number of Qubits"])]
-QSM.updateqSys(qSys, simulationList)
-
-
 
 # qSys.loadGeometries()
 
@@ -56,29 +52,28 @@ QSM.updateqSys(qSys, simulationList)
 
 # qSys.loadDesignFiles()
 # for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.items():
-    # LumpedRSimulation(qSys,readoutResonatorIndex).initialize()
-    # LumpedRSimulation(qSys,readoutResonatorIndex).run()
-    # LumpedRSimulation(qSys,readoutResonatorIndex).postProcess()
+    # LumpedRSim(readoutResonatorIndex)(qSys).initialize()
+    # LumpedRSimulation(readoutResonatorIndex)(qSys).run()
+    # LumpedRSimulation(readoutResonatorIndex)(qSys).postProcess()
 
 # CapMatGESimulation(qSys).postProcess()
 
 
 # qSys.loadDesignFiles()
-# for qubitIndex,qubit in qSys.allQubitsDict.items():
-#     ECQSimulation(qSys,qubitIndex).initialize()
-#     ECQSimulation(qSys,qubitIndex).postProcess()
+# for qubitIndex, qubit in qSys.allQubitsDict.items():
+#     ECQSim(qubitIndex)(qSys).postProcess()
 
 # qSys.loadDesignFiles()
 # for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.items():
-#     ECRSimulation(qSys,readoutResonatorIndex).initialize()
-#     ECRSimulation(qSys,readoutResonatorIndex).postProcess()
+#     ECRSim(readoutResonatorIndex)(qSys).postProcess()
 
 
 
 # Quantize(qSys).initialize()
 # Quantize(qSys).postProcess()
 
-# ZZQSimulation(qSys,0,1).initialize()
+# print(type(Quantize(qSys).HEvals[0]))
+ZZQCalc(qSys, 0, 1)
 
 # ZZQSimulation(qSys,0,1).postProcess()
 

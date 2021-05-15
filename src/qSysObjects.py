@@ -71,8 +71,8 @@ class Qubit:
         return self.componentParams["L_J(H)"]
 
     @property
-    def quantizeIndex(self, QuantizeObj):
-        return QuantizeObj.quantizeIndex(self.name)
+    def EJ(self):
+        return (Phi_0Const / (2 * np.pi)) ** 2 / self.LJ
 
     def QSym(self, dim, numComponents):
         return MatrixSymbol("Q_Q" + str(self.index), dim ** numComponents, dim ** numComponents)
@@ -80,39 +80,36 @@ class Qubit:
     def PhiSym(self, dim, numComponents):
         return MatrixSymbol("Phi_Q" + str(self.index), dim ** numComponents, dim ** numComponents)
 
-    def QsecondQuant(self, dim, numComponents):  # Returns a Qobj matrix. Already divided out hbar.
-        return 1j * np.sqrt(1 / (2 * self.Z)) * (self.aDagger(dim, numComponents) - self.a(dim, numComponents))
+    def QsecondQuant(self, dim, numComponents, quantizeIndex, EC):  # Returns a Qobj matrix. Already divided out hbar.
+        return 1j * np.sqrt(1 / (2 * self.Z(EC))) * (self.aDagger(dim, numComponents, quantizeIndex)
+                                                     - self.a(dim, numComponents, quantizeIndex))
 
-    def PhisecondQuant(self, dim, numComponents):  # Returns a Qobj matrix. Already divided out hbar.
-        return np.sqrt(1 * self.Z / 2) * (self.aDagger(dim, numComponents) + self.a(dim, numComponents))
+    def PhisecondQuant(self, dim, numComponents, quantizeIndex, EC):  # Returns a Qobj matrix. Already divided out hbar.
+        return np.sqrt(1 * self.Z(EC) / 2) * (self.aDagger(dim, numComponents, quantizeIndex)
+                                              + self.a(dim, numComponents, quantizeIndex))
 
-    @property
-    def L_i_calculated(self):
-        return 1 / (self.omega_i ** 2 * eConst ** 2 / (2 * self.EcVal))
+    # @property
+    # def L_i_calculated(self):
+    #     return 1 / (self.omega_i ** 2 * eConst ** 2 / (2 * self.EcVal))
 
-    @property
-    def EJ(self):
-        return (Phi_0Const / (2 * np.pi)) ** 2 / self.LJ
+    def omega_J(self, EC):
+        return 1 / np.sqrt(self.LJ * eConst ** 2 / (2 * EC))
+    #
+    # @property
+    # def omega_i(self, EC):
+    #     return self.omega_J(EC) - (EC / hbarConst) / (1 - EC / (hbarConst * self.omega_J(EC))
 
-    @property
-    def omega_J(self):
-        return 1 / np.sqrt(self.LJ * eConst ** 2 / (2 * self.EcVal))
+    def Z(self, EC):
+        return self.omega_J(EC) * self.LJ
 
-    @property
-    def omega_i(self):
-        return self.omega_J - (self.EcVal / hbarConst) / (1 - self.EcVal / (hbarConst * self.omega_J))
-
-    @property
-    def Z(self):
-        return self.omega_J * self.LJ
-
-    def a(self, dim, numComponents):
+    @staticmethod
+    def a(dim, numComponents, quantizeIndex):
         tensorState = [qeye(dim)] * numComponents
-        tensorState[self.quantizeIndex] = destroy(N=dim)
+        tensorState[quantizeIndex] = destroy(N=dim)
         return tensor(tensorState)
 
-    def aDagger(self, dim, numComponents):
-        return self.a(dim, numComponents).dag()
+    def aDagger(self, dim, numComponents, quantizeIndex):
+        return self.a(dim, numComponents, quantizeIndex).dag()
 
 
 class FloatingQubit(Qubit):
@@ -254,14 +251,16 @@ class CPWResonator:
     def PhiSym(self, dim, numComponents):
         return MatrixSymbol("Phi_R" + str(self.index), dim ** numComponents, dim ** numComponents)
 
-    def omega(self, LumpedRSimObj, ECRSimObj):
-        return 1 / np.sqrt(LumpedRSimObj.equivL * eConst ** 2 / (2 * ECRSimObj.EcVal))
+    def omega(self, equivL, EC):
+        return 1 / np.sqrt(equivL * eConst ** 2 / (2 * EC))
 
-    def QsecondQuant(self, dim, numComponents):  # Returns a Qobj matrix. Already divided out hbar.
-        return 1j * np.sqrt(1 / (2 * self.Z)) * (self.aDagger(dim, numComponents) - self.a(dim, numComponents))
+    def QsecondQuant(self, dim, numComponents, quantizeIndex, equivL, EC):  # Returns a Qobj matrix. Already divided out hbar.
+        return 1j * np.sqrt(1 / (2 * self.Z(equivL, EC))) * (self.aDagger(dim, numComponents, quantizeIndex)
+                                                             - self.a(dim, numComponents, quantizeIndex))
 
-    def PhisecondQuant(self, dim, numComponents):  # Returns a Qobj matrix. Already divided out hbar.
-        return np.sqrt(1 * self.Z / 2) * (self.aDagger(dim, numComponents) + self.a(dim, numComponents))
+    def PhisecondQuant(self, dim, numComponents, quantizeIndex, equivL, EC):  # Returns a Qobj matrix. Already divided out hbar.
+        return np.sqrt(1 * self.Z(equivL, EC) / 2) * (self.aDagger(dim, numComponents, quantizeIndex)
+                                                      + self.a(dim, numComponents, quantizeIndex))
 
     def updateMeanderNode(self, CPW_obj):
         endAngles = [self.geometryParams["Pad 1 Curve Angle"], self.geometryParams["Pad 2 Curve Angle"]]
@@ -291,16 +290,16 @@ class CPWResonator:
     def bareFreq(self, CPW_obj):
         return CPW_obj.vp() / (2 * self.length)
 
-    def Z(self, lumpedRSimObj):
-        return self.omega * lumpedRSimObj.equivL
+    def Z(self, equivL, EC):
+        return self.omega(equivL, EC) * equivL
 
-    def a(self, dim, numComponents):
+    def a(self, dim, numComponents, quantizeIndex):
         tensorState = [qeye(dim)] * numComponents
-        tensorState[self.quantizeIndex] = destroy(N=dim)
+        tensorState[quantizeIndex] = destroy(N=dim)
         return tensor(tensorState)
 
-    def aDagger(self, dim, numComponents):
-        return self.a(dim, numComponents).dag()
+    def aDagger(self, dim, numComponents, quantizeIndex):
+        return self.a(dim, numComponents, quantizeIndex).dag()
 
 
 class ReadoutResonator(CPWResonator):

@@ -962,8 +962,3 @@ def readJJLocation(JJLocationCode):
     """JJLocationCode is in the form [10:-20] corresponding to a shift 10um to the right and 20um down."""
     JJLoc = [float(i) for i in JJLocationCode[1:-1].split(":")]
     return JJLoc[0], JJLoc[1]
-
-
-def updateqSys(qSys, simulationList):
-    for simulation in simulationList:
-        simulation(qSys).updateqSys()
