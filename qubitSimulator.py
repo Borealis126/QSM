@@ -1,60 +1,43 @@
 #Import modules
 import sys
 import os
-computeLocation="Windows"#Edit this based on where the QSM is being run. Users at NIST should use "68707Max"
-QSMSourceFolder=""
+computeLocation="Windows" # Edit this based on where the QSM is being run. Users at NIST should use "68707Max"
 QSMSourceFolder="O:/68707/JoelHoward/ChipDesign/QSMSource/"
 sys.path.append(QSMSourceFolder)
 import qubitSimulationModule as QSM
+projectFolder = Path(os.path.dirname(os.path.abspath( __file__ )))
 
-projectFolder=Path(os.path.dirname(os.path.abspath( __file__ )))
+# QSM.generateSystemParams(projectFolder)#Run this command to generate the systemParameters file.
 
-#QSM.generateSystemParametersFile(projectFolder)#Run this command to generate the systemParameters file.
+# Once systemParameters is available and filled out, ALWAYS run this command first.
+qSys = QSM.initialize(projectFolder,computeLocation,QSMSourceFolder)
 
-qSys=QSM.initialize(projectFolder,computeLocation,QSMSourceFolder)#Once systemParameters is available and filled out, ALWAYS run this command first.
-#qSys.generateFile("GDS")#Run this command to generate layout files. "componentParams" --> "geometries" --> "GDS"
-#qSys.simulationCommand(["simulation","ECQ0","postProcess"])#All "simulations" require completed layout files. 
+# Generate and populate these sequentially.
+# qSys.generateComponentParams()
+# qSys.generateGeometries()
 
+# qSys.loadDesignFiles() # Once geometries is populated ALWAYS run this after QSM.initialize
 
-#SIMULATION COMMANDS
-#-----------------------------------------------------------------------------------------------------------
-#CAPACITANCE MATRIX
-#["simulation","capMat",{"init","run","postProcess"}]
-#-----------------------------------------------------------------------------------------------------------
-#CIRCUIT SIMULATIONS
-#["simulation","fullS21",{"init","run","postProcess"}]
+# qSys.generateGDS() #Optional to view layout.
 
-#["simulation","freqQ[N]",{"init","run","postProcess"}]
-#["simulation","decayQ[N]",{"init","run","postProcess"}]
-#["simulation","exchQ[N1]-[N2]",{"init","run"}] e.g. ["simulation","exchQ0-2","run"]
+# Run these sequentially. Populate simParams file after initialize().
+# CapMatSimulation(qSys).initialize()
+# CapMatSimulation(qSys).run()
+# CapMatSimulation(qSys).postProcess()
 
-#["simulation","freqR[N]",{"init","run","postProcess"}]
-#["simulation","lumpedR[N]",{"init","run","postProcess"}]
-#["simulation","feedlineCouplingR[N]",{"init","run","postProcess"}]#Depends on results of freqQ[N]
+# for readoutResonatorIndex, readoutResonator in qSys.allReadoutResonatorsDict.items():
+    # LumpedRSim(readoutResonatorIndex)(qSys).initialize()
+    # LumpedRSim(readoutResonatorIndex)(qSys).run()
+    # LumpedRSim(readoutResonatorIndex)(qSys).postProcess()
 
-#Helper commands:
-#"initAllCircuitSims"
-#"runAllCircuitSims"
-#"postProcessAllCircuitSims"
-#-----------------------------------------------------------------------------------------------------------
-#AFTER CIRCUIT SIMULATIONS
-#["simulation","capMatGE",{"init","postProcess"}]
-#["simulation","ECQ[N]",{"init","postProcess"}]#Depends on results of capMatGE
-#["simulation","L_iQ[N]",{"init","postProcess"}]#Check how closely this agrees with L_i in the component parameters file. Depends on EC
+# CapMatGESimulation(qSys).postProcess()
 
-#Helper commands:
-#"GEPlusAllEC": runs init/postprocess for capMatGE and all ECQ
-#"AllL_i"
-#-----------------------------------------------------------------------------------------------------------
-#QUANTIZATION
-#["simulation","quantize",{"init","postProcess"}]#Depends on results of all lumpedR
-#-----------------------------------------------------------------------------------------------------------
-#POST-QUANTIZATION
-#["simulation","zzQ[m]-[n]",{"init","postProcess"}]# i.e. zzQ0-1
-#["simulation","anharmonicityQ[N]",{"init","postProcess"}]
-#["simulation","dispersiveShiftR[N]",{"init","postProcess"}]
+# for qubitIndex, qubit in qSys.allQubitsDict.items():
+#     ECQSim(qubitIndex)(qSys).postProcess()
+# for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.items():
+#     ECRSim(readoutResonatorIndex)(qSys).postProcess()
 
-#Helper commands:
-#"Allzz"
-#"AllAnharmonicityQ"
-#-----------------------------------------------------------------------------------------------------------
+# Quantize(qSys).initialize()
+# Quantize(qSys).postProcess()
+
+# ZZQCalc(qSys, 0, 1)

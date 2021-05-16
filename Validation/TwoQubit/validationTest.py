@@ -26,35 +26,28 @@ def copyFile(sourceFile, destinationFile):
 
 # QSM.generateSystemParametersFile(projectFolder)  # Run this command to generate the systemParameters file.
 # copyFile(copyDir / "systemParametersFile.csv", projectFolder / "systemParametersFile.csv")
-#
-qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder)  # Once systemParameters is available and filled out, ALWAYS run this command first.
+
+# Once systemParameters is available and filled out, ALWAYS run this command first.
+qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder)
 qSys.loadDesignFiles()
 
-# qSys.loadGeometries()
-
 # qSys.generateComponentParams()
-# copyFile(copyDir/"componentParametersFile.csv",projectFolder/"componentParametersFile.csv")
+# copyFile(copyDir/"componentParametersFile.csv",projectFolder/"componentParametersFile.json")
 #
 # qSys.generateGeometries()
-# copyFile(copyDir/"componentGeometriesFile.csv",projectFolder/"componentGeometriesFile.csv")
-
+# copyFile(copyDir/"componentGeometriesFile.csv",projectFolder/"componentGeometriesFile.json")
 
 # qSys.generateGDS()
-# #
+
 # CapMatSimulation(qSys).initialize()
 # CapMatSimulation(qSys).run()
-
 # CapMatSimulation(qSys).postProcess()
 
-# copyFile(copyDir/"capMat"/"SimulationParameters.csv",projectFolder/"capMat"/"SimulationParameters.csv")
-
-
-
 # qSys.loadDesignFiles()
-# for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.items():
+# for readoutResonatorIndex, readoutResonator in qSys.allReadoutResonatorsDict.items():
     # LumpedRSim(readoutResonatorIndex)(qSys).initialize()
-    # LumpedRSimulation(readoutResonatorIndex)(qSys).run()
-    # LumpedRSimulation(readoutResonatorIndex)(qSys).postProcess()
+    # LumpedRSim(readoutResonatorIndex)(qSys).run()
+    # LumpedRSim(readoutResonatorIndex)(qSys).postProcess()
 
 # CapMatGESimulation(qSys).postProcess()
 
@@ -72,10 +65,8 @@ qSys.loadDesignFiles()
 # Quantize(qSys).initialize()
 # Quantize(qSys).postProcess()
 
-# print(type(Quantize(qSys).HEvals[0]))
 ZZQCalc(qSys, 0, 1)
 
-# ZZQSimulation(qSys,0,1).postProcess()
 
 # qSys.simulationCommand(["simulation","quantize","postProcess"])
 # qSys.simulationCommand(["simulation","zzQ0-1","postProcess"])

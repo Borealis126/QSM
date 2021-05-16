@@ -25,6 +25,7 @@ def generateSystemParametersFile(folder):
 
 def initialize(projectFolder, computeLocation, QSMSourceFolder):
     qSys = loadSystemParametersFile(projectFolder, computeLocation, QSMSourceFolder)
+
     return qSys
 
 

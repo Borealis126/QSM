@@ -11,9 +11,9 @@ from constants import *
 from analysisFunctions import *
 from quantumStateFunctions import stateFromHeader, baseRepresentation, H_Header
 from scipy.misc import derivative
-from sympy import zeros, Matrix, zeros, sin
+from sympy import Matrix, zeros, sin
 from qSysObjects import GroundedQubit, FloatingQubit, ReadoutResonator, Qubit
-from qutip import state_number_index, qzero, ket, bra
+from qutip import state_number_index, qzero, ket, bra, tensor, destroy, qeye
 
 """Simulations are anything that is saved to a folder. 
 These are anything requiring Ansys and anything with a non-trivial calculation time (matrix inversion, etc.)"""
@@ -33,9 +33,12 @@ class Simulation:
         self.paramsPath = self.directoryPath / "SimulationParameters.json"
         self.resultsFilePath = self.directoryPath / "Results.json"
 
-    @property
-    def simParams(self):
-        return jsonRead(self.paramsPath)
+        self.simParams = dict()
+        self.resultsDict = dict()
+        if os.path.exists(self.paramsPath):
+            self.simParams = jsonRead(self.paramsPath)
+        if os.path.exists(self.resultsFilePath):
+            self.resultsDict = jsonRead(self.resultsFilePath)
 
     def runAnsysSimulator(self, aedtFile, simulatorFile, maxRunTime):
         simulateCommand = ""
@@ -52,8 +55,7 @@ class Simulation:
     def createDirectory(self):
         # Create the directory if it doesn't yet exist.
         if self.qSys.sysParams["Compute Location"] == "Windows":
-            bashCommand = "if not exist " + str(self.directoryPath) + " mkdir " + str(
-                self.directory)
+            bashCommand = "if not exist " + str(self.directoryPath) + " mkdir " + str(self.directoryPath)
             subprocess.call(bashCommand, shell=True)
         elif self.qSys.sysParams["Compute Location"] == "Cluster":
             subprocess.call("rm -rf " + str(self.directoryPath), shell=True)
@@ -152,16 +154,13 @@ class Simulation:
             )
         subprocess.call(copyAEDTTemplateCommand, shell=True)
 
-    @property
-    def resultsDict(self):
-        return jsonRead(self.resultsFilePath)
-
 
 class CapMatSimulation(Simulation):
     def __init__(self, qSys):
         super().__init__(qSys, "capMat")
         q3dSimName = "capMatExtractor"
         self.q3dSims = {q3dSimName: Q3DExtractor(q3dSimName, self.directoryPath)}
+
     def initialize(self):
         simParamsDict = {"PerRefine": "100", "MaxPass": "99"}
         self.generateParams(simParamsDict)
@@ -313,7 +312,7 @@ class CapMatSimulation(Simulation):
     @property
     def capMat(self):
         numNodes = len(self.ansysCapMatHeaders)
-        capMat = jsonRead(self.resultsFilePath)["capMat (F)"]
+        capMat = self.resultsDict["capMat (F)"]
         """If the feedline is not simulated, add in the capacitance to the resonators."""
         if self.qSys.sysParams["Simulate Feedline?"] == "No" and self.qSys.allControlLinesDict != {}:
             newCapMat = [i+[0] for i in capMat.copy()]  # Add a dimension for the feedline, the highest index.
@@ -378,7 +377,7 @@ class CapMatGESimulation(Simulation):
 
         # Alter the resonator pad 2 capacitance to ground according to the lumped resonator model.
         for readoutResonatorIndex, readoutResonator in self.qSys.allReadoutResonatorsDict.items():
-            lumpedRSim = LumpedRSimulation(self.qSys, readoutResonatorIndex)
+            lumpedRSim = LumpedRSim(readoutResonatorIndex)(self.qSys)
             index = ansysCapMatHeaders.index(readoutResonator.pad2.node.name)
             capMatReduced[index, index] = (capMatReduced[index, index]
                                            - sum(capMatReduced.row(index)) + lumpedRSim.equivC)
@@ -509,12 +508,13 @@ class CapMatGESimulation(Simulation):
 
     @property
     def capMatGE(self):
-        return np.array(jsonRead(self.resultsFilePath)["capMatGE (F)"])
+        return np.array(self.resultsDict["capMatGE (F)"])
 
 
 class Quantize(Simulation):
     def __init__(self, qSys):
         super().__init__(qSys, "quantize")
+        self.CapMatGESim = CapMatGESimulation(self.qSys)
 
     def initialize(self):
         quantizeList = "["
@@ -529,53 +529,64 @@ class Quantize(Simulation):
         self.deleteUnneededFiles()
         self.quantizeSimulation()
 
-    def QsecondQuant(self, component, dim, numComponents):
-        QsecondQuant=None
-        if issubclass(type(component), Qubit):
-            EC = ECQSim(component.index)(self.qSys).EC
-            QsecondQuant = component.QsecondQuant(dim, numComponents, self.quantizeIndex(component), EC)
-        elif isinstance(component, ReadoutResonator):
-            equivL = LumpedRSim(component.index)(self.qSys).equivL
-            EC = ECRSim(component.index)(self.qSys).EC
-            QsecondQuant = component.QsecondQuant(dim, numComponents, self. quantizeIndex(component), equivL, EC)
-        return QsecondQuant
+    @property
+    def numComponents(self):
+        return len(self.HComponentOrder)
 
-    def PhisecondQuant(self, component, dim, numComponents):
-        PhisecondQuant=None
+    @property
+    def maxDim(self):
+        return max(self.simParams["NumQubitPhotons"], self.simParams["NumResonatorPhotons"])+2
+
+    def a(self, component):
+        tensorState = [qeye(self.maxDim)] * self.numComponents
+        tensorState[self.quantizeIndex(component)] = destroy(N=self.maxDim)
+        return tensor(tensorState)
+
+    def aDagger(self, component):
+        return self.a(component).dag()
+
+    def QSecondQuant(self, component):
+        QSecondQuant = None
         if issubclass(type(component), Qubit):
             EC = ECQSim(component.index)(self.qSys).EC
-            PhisecondQuant = component.PhisecondQuant(dim, numComponents, self.quantizeIndex(component), EC)
+            QSecondQuant = 1j * np.sqrt(1 / (2 * component.Z(EC))) * (self.aDagger(component) - self.a(component))
         elif isinstance(component, ReadoutResonator):
             equivL = LumpedRSim(component.index)(self.qSys).equivL
             EC = ECRSim(component.index)(self.qSys).EC
-            PhisecondQuant = component.PhisecondQuant(dim, numComponents, self. quantizeIndex(component), equivL, EC)
-        return PhisecondQuant
+            QSecondQuant = 1j * np.sqrt(1 / (2 * component.Z(equivL, EC))) * (self.aDagger(component)
+                                                                              - self.a(component))
+        return QSecondQuant
+
+    def PhiSecondQuant(self, component):
+        PhiSecondQuant = None
+        if issubclass(type(component), Qubit):
+            EC = ECQSim(component.index)(self.qSys).EC
+            PhiSecondQuant = np.sqrt(1 * component.Z(EC) / 2) * (self.aDagger(component) + self.a(component))
+        elif isinstance(component, ReadoutResonator):
+            equivL = LumpedRSim(component.index)(self.qSys).equivL
+            EC = ECRSim(component.index)(self.qSys).EC
+            PhiSecondQuant = np.sqrt(1 * component.Z(equivL, EC) / 2) * (self.aDagger(component) + self.a(component))
+        return PhiSecondQuant
 
     def quantizeSimulation(self):
         print("started quantize")
         quantizeStartTime = time.time()
 
-        HComponentOrder = self.HComponentOrder  # So it's not reading from the CSV every time.
-        CapMatGESim = CapMatGESimulation(self.qSys)
-        capMatGE = CapMatGESim.capMatGE
-        postGEComponentList = CapMatGESim.postGEComponentList
+        capMatGE = self.CapMatGESim.capMatGE
+        postGEComponentList = self.CapMatGESim.postGEComponentList
 
         numQubitPhotons = self.simParams["NumQubitPhotons"]
         numResonatorPhotons = self.simParams["NumResonatorPhotons"]
-        numPhotons = max(numQubitPhotons, numResonatorPhotons)
-
         # self.capMatGE needs to be reduced based on the requested components to quantize.
 
-        numComponents = len(HComponentOrder)
         capMatGEIndicesToKeep = [[i.name for i in postGEComponentList].index(i)
-                                 for i in [j.name for j in HComponentOrder]]
+                                 for i in [j.name for j in self.HComponentOrder]]
 
         rows = np.array(capMatGEIndicesToKeep, dtype=np.intp)
         columns = np.array(capMatGEIndicesToKeep, dtype=np.intp)
         capMatGE_quant = capMatGE[rows[:, np.newaxis], columns]
 
-        dim = numPhotons + 2
-        qObjDim = [dim] * numComponents
+        qObjDim = [self.maxDim] * self.numComponents
         Cinv = np.linalg.inv(capMatGE_quant)
 
         # Assemble the Hamiltonian. H is in units of radians (H/hbar). Calculates 1/2*Q.T*Cinv*Q.
@@ -584,10 +595,10 @@ class Quantize(Simulation):
         resolveLHSSum = qzero(qObjDim)
         for Cinv_rowIndex, Cinv_row in enumerate(Cinv):
             resolveRHSSum = qzero(qObjDim)
-            for componentIndex, component in enumerate(HComponentOrder):
-                    resolveRHSSum += Cinv_row[componentIndex] * self.QsecondQuant(component, dim, numComponents)
-            LHSComponent = HComponentOrder[Cinv_rowIndex]
-            resolveLHSSum += 1 / 2 * self.QsecondQuant(LHSComponent, dim, numComponents) * resolveRHSSum
+            for componentIndex, component in enumerate(self.HComponentOrder):
+                resolveRHSSum += Cinv_row[componentIndex] * self.QSecondQuant(component)
+            LHSComponent = self.HComponentOrder[Cinv_rowIndex]
+            resolveLHSSum += 1 / 2 * self.QSecondQuant(LHSComponent) * resolveRHSSum
         H = resolveLHSSum
         endTime = time.time()
         print("Finished assembling H", (endTime - startTime) / 60)
@@ -596,41 +607,42 @@ class Quantize(Simulation):
         print("Start adding inductance")
         startTime = time.time()
         # Add inductance terms
-        for component in HComponentOrder:
+        for component in self.HComponentOrder:
             print(component.name)
-            if issubclass(type(component), qSysObjects.Qubit):
-                x = ((2 * np.pi * np.sqrt(hbarConst) / Phi_0Const) * self.PhisecondQuant(component, dim, numComponents))
+            if issubclass(type(component), Qubit):
+                x = ((2 * np.pi * np.sqrt(hbarConst) / Phi_0Const) * self.PhiSecondQuant(component))
                 for i in range(int(self.simParams["TrigOrder"] / 2) + 1):
                     cosTerm = (-1) ** i * x ** (2 * i) / np.math.factorial(2 * i)
                     H -= (component.EJ / hbarConst) * cosTerm
                     print("cos x^" + str(2 * i) + " term Frobenius norm: ", cosTerm.norm(norm="fro"))
-            elif isinstance(component, qSysObjects.ReadoutResonator):
+            elif isinstance(component, ReadoutResonator):
                 lumpedRSim = LumpedRSim(component.index)(self.qSys)
-                term = self.PhisecondQuant(component, dim, numComponents) ** 2 / (2 * lumpedRSim.equivL)
+                term = self.PhiSecondQuant(component) ** 2 / (2 * lumpedRSim.equivL)
                 H += term
         endTime = time.time()
         print("Finished adding inductance", (endTime - startTime) / 60)
 
-        # Truncate H based on numPhotons
+        # Truncate H based on maxNumPhotons
         print("Truncating H")
         startTime = time.time()
         numAllStates = H.shape[0]
         # Compile a list of all the states in H
         allStatesList = [0] * numAllStates
-        base = dim
+        base = self.maxDim
         for i in range(numAllStates):
-            stateList = baseRepresentation(i, base, numComponents)
+            stateList = baseRepresentation(i, base, self.numComponents)
             H_index = state_number_index(H.dims[0], stateList)
             allStatesList[
                 H_index] = stateList  # The order of allStatesList now corresponds to the order of rows/columns in H.
-        # Compile a list of all the states to keep based on the numPhotons parameters.
+        # Compile a list of all the states to keep based on the maxNumPhotons parameters.
         keepStatesList = []
-        qubitIndices = [i for i in range(numComponents) if issubclass(type(HComponentOrder[i]), qSysObjects.Qubit)]
-        readoutResonatorIndices = [i for i in range(numComponents) if
-                                   isinstance(HComponentOrder[i], qSysObjects.ReadoutResonator)]
+        qubitIndices = [i for i in range(self.numComponents) if issubclass(type(self.HComponentOrder[i]), Qubit)]
+        readoutResonatorIndices = [i for i in range(self.numComponents) if
+                                   isinstance(self.HComponentOrder[i], ReadoutResonator)]
         for stateList in allStatesList:
-            qubitExcitations = [stateList[i] for i in range(numComponents) if i in qubitIndices]
-            readoutResonatorExcitations = [stateList[i] for i in range(numComponents) if i in readoutResonatorIndices]
+            qubitExcitations = [stateList[i] for i in range(self.numComponents) if i in qubitIndices]
+            readoutResonatorExcitations = [stateList[i]
+                                           for i in range(self.numComponents) if i in readoutResonatorIndices]
             if all(i <= numQubitPhotons for i in qubitExcitations) and all(
                     i <= numResonatorPhotons for i in readoutResonatorExcitations):
                 keepStatesList.append(stateList)
@@ -642,10 +654,10 @@ class Quantize(Simulation):
         H = H.extract_states(indicesToKeep)
         # Update the dimension of H to reflect the truncation.
         newHDim = []
-        for component in HComponentOrder:
-            if issubclass(type(component), qSysObjects.Qubit):
+        for component in self.HComponentOrder:
+            if issubclass(type(component), Qubit):
                 newHDim.append(numQubitPhotons + 1)
-            elif isinstance(component, qSysObjects.ReadoutResonator):
+            elif isinstance(component, ReadoutResonator):
                 newHDim.append(numResonatorPhotons + 1)
         H.dims = [newHDim, newHDim]
         stateListHIndices = {str(stateList): state_number_index(H.dims[0], stateList) for stateList in keepStatesList}
@@ -658,8 +670,8 @@ class Quantize(Simulation):
         startTime = time.time()
         """Each element is a list of the eigenstates in fock ordering for a particular component."""
         subspaceEigenstates = []
-        for component in HComponentOrder:
-            fockStates = [[n if i == self.quantizeIndex(component) else 0 for i in range(numComponents)] for n in
+        for component in self.HComponentOrder:
+            fockStates = [[n if i == self.quantizeIndex(component) else 0 for i in range(self.numComponents)] for n in
                           range(newHDim[self.quantizeIndex(component)])]
             subspaceStateIndices = [stateListHIndices[str(i)] for i in fockStates]
             componentH = H.extract_states(subspaceStateIndices)
@@ -671,12 +683,12 @@ class Quantize(Simulation):
         outputStatesList = []
         for photonManifold in [0, 1, 2]:
             base = photonManifold + 1
-            allNumsBase = [baseRepresentation(i, base, numComponents)
-                           for i in range(1, base ** (numComponents - 1) * photonManifold + 1)]
+            allNumsBase = [baseRepresentation(i, base, self.numComponents)
+                           for i in range(1, base ** (self.numComponents - 1) * photonManifold + 1)]
             manifoldNums = [i for i in allNumsBase if sum(i) == photonManifold]  # Remove numbers outside the manifold
             manifoldNums.reverse()
             outputStatesList = outputStatesList + manifoldNums
-        zeroStateList = [0] * numComponents
+        zeroStateList = [0] * self.numComponents
         outputStatesList = [zeroStateList] + outputStatesList
 
         H_output_headers = [H_Header(i) for i in outputStatesList]
@@ -706,7 +718,7 @@ class Quantize(Simulation):
         # Output
         print("Starting output")
 
-        resultsDict = {"Index Order": [i.name for i in HComponentOrder], "Headers": H_output_headers,
+        resultsDict = {"Index Order": [i.name for i in self.HComponentOrder], "Headers": H_output_headers,
                        "H_output (GHz)": H_output.astype(str).tolist(), "Evals (GHz)": eigsRealNorm}
         jsonWrite(self.resultsFilePath, resultsDict)
 
@@ -718,18 +730,10 @@ class Quantize(Simulation):
         return [str(i) for i in quantizeList[1:-1].split(":")]
 
     @property
-    def HIndexLineIndex(self):
-        return self.resultsFileLines.index([i for i in self.resultsFileLines if i[0] == "Index Order"][0]) + 1
-
-    @property
     def HComponentOrder(self):
         quantizeComponentListNames = self.readQuantizeList(self.simParams["QuantizeList"])
         quantizeComponentList = [self.qSys.componentFromName(i) for i in quantizeComponentListNames]
         return quantizeComponentList
-
-    @property
-    def headerLineIndex(self):
-        return self.resultsFileLines.index([i for i in self.resultsFileLines if i[0] == "H (GHz)"][0]) + 1
 
     def quantizeIndex(self, component):
         return [self.HComponentOrder.index(i) for i in self.HComponentOrder if i.name == component.name][0]
