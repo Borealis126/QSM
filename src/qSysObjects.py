@@ -74,16 +74,11 @@ class Qubit:
     def EJ(self):
         return (Phi_0Const / (2 * np.pi)) ** 2 / self.LJ
 
-    # @property
-    # def L_i_calculated(self):
-    #     return 1 / (self.omega_i ** 2 * eConst ** 2 / (2 * self.EcVal))
-
     def omega_J(self, EC):
         return 1 / np.sqrt(self.LJ * eConst ** 2 / (2 * EC))
-    #
-    # @property
-    # def omega_i(self, EC):
-    #     return self.omega_J(EC) - (EC / hbarConst) / (1 - EC / (hbarConst * self.omega_J(EC))
+
+    def omega_i(self, EC):
+        return self.omega_J(EC) - (EC / hbarConst) / (1 - EC / (hbarConst * self.omega_J(EC))
 
     def Z(self, EC):
         return self.omega_J(EC) * self.LJ

@@ -2,15 +2,14 @@
 import sys
 import os
 from pathlib import Path
-from calculations import *
-
 computeLocation = "Windows"  # Edit this based on where the QSM is being run. Users at NIST should use "68707Max"
 QSMSourceFolder = "O:/68707/JoelHoward/ChipDesign/QSMSource/"
 sys.path.append(QSMSourceFolder)
 import qubitSimulationModule as QSM
 from simulations import *
-
+from calculations import *
 projectFolder = Path(os.path.dirname(os.path.abspath(__file__)))
+
 
 # QSM.generateSystemParams(projectFolder)#Run this command to generate the systemParameters file.
 

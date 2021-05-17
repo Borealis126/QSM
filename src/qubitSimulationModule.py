@@ -17,21 +17,19 @@ def generateSystemParametersFile(folder):
                      "Number of Qubits": 1, "Number of Readout Resonators": 1,
                      "Material": "perfect conductor",
                      "Flip Chip?": "No", "Chip Markers": "Pappas", "Simulation": "2D",
-                     "Simulate Feedline?": "No",
-                     "Add Mesh to GDS?": "No", "Invert GDS?": "No",
-                     "Anti-Vortex Mesh Boundary": 40, "Anti-Vortex Mesh Spacing": 50, "Anti-Vortex Mesh Size": 5}
-    jsonWrite(folder / "systemParametersFile.json", sysParamsDict)
+                     "Simulate Feedline?": "No"}
+    jsonWrite(folder / "systemParameters.json", sysParamsDict)
 
 
-def initialize(projectFolder, computeLocation, QSMSourceFolder, designFilesCompleted=False):
+def initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=False):
     qSys = loadSystemParametersFile(projectFolder, computeLocation, QSMSourceFolder)
-    if designFilesCompleted:
+    if layoutCompleted:
         qSys.loadDesignFiles()
     return qSys
 
 
 def loadSystemParametersFile(projectFolder, computeLocation, QSMSourceFolder):
-    sysParams = jsonRead(projectFolder / "systemParametersFile.json")
+    sysParams = jsonRead(projectFolder / "systemParameters.json")
     sysParams["Project Folder"] = projectFolder
     sysParams["Compute Location"] = computeLocation
     sysParams["QSM Source Folder"] = QSMSourceFolder
@@ -43,8 +41,8 @@ class QubitSystem:
         # ---independent of flip chip
         self.sysParams = sysParams
         self.projectFolder = self.sysParams["Project Folder"]
-        self.componentParametersFile = self.projectFolder / "componentParametersFile.json"
-        self.componentGeometriesFile = self.projectFolder / "componentGeometriesFile.json"
+        self.componentParametersFile = self.projectFolder / "componentParameters.json"
+        self.componentGeometriesFile = self.projectFolder / "componentGeometries.json"
         self.gdspyFile = self.projectFolder / "layout.gds"
 
         # Dictionaries that are only used until the components are assigned to their respective chips
@@ -67,7 +65,7 @@ class QubitSystem:
         if self.sysParams["Flip Chip?"] == "Yes":
             for paramsList in [qubitParams, readoutResonatorParams, controlLineParams]:
                 paramsList.append("Chip")
-            bumpsParams = ["Bumps", "Spacing", "Bump Metal Width", "Under Bump Width"]
+            bumpsParams = ["Bumps", "Spacing", "Bump Metal Width", "Under Bump Width", "Mesh Boundary"]
             componentsDict["Bumps"] = {param: None for param in bumpsParams}
         if self.sysParams["Number of Qubits"] != 0:
             componentsDict["Qubits"] = dict()
@@ -205,7 +203,7 @@ class QubitSystem:
         geometriesDict["Ground(s)"] = dict()
         geometriesDict["Substrate(s)"] = dict()
         for chipIndex, chip in self.chipDict.items():
-            groundParams = {"Height": 0.1}
+            groundParams = {"Height": 0.1, "Mesh Boundary": 40, "Mesh Spacing": 50, "Mesh Size": 5}
             geometriesDict["Ground(s)"][chipIndex] = groundParams
             substrateParams = {"Material": "silicon", "Thickness": 500, "Width": 9500, "Length": 7500}
             geometriesDict["Substrate(s)"][chipIndex] = substrateParams
@@ -443,7 +441,7 @@ class QubitSystem:
                                 geoms["Pad " + str(pad.index) + " Side " + str(side) + " Boundary"]
                 # Common to all qubit geometries
                 for qubitPad in qubit.padListGeom:
-                    qubitPad.node.polylineShapeParams["Mesh Boundary"] = self.sysParams["Anti-Vortex Mesh Boundary"]
+                    qubitPad.node.polylineShapeParams["Mesh Boundary"] = chip.substrate.geometryParams["Mesh Boundary"]
                     qubitPad.node.updatePolylines()
                     # Z values
                     if chipIndex == 0:
@@ -463,8 +461,8 @@ class QubitSystem:
                     elif chipIndex == 1:
                         resonatorPadNode.Z = self.chipDict[1].substrate.node.Z - resonatorPadNode.height
                 # Mesh boundary
-                pad1Node.polylineShapeParams["Mesh Boundary"] = self.sysParams["Anti-Vortex Mesh Boundary"]
-                pad2Node.polylineShapeParams["Mesh Boundary"] = self.sysParams["Anti-Vortex Mesh Boundary"]
+                pad1Node.polylineShapeParams["Mesh Boundary"] = chip.substrate.geometryParams["Mesh Boundary"]
+                pad2Node.polylineShapeParams["Mesh Boundary"] = chip.substrate.geometryParams["Mesh Boundary"]
                 # Meanders
                 readoutResonator.updateMeanderNode(self.CPW)
                 # Height
@@ -542,7 +540,7 @@ class QubitSystem:
                 # Path Polyline
                 lineNode.polylineShape = "path"
                 lineNode.polylineShapeParams["CPW"] = self.CPW
-                lineNode.polylineShapeParams["Mesh Boundary"] = self.sysParams["Anti-Vortex Mesh Boundary"]
+                lineNode.polylineShapeParams["Mesh Boundary"] = chip.substrate.geometryParams["Mesh Boundary"]
                 for param in geoms:
                     lineNode.polylineShapeParams[param] = geoms[param]
                 lineNode.updatePolylines()
@@ -671,7 +669,7 @@ class QubitSystem:
         self.loadGeometries()
         self.CPW.vp = self.CPW.componentParams["Phase Velocity(um/s)"]
 
-    def generateGDS(self):
+    def generateGDS(self, addMesh=False, invertGDS=False):
         self.loadDesignFiles()
         Main = gdspy.Cell('Main')
         unitChange = 1  # Convert if necessary.
@@ -759,14 +757,14 @@ class QubitSystem:
             subtractFromGround.append(descriptionText)
 
             # Draw mesh
-            if self.sysParams["Add Mesh to GDS?"] == "Yes":
+            if addMesh:
                 # meshContainer=gdspy.Cell((-chipWidth/2,-chipLength/2),(chipWidth/2,chipLength/2),layer=chip.index+2)
-                size = self.sysParams["Anti-Vortex Mesh Size"] * unitChange
+                size = chip.substrate.geometryParams["Mesh Size"] * unitChange
                 chipBorder = 150
                 for xVal in np.arange(-chipWidth / 2 + chipBorder, chipWidth / 2 - chipBorder,
-                                      self.sysParams["Anti-Vortex Mesh Spacing"] * unitChange):
+                                      chip.substrate.geometryParams["Mesh Spacing"] * unitChange):
                     for yVal in np.arange(-chipLength / 2 + chipBorder, chipLength / 2 - chipBorder,
-                                          self.sysParams["Anti-Vortex Mesh Spacing"] * unitChange):
+                                          chip.substrate.geometryParams["Mesh Size"] * unitChange):
                         exclude = "No"
                         for meshPeriphery in meshPeripheries:
                             if pointInPolyline([xVal, yVal], meshPeriphery):
@@ -778,7 +776,7 @@ class QubitSystem:
                                 layer=chip.index + 2
                             ))
             # Create ground plane
-            if self.sysParams["Invert GDS?"] == "No":
+            if not invertGDS:
                 GND = gdspy.Rectangle((-chipWidth / 2, -chipLength / 2), (chipWidth / 2, chipLength / 2),
                                       layer=chip.index)
                 for item in subtractFromGround:
@@ -878,7 +876,7 @@ class QubitSystem:
                             "Side 2 Boundary": 0,
                             "Side 3 Boundary": 0,
                             "Side 4 Boundary": 0,
-                            "Mesh Boundary": self.sysParams["Anti-Vortex Mesh Boundary"]
+                            "Mesh Boundary": self.bumpsDict["Mesh Boundary"]
                         }
                         node.updatePolylines()
                     for node in [thisBump.bumpMetalBottomNode, thisBump.bumpMetalTopNode]:
@@ -892,7 +890,7 @@ class QubitSystem:
                             "Side 2 Boundary": 0,
                             "Side 3 Boundary": 0,
                             "Side 4 Boundary": 0,
-                            "Mesh Boundary": self.sysParams["Anti-Vortex Mesh Boundary"]
+                            "Mesh Boundary": self.bumpsDict["Mesh Boundary"]
                         }
                         node.updatePolylines()
 

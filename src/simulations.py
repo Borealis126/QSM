@@ -155,7 +155,7 @@ class Simulation:
         subprocess.call(copyAEDTTemplateCommand, shell=True)
 
 
-class CapMatSimulation(Simulation):
+class CapMat(Simulation):
     def __init__(self, qSys):
         super().__init__(qSys, "capMat")
         q3dSimName = "capMatExtractor"
@@ -336,7 +336,7 @@ class CapMatSimulation(Simulation):
         return np.array(capMat)
 
 
-class CapMatGESimulation(Simulation):
+class CapMat(Simulation):
     def __init__(self, qSys):
         super().__init__(qSys, "capMatGE")
         # Components ordering
@@ -780,7 +780,7 @@ class Quantize(Simulation):
         return s
 
 
-def LumpedRSim(index):
+def LumpedR(index):
     class LumpedRSimulation(Simulation):
         def __init__(self, qSys):
             super(LumpedRSimulation, self).__init__(qSys, "lumpedR" + str(index))
@@ -831,7 +831,7 @@ def LumpedRSim(index):
     return LumpedRSimulation
 
 
-def ECQSim(index):
+def ECQ(index):
     class ECQSimulation(Simulation):
         def __init__(self, qSys):
             super(ECQSimulation, self).__init__(qSys, "ECQ" + str(index))
@@ -863,8 +863,7 @@ def ECQSim(index):
             return self.resultsDict["EC"]
     return ECQSimulation
 
-
-def ECRSim(index):
+def ECR(index):
     class ECRSimulation(Simulation):
         def __init__(self, qSys):
             super(ECRSimulation, self).__init__(qSys, "ECR" + str(index))
