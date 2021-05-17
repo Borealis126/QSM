@@ -12,9 +12,11 @@ elif computeLocation == "Cluster":
 sys.path.append(str(QSMSourceFolder))
 import qubitSimulationModule as QSM
 from simulations import *
+from calculations import *
 
-projectFolder = Path(os.path.dirname(os.path.abspath(__file__)))
+projectFolder = Path(__file__).parent.absolute()
 copyDir = projectFolder / ".." / "TwoQubit_filesToCopy"
+
 
 def copyFile(sourceFile, destinationFile):
     copyCommand = ""
@@ -24,18 +26,18 @@ def copyFile(sourceFile, destinationFile):
         copyCommand = "cp " + str(Path(sourceFile)) + " " + str(Path(destinationFile))
     subprocess.call(copyCommand, shell=True)
 
+
 # QSM.generateSystemParametersFile(projectFolder)  # Run this command to generate the systemParameters file.
 # copyFile(copyDir / "systemParametersFile.csv", projectFolder / "systemParametersFile.csv")
 
 # Once systemParameters is available and filled out, ALWAYS run this command first.
-qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder)
-qSys.loadDesignFiles()
+qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, designFilesCompleted=True)
 
 # qSys.generateComponentParams()
-# copyFile(copyDir/"componentParametersFile.csv",projectFolder/"componentParametersFile.json")
-#
+# copyFile(copyDir/"componentParametersFile.json", projectFolder/"componentParametersFile.json")
+
 # qSys.generateGeometries()
-# copyFile(copyDir/"componentGeometriesFile.csv",projectFolder/"componentGeometriesFile.json")
+# copyFile(copyDir/"componentGeometriesFile.json", projectFolder/"componentGeometriesFile.json")
 
 # qSys.generateGDS()
 
@@ -43,81 +45,21 @@ qSys.loadDesignFiles()
 # CapMatSimulation(qSys).run()
 # CapMatSimulation(qSys).postProcess()
 
-# qSys.loadDesignFiles()
 # for readoutResonatorIndex, readoutResonator in qSys.allReadoutResonatorsDict.items():
     # LumpedRSim(readoutResonatorIndex)(qSys).initialize()
     # LumpedRSim(readoutResonatorIndex)(qSys).run()
     # LumpedRSim(readoutResonatorIndex)(qSys).postProcess()
 
 # CapMatGESimulation(qSys).postProcess()
-
-
-# qSys.loadDesignFiles()
+#
 # for qubitIndex, qubit in qSys.allQubitsDict.items():
 #     ECQSim(qubitIndex)(qSys).postProcess()
-
-# qSys.loadDesignFiles()
+#
 # for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.items():
 #     ECRSim(readoutResonatorIndex)(qSys).postProcess()
-
-
+#
 
 # Quantize(qSys).initialize()
 # Quantize(qSys).postProcess()
 
-ZZQCalc(qSys, 0, 1)
-
-
-# qSys.simulationCommand(["simulation","quantize","postProcess"])
-# qSys.simulationCommand(["simulation","zzQ0-1","postProcess"])
-
-# for qubitIndex,qubit in qSys.allQubitsDict.items():
-# qSys.simulationCommand(["simulation","anharmonicityQ"+str(qubitIndex),"init"])
-# qSys.simulationCommand(["simulation","anharmonicityQ"+str(qubitIndex),"postProcess"])
-
-# for readoutResonatorIndex, readoutResonator in qSys.allReadoutResonatorsDict.items():
-#     qSys.simulationCommand(["simulation", "dispersiveShiftR" + str(readoutResonatorIndex), "init"])
-#     qSys.simulationCommand(["simulation", "dispersiveShiftR" + str(readoutResonatorIndex), "postProcess"])
-
-# SIMULATION COMMANDS
-# -----------------------------------------------------------------------------------------------------------
-# CAPACITANCE MATRIX
-# ["simulation","capMat",{"init","run","postProcess"}]
-# -----------------------------------------------------------------------------------------------------------
-# CIRCUIT SIMULATIONS
-# ["simulation","fullS21",{"init","run","postProcess"}]
-
-# ["simulation","freqQ[N]",{"init","run","postProcess"}]
-# ["simulation","decayQ[N]",{"init","run","postProcess"}]
-# ["simulation","exchQ[N1]-[N2]",{"init","run"}] e.g. ["simulation","exchQ0-2","run"]
-
-# ["simulation","freqR[N]",{"init","run","postProcess"}]
-# ["simulation","lumpedR[N]",{"init","run","postProcess"}]
-# ["simulation","feedlineCouplingR[N]",{"init","run","postProcess"}]#Depends on results of freqQ[N]
-
-# Helper commands:
-# "initAllSims"
-# "runAllSims"
-# "postProcessAllSims"
-# -----------------------------------------------------------------------------------------------------------
-# AFTER CIRCUIT SIMULATIONS
-# ["simulation","capMatGE",{"init","postProcess"}]
-# ["simulation","ECQ[N]",{"init","postProcess"}]#Depends on results of capMatGE
-# ["simulation","L_iQ[N]",{"init","postProcess"}]#Check how closely this agrees with L_i in the component parameters file. Depends on EC
-
-# Helper commands:
-# "GEPlusAllEC": runs init/postprocess for capMatGE and all ECQ
-# "AllL_i"
-# -----------------------------------------------------------------------------------------------------------
-# QUANTIZATION
-# ["simulation","quantize",{"init","postProcess"}]#Depends on results of all lumpedR
-# -----------------------------------------------------------------------------------------------------------
-# POST-QUANTIZATION
-# ["simulation","zzQ[m]-[n]",{"init","postProcess"}]# i.e. zzQ0-1
-# ["simulation","anharmonicityQ[N]",{"init","postProcess"}]
-# ["simulation","dispersiveShiftR[N]",{"init","postProcess"}]
-
-# Helper commands:
-# "Allzz"
-# "AllAnharmonicityQ"
-# -----------------------------------------------------------------------------------------------------------
+# ZZQCalc(qSys, 0, 1)

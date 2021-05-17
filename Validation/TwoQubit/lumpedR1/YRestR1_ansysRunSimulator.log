@@ -2,66 +2,29 @@
 ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
 Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
 Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Validation/TwoQubit/lumpedR1/YRestR1_ansysRunSimulator.py
-Starting Batch Run: 5:17:58 PM  May 14, 2021
+Starting Batch Run: 5:52:28 PM  May 16, 2021
 Temp directory: /tmp
 Project directory: /u/eu/an/joelhoward/Ansoft
-[info] Project:YRestR1, Design:Netlist, (info): Processing circuit for new analysis. (5:18:27 PM  May 14, 2021)
-[warning] Project:YRestR1, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (5:18:27 PM  May 14, 2021)
-[warning] Project:YRestR1, Design:Netlist, models:resistor(warning): rr1pad1_r1pad2 - Resistance value less than RESMIN, resetting value to 1e-05 (5:18:28 PM  May 14, 2021)
-[warning] Project:YRestR1, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (5:18:28 PM  May 14, 2021)
-[info] Project:YRestR1, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (5:18:28 PM  May 14, 2021)
-[warning] Project:YRestR1, Design:Netlist, diagnostics(warning): Only one connection for node net_r1pad1. (5:18:28 PM  May 14, 2021)
-[info] Project:YRestR1, Design:Netlist, (info): Starting analysis type LNA. (5:18:28 PM  May 14, 2021)
-[info] Project:YRestR1, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:01 (5:18:29 PM  May 14, 2021)
-Stopping Batch Run: 5:18:30 PM  May 14, 2021
+[info] Project:YRestR1, Design:Netlist, (info): Processing circuit for new analysis. (5:52:42 PM  May 16, 2021)
+[warning] Project:YRestR1, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (5:52:42 PM  May 16, 2021)
+[warning] Project:YRestR1, Design:Netlist, models:resistor(warning): rr1pad1_r1pad2 - Resistance value less than RESMIN, resetting value to 1e-05 (5:52:43 PM  May 16, 2021)
+[warning] Project:YRestR1, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (5:52:43 PM  May 16, 2021)
+[info] Project:YRestR1, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (5:52:43 PM  May 16, 2021)
+[warning] Project:YRestR1, Design:Netlist, diagnostics(warning): Only one connection for node net_r1pad1. (5:52:43 PM  May 16, 2021)
+[info] Project:YRestR1, Design:Netlist, (info): Starting analysis type LNA. (5:52:43 PM  May 16, 2021)
+[info] Project:YRestR1, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:01 (5:52:43 PM  May 16, 2021)
+Stopping Batch Run: 5:52:45 PM  May 16, 2021
  
 ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
 Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
 Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Validation/TwoQubit/lumpedR1/YRestR1_ansysRunSimulator.py
-Starting Batch Run: 5:47:49 PM  May 14, 2021
+Starting Batch Run: 6:30:09 PM  May 16, 2021
 Temp directory: /tmp
 Project directory: /u/eu/an/joelhoward/Ansoft
-[info] Project:YRestR1, Design:Netlist, (info): Processing circuit for new analysis. (5:48:06 PM  May 14, 2021)
-[warning] Project:YRestR1, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (5:48:06 PM  May 14, 2021)
-[warning] Project:YRestR1, Design:Netlist, models:resistor(warning): rr1pad1_r1pad2 - Resistance value less than RESMIN, resetting value to 1e-05 (5:48:08 PM  May 14, 2021)
-[warning] Project:YRestR1, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (5:48:08 PM  May 14, 2021)
-[info] Project:YRestR1, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (5:48:08 PM  May 14, 2021)
-[warning] Project:YRestR1, Design:Netlist, diagnostics(warning): Only one connection for node net_r1pad1. (5:48:08 PM  May 14, 2021)
-[info] Project:YRestR1, Design:Netlist, (info): Starting analysis type LNA. (5:48:08 PM  May 14, 2021)
-[info] Project:YRestR1, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:01 (5:48:08 PM  May 14, 2021)
-Stopping Batch Run: 5:48:10 PM  May 14, 2021
- 
-ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
-Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
-Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Validation/TwoQubit/lumpedR1/YRestR1_ansysRunSimulator.py
-Starting Batch Run: 6:01:10 PM  May 14, 2021
-Temp directory: /tmp
-Project directory: /u/eu/an/joelhoward/Ansoft
-[info] Project:YRestR1, Design:Netlist, (info): Processing circuit for new analysis. (6:01:26 PM  May 14, 2021)
-[warning] Project:YRestR1, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (6:01:27 PM  May 14, 2021)
-[warning] Project:YRestR1, Design:Netlist, models:resistor(warning): rr1pad1_r1pad2 - Resistance value less than RESMIN, resetting value to 1e-05 (6:01:28 PM  May 14, 2021)
-[warning] Project:YRestR1, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (6:01:28 PM  May 14, 2021)
-[info] Project:YRestR1, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (6:01:28 PM  May 14, 2021)
-[warning] Project:YRestR1, Design:Netlist, diagnostics(warning): Only one connection for node net_r1pad1. (6:01:28 PM  May 14, 2021)
-[info] Project:YRestR1, Design:Netlist, (info): Starting analysis type LNA. (6:01:28 PM  May 14, 2021)
-[info] Project:YRestR1, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:01 (6:01:28 PM  May 14, 2021)
-Stopping Batch Run: 6:01:30 PM  May 14, 2021
- 
-ANSYS Electronics Desktop Version 2021.1.0, Build: 2020-11-16 21:28:10
-Location: /sw/apps/ansys/ansysEM/AnsysEM21.1/Linux64/ansysedt.exe
-Batch Script: /beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Validation/TwoQubit/lumpedR1/YRestR1_ansysRunSimulator.py
-Starting Batch Run: 8:32:47 PM  May 15, 2021
-A new installation of your ANSYS product has been detected.  
-The library directories have been reset to those of the newly installed libraries.  
-To change this, go to Tools/Options/General Options.
-Temp directory: /tmp
-Project directory: /u/eu/an/joelhoward/Ansoft
-[info] Project:YRestR1, Design:Netlist, (info): Processing circuit for new analysis. (8:33:01 PM  May 15, 2021)
-[warning] Project:YRestR1, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (8:33:01 PM  May 15, 2021)
-[warning] Project:YRestR1, Design:Netlist, models:resistor(warning): rr1pad1_r1pad2 - Resistance value less than RESMIN, resetting value to 1e-05 (8:33:02 PM  May 15, 2021)
-[warning] Project:YRestR1, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (8:33:02 PM  May 15, 2021)
-[info] Project:YRestR1, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (8:33:02 PM  May 15, 2021)
-[warning] Project:YRestR1, Design:Netlist, diagnostics(warning): Only one connection for node net_r1pad1. (8:33:02 PM  May 15, 2021)
-[info] Project:YRestR1, Design:Netlist, (info): Starting analysis type LNA. (8:33:02 PM  May 15, 2021)
-[info] Project:YRestR1, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:01 (8:33:02 PM  May 15, 2021)
-Stopping Batch Run: 8:33:05 PM  May 15, 2021
+[info] Project:YRestR1, Design:Netlist, (info): Processing circuit for new analysis. (6:30:24 PM  May 16, 2021)
+[warning] Project:YRestR1, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (6:30:24 PM  May 16, 2021)
+[warning] Project:YRestR1, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (6:30:25 PM  May 16, 2021)
+[info] Project:YRestR1, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (6:30:25 PM  May 16, 2021)
+[info] Project:YRestR1, Design:Netlist, (info): Starting analysis type LNA. (6:30:25 PM  May 16, 2021)
+[info] Project:YRestR1, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:01 (6:30:25 PM  May 16, 2021)
+Stopping Batch Run: 6:30:27 PM  May 16, 2021

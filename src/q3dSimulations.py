@@ -1,5 +1,5 @@
-from ansysFunctions import *
-from csvFunctions import csvRead
+from ansysAPI import *
+from dataIO import csvRead
 
 class Q3DSim():  # capMat is a simulation that has the Q3DSim q3dExtractor
     def __init__(self, q3dSimName, simDirectory):

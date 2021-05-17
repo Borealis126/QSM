@@ -1,22 +1,25 @@
-#Import modules
+# Import modules
 import sys
 import os
-computeLocation="Windows" # Edit this based on where the QSM is being run. Users at NIST should use "68707Max"
-QSMSourceFolder="O:/68707/JoelHoward/ChipDesign/QSMSource/"
+from pathlib import Path
+from calculations import *
+
+computeLocation = "Windows"  # Edit this based on where the QSM is being run. Users at NIST should use "68707Max"
+QSMSourceFolder = "O:/68707/JoelHoward/ChipDesign/QSMSource/"
 sys.path.append(QSMSourceFolder)
 import qubitSimulationModule as QSM
-projectFolder = Path(os.path.dirname(os.path.abspath( __file__ )))
+from simulations import *
+
+projectFolder = Path(os.path.dirname(os.path.abspath(__file__)))
 
 # QSM.generateSystemParams(projectFolder)#Run this command to generate the systemParameters file.
 
 # Once systemParameters is available and filled out, ALWAYS run this command first.
-qSys = QSM.initialize(projectFolder,computeLocation,QSMSourceFolder)
+qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, designFilesCompleted=True)
 
 # Generate and populate these sequentially.
 # qSys.generateComponentParams()
 # qSys.generateGeometries()
-
-# qSys.loadDesignFiles() # Once geometries is populated ALWAYS run this after QSM.initialize
 
 # qSys.generateGDS() #Optional to view layout.
 

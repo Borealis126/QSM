@@ -128,9 +128,6 @@ def ansysSignalLine_Lines(node):
     ]
 
 
-
-
-
 def ansysUniteNodes(nodeList):
     insertionLine = nodeList[0].name + ","
     for thisNode in nodeList[1:-1]:
@@ -159,9 +156,6 @@ def aedtEdit(line):
         else:
             returnLine = returnLine + char
     return returnLine
-
-
-
 
 
 def ansysOutputToComplex(complexString):

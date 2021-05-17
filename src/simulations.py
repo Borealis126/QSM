@@ -1,15 +1,15 @@
 import numpy as np
 import os
 import time
-from csvFunctions import jsonRead, jsonWrite, csvRead, arrayNoBlanks, readY11Data
-from ansysFunctions import *
+from dataIO import jsonRead, jsonWrite, csvRead, arrayNoBlanks, readY11Data
+from ansysAPI import *
 import subprocess
 from q3dSimulations import Q3DExtractor
 from circuitSimulations import *
 from sympy import symbols
 from constants import *
-from analysisFunctions import *
-from quantumStateFunctions import stateFromHeader, baseRepresentation, H_Header
+from misc import *
+from quantumState import stateFromHeader, baseRepresentation, H_Header
 from scipy.misc import derivative
 from sympy import Matrix, zeros, sin
 from qSysObjects import GroundedQubit, FloatingQubit, ReadoutResonator, Qubit
@@ -803,8 +803,8 @@ def LumpedRSim(index):
             equivL_val, equivC_val = self.calculateLumpedResonator()
             resultsDict = {"equivL(H):": equivL_val, "equivC(F):": equivC_val}
             jsonWrite(self.resultsFilePath, resultsDict)
-            print("equivL(H):" + str(self.equivL))
-            print("equivC(F):" + str(self.equivC))
+            print("equivL(H):" + str(equivL_val))
+            print("equivC(F):" + str(equivC_val))
 
         def calculateLumpedResonator(self):  # Calculates from lumpedR files
             # Load Y11,YRest data
@@ -887,30 +887,3 @@ def ECRSim(index):
         def EC(self):
             return self.resultsDict["EC"]
     return ECRSimulation
-
-
-"""Everything below here is a calculation, which is not saved in a folder."""
-
-
-def ZZQCalc(qSys, q1Index, q2Index):
-    QuantizeObj = Quantize(qSys)
-    q1QuantizeIndex = QuantizeObj.quantizeIndex(qSys.allQubitsDict[q1Index])
-    q2QuantizeIndex = QuantizeObj.quantizeIndex(qSys.allQubitsDict[q2Index])
-
-    stateListFunc = QuantizeObj.stateList
-
-    stateList01 = stateListFunc([[q2QuantizeIndex, 1]])
-    stateList10 = stateListFunc([[q1QuantizeIndex, 1]])
-    stateList11 = stateListFunc([[q1QuantizeIndex, 1], [q2QuantizeIndex, 1]])
-
-    E11 = QuantizeObj.HEval(stateList11)
-    E10 = QuantizeObj.HEval(stateList10)
-    E01 = QuantizeObj.HEval(stateList01)
-
-    print("E11 (GHz):", E11)
-    print("E10 (GHz):", E10)
-    print("E01 (GHz):", E01)
-
-    gz = E11 - E01 - E10
-
-    print("gz" + str(q1Index) + "-" + str(q2Index) + "(MHz): ", gz * 1000)

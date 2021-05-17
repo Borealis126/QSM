@@ -1,6 +1,6 @@
 import simulations
 import qSysObjects
-from ansysFunctions import aedtEdit
+from ansysAPI import aedtEdit
 from copy import deepcopy
 
 
@@ -177,7 +177,8 @@ class Y11RSimulation(CircuitSim):
                             + " " + str(portIndex) + " RPort" + str(portIndex) + "\n")]
         return portsLines
 
-    def netlistSimulationLines(self, simParams):  # Contains simulation-specific info
+    @staticmethod
+    def netlistSimulationLines(simParams):  # Contains simulation-specific info
         return [
             ".LNA\n",
             "+ LIN " + str(simParams["LNA_counts"]) + " " + str(simParams["LNA_start (GHz)"] * 1e9)
@@ -220,12 +221,13 @@ class YRestRSimulation(CircuitSim):
         netlistComponents["Capacitances"]["CR" + str(self.index) + "Pad2_G"]["C"] = 0
         netlistComponents["Capacitances"]["CR" + str(self.index) + "Pad1_F" + str(self.index)]["C"] = 0
 
-        netlistComponents["Resistors"][
-            "RR" + str(self.index) + "Pad1_R" + str(self.index) + "Pad2"] = {
-            "node1NetlistName": self.netlistName(node1Name),
-            "node2NetlistName": self.netlistName(node2Name),
-            "R": 0
-        }  # Short the two resonator fingers
+        """Short the two ends of the resonator together. This is functionally accomplished by removing all elements
+        of the netlist containing R[N]Pad[N} nodes."""
+
+        for netlistName, component in deepcopy(netlistComponents["Capacitances"]).items():
+            if (component["node1NetlistName"] == self.netlistName(node1Name)
+                    or component["node2NetlistName"] == self.netlistName(node1Name)):
+                netlistComponents["Capacitances"].pop(netlistName)
 
         return netlistComponents
 
@@ -249,6 +251,7 @@ class YRestRSimulation(CircuitSim):
                             + " " + str(portIndex) + " RPort" + str(portIndex) + "\n")]
         return portsLines
 
+    @staticmethod
     def netlistSimulationLines(self, simParams):  # Contains simulation-specific info
         return [
             ".LNA\n",
@@ -260,6 +263,7 @@ class YRestRSimulation(CircuitSim):
     @property
     def reportLines(self):
         return YReportLines(self.resultsFilePath)
+
 
 S21_params = {"LNA_start (GHz)": 4, "LNA_stop (GHz)": 7, "LNA_counts": 200}
 

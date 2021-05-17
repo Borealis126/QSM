@@ -220,7 +220,7 @@ $begin 'AnsoftProject'
 			WorkflowName=''
 			SpecName=''
 			TemplateName=''
-			LibLoc=11095
+			LibLoc=10982
 		$end 'Workflow'
 		$begin 'DesignDatasets'
 			NextUniqueID=0
@@ -240,45 +240,35 @@ CQ0Pad1_G net_Q0Pad1 0 6.339999999999999e-14\
 CQ0Pad1_Q0Pad2 net_Q0Pad1 net_Q0Pad2 4.29e-14\
 CQ0Pad1_Q1Pad1 net_Q0Pad1 net_Q1Pad1 3.77e-15\
 CQ0Pad1_Q1Pad2 net_Q0Pad1 net_Q1Pad2 2.52e-15\
-CQ0Pad1_R0Pad1 net_Q0Pad1 net_R0Pad1 0.0\
 CQ0Pad1_R0Pad2 net_Q0Pad1 Port1 1.156e-14\
 CQ0Pad1_R1Pad1 net_Q0Pad1 net_R1Pad1 0.0\
 CQ0Pad1_R1Pad2 net_Q0Pad1 net_R1Pad2 4e-17\
 CQ0Pad2_G net_Q0Pad2 0 6.735e-14\
 CQ0Pad2_Q1Pad1 net_Q0Pad2 net_Q1Pad1 2.52e-15\
 CQ0Pad2_Q1Pad2 net_Q0Pad2 net_Q1Pad2 3.81e-15\
-CQ0Pad2_R0Pad1 net_Q0Pad2 net_R0Pad1 0.0\
 CQ0Pad2_R0Pad2 net_Q0Pad2 Port1 1.2299999999999999e-15\
 CQ0Pad2_R1Pad1 net_Q0Pad2 net_R1Pad1 0.0\
 CQ0Pad2_R1Pad2 net_Q0Pad2 net_R1Pad2 4e-17\
 CQ1Pad1_G net_Q1Pad1 0 6.236e-14\
 CQ1Pad1_Q1Pad2 net_Q1Pad1 net_Q1Pad2 2.892e-14\
-CQ1Pad1_R0Pad1 net_Q1Pad1 net_R0Pad1 0.0\
 CQ1Pad1_R0Pad2 net_Q1Pad1 Port1 4e-17\
 CQ1Pad1_R1Pad1 net_Q1Pad1 net_R1Pad1 0.0\
 CQ1Pad1_R1Pad2 net_Q1Pad1 net_R1Pad2 6.6100000000000005e-15\
 CQ1Pad2_G net_Q1Pad2 0 6.550999999999998e-14\
-CQ1Pad2_R0Pad1 net_Q1Pad2 net_R0Pad1 0.0\
 CQ1Pad2_R0Pad2 net_Q1Pad2 Port1 4e-17\
 CQ1Pad2_R1Pad1 net_Q1Pad2 net_R1Pad1 0.0\
 CQ1Pad2_R1Pad2 net_Q1Pad2 net_R1Pad2 1.16e-15\
-CR0Pad1_G net_R0Pad1 0 0\
-CR0Pad1_R0Pad2 net_R0Pad1 Port1 0.0\
-CR0Pad1_R1Pad1 net_R0Pad1 net_R1Pad1 0.0\
-CR0Pad1_R1Pad2 net_R0Pad1 net_R1Pad2 0.0\
 CR0Pad2_G Port1 0 0\
 CR0Pad2_R1Pad1 Port1 net_R1Pad1 0.0\
 CR0Pad2_R1Pad2 Port1 net_R1Pad2 0.0\
 CR1Pad1_G net_R1Pad1 0 4.476e-14\
 CR1Pad1_R1Pad2 net_R1Pad1 net_R1Pad2 0.0\
 CR1Pad2_G net_R1Pad2 0 1.576e-14\
-CR0Pad1_F0 net_R0Pad1 net_F0 0\
 CR1Pad1_F1 net_R1Pad1 net_F1 8.84e-15\
 LQ0Pad1_Q0Pad2 net_Q0Pad1 net_Q0Pad2 1.25e-08\
 LQ1Pad1_Q1Pad2 net_Q1Pad1 net_Q1Pad2 1.25e-08\
 RFL 0 net_FL 50\
 RFR 0 net_FR 50\
-RR0Pad1_R0Pad2 net_R0Pad1 Port1 0\
 TR1Pad1_R1Pad2 net_R1Pad1 0 net_R1Pad2 0 Z0=50 TD=7.875e-11\
 TFL_F0 net_FL 0 net_F0 0 Z0=50 TD=3.813074950809571e-11\
 TF0_F1 net_F0 0 net_F1 0 Z0=50 TD=1.84295e-11\
@@ -354,7 +344,7 @@ RPort1 Port1 0 PORTNUM=1 RZ=50\
 		Notes=$begin_cdata$ $end_cdata$
 		$begin 'AnimationSetups'
 		$end 'AnimationSetups'
-		CacheHeaderFile='HDRpJSChb23028316211323572.tmp'
+		CacheHeaderFile='HDRzNl8PH21894016212114402.tmp'
 	$end 'NexximNetlist'
 	$begin 'DataInstances'
 		DesignEditor='TopLevel'

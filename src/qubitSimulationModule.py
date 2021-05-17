@@ -3,13 +3,13 @@ import numpy as np
 import os
 import gdspy
 from ChipElements import OtherComponents
-from basicGeometryFunctions import pointInPolyline, rotate, translate
+from basicGeometry import pointInPolyline, rotate, translate
 from node import Node
-from polylineFunctions import rectanglePolyline, multiplyPolyline
+from polyline import rectanglePolyline, multiplyPolyline
 from qSysObjects import *
 from constants import *
 import json
-from csvFunctions import jsonRead, jsonWrite
+from dataIO import jsonRead, jsonWrite
 
 
 def generateSystemParametersFile(folder):
@@ -23,16 +23,15 @@ def generateSystemParametersFile(folder):
     jsonWrite(folder / "systemParametersFile.json", sysParamsDict)
 
 
-def initialize(projectFolder, computeLocation, QSMSourceFolder):
+def initialize(projectFolder, computeLocation, QSMSourceFolder, designFilesCompleted=False):
     qSys = loadSystemParametersFile(projectFolder, computeLocation, QSMSourceFolder)
-
+    if designFilesCompleted:
+        qSys.loadDesignFiles()
     return qSys
 
 
 def loadSystemParametersFile(projectFolder, computeLocation, QSMSourceFolder):
-    """Returns qubitSystem object based on data in systemParametersFile"""
-    with open(projectFolder / "systemParametersFile.json", "r") as read_file:
-        sysParams = json.load(read_file)
+    sysParams = jsonRead(projectFolder / "systemParametersFile.json")
     sysParams["Project Folder"] = projectFolder
     sysParams["Compute Location"] = computeLocation
     sysParams["QSM Source Folder"] = QSMSourceFolder
@@ -223,6 +222,7 @@ class QubitSystem:
         jsonWrite(self.componentGeometriesFile, geometriesDict)
 
     def loadGeometries(self):
+        self.loadComponentParams()
         componentsDict = jsonRead(self.componentGeometriesFile)
         # Load CPW info
         self.CPW.geometryParams = componentsDict["CPW"]
@@ -936,8 +936,6 @@ class QubitSystem:
             for launchPadName, launchPad in controlLine.launchPadNodeDict.items():
                 allNodes.append(launchPad)
         return allNodes
-
-
 
     def deleteFile(self, fileName):
         if self.sysParams["Compute Location"] == "Windows":

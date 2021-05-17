@@ -1,5 +1,5 @@
-from polylineFunctions import pathPolyline, rectanglePolylineSet, rectanglePolyline, circlePolyline
-from basicGeometryFunctions import rotate, translate
+from polyline import pathPolyline, rectanglePolylineSet, rectanglePolyline, circlePolyline
+from basicGeometry import rotate, translate
 from constants import traceBuffer
 
 

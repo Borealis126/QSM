@@ -2,10 +2,10 @@ import numpy as np
 from sympy import symbols, MatrixSymbol
 from qutip import qeye, destroy, tensor
 from constants import Phi_0Const, hbarConst, eConst
-from basicGeometryFunctions import nearestPoint, distancePointPoint, midpoint, segmentBoundary, vertexBoundary
-from meanderFunctions import meanderNodeGen
+from basicGeometry import nearestPoint, distancePointPoint, midpoint, segmentBoundary, vertexBoundary
+from meander import meanderNodeGen
 from node import Node
-from polylineFunctions import launchPadPolylines
+from polyline import launchPadPolylines
 from pointToLine import pnt2line
 
 class JJGDS:
