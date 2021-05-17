@@ -1,23 +1,23 @@
-Welcome to QSM's documentation!$
-===============================$
+Welcome to QSM's documentation!
+===============================
 
-Another simple header$
-=====================$
+Another simple header
+=====================
 
-Here is some text.$
+Here is some text.
 
-Guide$
-^^^^^$
+Guide
+^^^^^
 
-.. toctree::$
-   :maxdepth: 2$
-   :caption: Contents:$
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
 
 
 
-Indices and tables$
-==================$
+Indices and tables
+==================
 
-* :ref:`genindex`$
-* :ref:`modindex`$
-* :ref:`search`$
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
