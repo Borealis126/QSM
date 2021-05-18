@@ -6,7 +6,7 @@ Introduction
 
 The Qubit Simulation Module (QSM) is a software package that facilitates the full design process for
 superconducting qubits and resonators. It is designed to be highly modular and accommodate any user-defined models,
-but by default it uses those found in Chapter 4 of Junling Long’s doctoral thesis found
+but by default it uses those found in Chapter 4 of Dr. Long’s doctoral thesis found
 `here <https://sites.google.com/view/junlings-research-homepage/thesis?authuser=0>`_.
 
 It is written in Python with external calls to the Ansys HFSS, Q3D, and Nexxim simulators.
