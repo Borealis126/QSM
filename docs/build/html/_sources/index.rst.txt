@@ -228,7 +228,8 @@ along with flip chip functionality. Other NIST simulations and calculations will
 License
 =======
 This software package was a joint project by the
-`Singh <https://inside.mines.edu/~msingh/>`_/Gong groups at the Colorado School of Mines and the
+`Singh <https://inside.mines.edu/~msingh/>`_/`Gong <https://quantum.mines.edu/project/gong-zhexuan/>`_
+groups at the Colorado School of Mines and the
 `Quantum Processing Group <https://www.nist.gov/pml/quantum-electromagnetics/quantum-processing>`_
 at the National Institute of Standards and Technology in Boulder, CO.
 It is free for public use with proper credit/attribution.
