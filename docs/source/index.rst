@@ -221,8 +221,8 @@ To define new geometries, the user needs to define the parameters of that geomet
 section to the node class in node.py.
 
 QSM currently contains API methods for Ansys Q3D and Circuit simulations, so adding analyses that
-require variations of these should be straightforward. HFSS APIs will be coming shortly. Other NIST simulations
-and calculations will also be added periodically.
+require variations of these should be straightforward. HFSS APIs will be coming shortly,
+along with flip chip functionality. Other NIST simulations and calculations will also be added periodically.
 
 
 License
