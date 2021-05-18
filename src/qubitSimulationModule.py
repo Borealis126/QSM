@@ -14,9 +14,9 @@ from dataIO import jsonRead, jsonWrite
 
 def generateSystemParametersFile(folder):
     sysParamsDict = {"Chip Description": "description",
-                     "Number of Qubits": 1, "Number of Readout Resonators": 1,
+                     "Number of Qubits": 1, "Number of Readout Resonators": 1, "Number of Control Lines": 1,
                      "Material": "perfect conductor",
-                     "Flip Chip?": "No", "Chip Markers": "Pappas", "Simulation": "2D",
+                     "Flip Chip?": "No", "Chip Markers": "Pappas",
                      "Simulate Feedline?": "No"}
     jsonWrite(folder / "systemParameters.json", sysParamsDict)
 
@@ -441,7 +441,7 @@ class QubitSystem:
                                 geoms["Pad " + str(pad.index) + " Side " + str(side) + " Boundary"]
                 # Common to all qubit geometries
                 for qubitPad in qubit.padListGeom:
-                    qubitPad.node.polylineShapeParams["Mesh Boundary"] = chip.substrate.geometryParams["Mesh Boundary"]
+                    qubitPad.node.polylineShapeParams["Mesh Boundary"] = chip.ground.geometryParams["Mesh Boundary"]
                     qubitPad.node.updatePolylines()
                     # Z values
                     if chipIndex == 0:
@@ -461,8 +461,8 @@ class QubitSystem:
                     elif chipIndex == 1:
                         resonatorPadNode.Z = self.chipDict[1].substrate.node.Z - resonatorPadNode.height
                 # Mesh boundary
-                pad1Node.polylineShapeParams["Mesh Boundary"] = chip.substrate.geometryParams["Mesh Boundary"]
-                pad2Node.polylineShapeParams["Mesh Boundary"] = chip.substrate.geometryParams["Mesh Boundary"]
+                pad1Node.polylineShapeParams["Mesh Boundary"] = chip.ground.geometryParams["Mesh Boundary"]
+                pad2Node.polylineShapeParams["Mesh Boundary"] = chip.ground.geometryParams["Mesh Boundary"]
                 # Meanders
                 readoutResonator.updateMeanderNode(self.CPW)
                 # Height
@@ -540,7 +540,7 @@ class QubitSystem:
                 # Path Polyline
                 lineNode.polylineShape = "path"
                 lineNode.polylineShapeParams["CPW"] = self.CPW
-                lineNode.polylineShapeParams["Mesh Boundary"] = chip.substrate.geometryParams["Mesh Boundary"]
+                lineNode.polylineShapeParams["Mesh Boundary"] = chip.ground.geometryParams["Mesh Boundary"]
                 for param in geoms:
                     lineNode.polylineShapeParams[param] = geoms[param]
                 lineNode.updatePolylines()
@@ -759,12 +759,12 @@ class QubitSystem:
             # Draw mesh
             if addMesh:
                 # meshContainer=gdspy.Cell((-chipWidth/2,-chipLength/2),(chipWidth/2,chipLength/2),layer=chip.index+2)
-                size = chip.substrate.geometryParams["Mesh Size"] * unitChange
+                size = chip.ground.geometryParams["Mesh Size"] * unitChange
                 chipBorder = 150
                 for xVal in np.arange(-chipWidth / 2 + chipBorder, chipWidth / 2 - chipBorder,
-                                      chip.substrate.geometryParams["Mesh Spacing"] * unitChange):
+                                      chip.ground.geometryParams["Mesh Spacing"] * unitChange):
                     for yVal in np.arange(-chipLength / 2 + chipBorder, chipLength / 2 - chipBorder,
-                                          chip.substrate.geometryParams["Mesh Size"] * unitChange):
+                                          chip.ground.geometryParams["Mesh Spacing"] * unitChange):
                         exclude = "No"
                         for meshPeriphery in meshPeripheries:
                             if pointInPolyline([xVal, yVal], meshPeriphery):

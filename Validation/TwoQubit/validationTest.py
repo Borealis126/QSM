@@ -31,7 +31,7 @@ def copyFile(sourceFile, destinationFile):
 # copyFile(copyDir / "systemParametersFile.csv", projectFolder / "systemParametersFile.csv")
 
 # Once systemParameters is available and filled out, ALWAYS run this command first.
-qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, designFilesCompleted=True)
+qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=True)
 
 # qSys.generateComponentParams()
 # copyFile(copyDir/"componentParametersFile.json", projectFolder/"componentParametersFile.json")
@@ -39,27 +39,33 @@ qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, designFil
 # qSys.generateGeometries()
 # copyFile(copyDir/"componentGeometriesFile.json", projectFolder/"componentGeometriesFile.json")
 
-# qSys.generateGDS()
+# qSys.generateGDS(addMesh=True)
 
-# CapMatSimulation(qSys).initialize()
-# CapMatSimulation(qSys).run()
-# CapMatSimulation(qSys).postProcess()
+# CapMat(qSys).initialize()
+# CapMat(qSys).run()
+# CapMat(qSys).postProcess()
 
 # for readoutResonatorIndex, readoutResonator in qSys.allReadoutResonatorsDict.items():
-    # LumpedRSim(readoutResonatorIndex)(qSys).initialize()
-    # LumpedRSim(readoutResonatorIndex)(qSys).run()
-    # LumpedRSim(readoutResonatorIndex)(qSys).postProcess()
+    # LumpedR(readoutResonatorIndex)(qSys).initialize()
+    # LumpedR(readoutResonatorIndex)(qSys).run()
+    # LumpedR(readoutResonatorIndex)(qSys).postProcess()
 
-# CapMatGESimulation(qSys).postProcess()
+# CapMatGE(qSys).postProcess()
 #
 # for qubitIndex, qubit in qSys.allQubitsDict.items():
-#     ECQSim(qubitIndex)(qSys).postProcess()
+#     ECQ(qubitIndex)(qSys).postProcess()
 #
 # for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.items():
-#     ECRSim(readoutResonatorIndex)(qSys).postProcess()
-#
+#     ECR(readoutResonatorIndex)(qSys).postProcess()
+# #
 
 # Quantize(qSys).initialize()
 # Quantize(qSys).postProcess()
 
-# ZZQCalc(qSys, 0, 1)
+print(ZZQ(qSys, 0, 1))
+
+print(L_iQ(qSys, 0))
+
+print(anharmonicityQ(qSys, 0))
+
+print(dispersiveShiftR(qSys, 0))

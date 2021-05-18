@@ -138,15 +138,16 @@ Some fields in the layout files require specific input. The current available op
 
 * systemParameters
 
-  * Material -> perfector conductor, aluminum, etc. -> see Ansys material list. 
+  * Material -> perfect conductor, aluminum, etc. -> see Ansys material list.
   
   * Flip Chip? -> Currently just No, will be available shortly. 
   
-  * Simulate Feedline? -> Yes, No
+  * Simulate Feedline? -> Yes, No. This determines if the feedline is included in the capacitance matrix simulation.
+    For designs with known capacitances to the feedline it is faster to set this to No.
   
   * Chip Markers -> Pappas, Schmidt
   
-  * Simulation -> 2D,3D
+  * Simulation -> 2D,3D. 3D is slower but likely more accurate for components that aren't approximately flat.
   
 * componentParameters
 
@@ -203,13 +204,26 @@ The NIST quantization model involves running the following analyses in order:
 
 * Quantize
 
-The following calculations are also available for convenience:
+See QSM_Quantization.pdf for more details.
 
-* ZZQ_Calc
+The following calculations (in calculations.py) are also available for convenience:
+
+* ZZQ
 
 * anharmonicityQ
 
 * dispersiveShiftR
+
+Extensibility
+^^^^^^^^^^^^^
+
+To define new geometries, the user needs to define the parameters of that geometry, then add a corresponding
+section to the node class in node.py.
+
+QSM currently contains API methods for Ansys Q3D and Circuit simulations, so adding analyses that
+require variations of these should be straightforward. HFSS APIs will be coming shortly. Other NIST simulations
+and calculations will also be added periodically.
+
 
 License
 =======

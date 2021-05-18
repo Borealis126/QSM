@@ -1,45 +1,47 @@
-# Import modules
 import sys
-import os
 from pathlib import Path
-computeLocation = "Windows"  # Edit this based on where the QSM is being run. Users at NIST should use "68707Max"
-QSMSourceFolder = "O:/68707/JoelHoward/ChipDesign/QSMSource/"
-sys.path.append(QSMSourceFolder)
+computeLocation = "Windows"  # Edit this based on where the QSM is being run. Should be "Windows" for most users.
+QSMSourceFolder = Path("/beegfs/scratch/joelhoward/QSMSimulations/QSMSource/src")
+sys.path.append(str(QSMSourceFolder))
 import qubitSimulationModule as QSM
 from simulations import *
 from calculations import *
-projectFolder = Path(os.path.dirname(os.path.abspath(__file__)))
+projectFolder = Path(__file__).parent.absolute()
 
+# QSM.generateSystemParametersFile(projectFolder)  # First, run just this command to generate the systemParameters file.
 
-# QSM.generateSystemParams(projectFolder)#Run this command to generate the systemParameters file.
+# qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=False)
 
-# Once systemParameters is available and filled out, ALWAYS run this command first.
-qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, designFilesCompleted=True)
-
-# Generate and populate these sequentially.
 # qSys.generateComponentParams()
 # qSys.generateGeometries()
+# qSys.generateGDS(addMesh=False)
 
-# qSys.generateGDS() #Optional to view layout.
-
-# Run these sequentially. Populate simParams file after initialize().
-# CapMatSimulation(qSys).initialize()
-# CapMatSimulation(qSys).run()
-# CapMatSimulation(qSys).postProcess()
+# CapMat(qSys).initialize()
+# CapMat(qSys).run()
+# CapMat(qSys).postProcess()
 
 # for readoutResonatorIndex, readoutResonator in qSys.allReadoutResonatorsDict.items():
-    # LumpedRSim(readoutResonatorIndex)(qSys).initialize()
-    # LumpedRSim(readoutResonatorIndex)(qSys).run()
-    # LumpedRSim(readoutResonatorIndex)(qSys).postProcess()
+#     LumpedR(readoutResonatorIndex)(qSys).initialize()
+# for readoutResonatorIndex, readoutResonator in qSys.allReadoutResonatorsDict.items():
+#     LumpedR(readoutResonatorIndex)(qSys).run()
+# for readoutResonatorIndex, readoutResonator in qSys.allReadoutResonatorsDict.items():
+#     LumpedR(readoutResonatorIndex)(qSys).postProcess()
 
-# CapMatGESimulation(qSys).postProcess()
+# CapMatGE(qSys).initialize()
+# CapMatGE(qSys).postProcess()
 
 # for qubitIndex, qubit in qSys.allQubitsDict.items():
-#     ECQSim(qubitIndex)(qSys).postProcess()
+#     ECQ(qubitIndex)(qSys).initialize()
+#     ECQ(qubitIndex)(qSys).postProcess()
+
 # for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.items():
-#     ECRSim(readoutResonatorIndex)(qSys).postProcess()
+#     ECR(readoutResonatorIndex)(qSys).initialize()
+#     ECR(readoutResonatorIndex)(qSys).postProcess()
 
 # Quantize(qSys).initialize()
 # Quantize(qSys).postProcess()
 
-# ZZQCalc(qSys, 0, 1)
+# print(ZZQ(qSys, 0, 1))
+# print(L_iQ(qSys, 0))
+# print(anharmonicityQ(qSys, 0))
+# print(dispersiveShiftR(qSys, 0))

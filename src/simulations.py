@@ -162,7 +162,7 @@ class CapMat(Simulation):
         self.q3dSims = {q3dSimName: Q3DExtractor(q3dSimName, self.directoryPath)}
 
     def initialize(self):
-        simParamsDict = {"PerRefine": "100", "MaxPass": "99"}
+        simParamsDict = {"Dimension": "2D", "PerRefine": "100", "MaxPass": "99"}
         self.generateParams(simParamsDict)
 
     def run(self):
@@ -236,7 +236,7 @@ class CapMat(Simulation):
                     polyline3D=[[point[0], point[1], thisNode.Z] for point in
                                 thisNode.polyline]
                 )
-                lines += ansysQ3DMake3D(self.qSys.sysParams["Simulation"], thisNode)
+                lines += ansysQ3DMake3D(self.simParams["Dimension"], thisNode)
                 # Trench round 1
                 addTrenchNodeLines, subtractTrenchPeripheryLines, makeTrenchComponent3DLines = ansysTrench(
                     componentNode=thisNode, trench=self.qSys.CPW.geometryParams["Trench"], chip=chip)
@@ -275,7 +275,7 @@ class CapMat(Simulation):
                     if controlLine.lineType == "fluxBias":
                         lines += ansysUniteNodes([self.chipDict[0].ground.outlineNode, controlLine.lineNode])
             # Make the ground 3D
-            lines += ansysQ3DMake3D(self.qSys.sysParams["Simulation"], chip.ground.outlineNode)
+            lines += ansysQ3DMake3D(self.simParams["Dimension"], chip.ground.outlineNode)
         # Draw bumps if flip chip, and join the ground nodes via the bumps
         if self.qSys.sysParams["Flip Chip?"] == "Yes":
             uniteNodeList = [self.qSys.chipDict[0].ground.outlineNode, self.qSys.chipDict[1].ground.outlineNode]
@@ -336,7 +336,7 @@ class CapMat(Simulation):
         return np.array(capMat)
 
 
-class CapMat(Simulation):
+class CapMatGE(Simulation):
     def __init__(self, qSys):
         super().__init__(qSys, "capMatGE")
         # Components ordering
@@ -358,6 +358,9 @@ class CapMat(Simulation):
             self.postGEComponentList.append(readoutResonator)
             nonGECapMatIndex += 1
 
+    def initialize(self):
+        self.createDirectory()
+
     def postProcess(self):
         self.deleteUnneededFiles()
         header = [component.name for component in self.postGEComponentList]
@@ -372,12 +375,12 @@ class CapMat(Simulation):
     def capMatForGE(self):
         dimPreGEQuant = len(self.preGECapMatHeaders)
         capMat_preGE = zeros(dimPreGEQuant, dimPreGEQuant)
-        capMatReduced = Matrix(CapMatSimulation(self.qSys).capMat)
-        ansysCapMatHeaders = CapMatSimulation(self.qSys).ansysCapMatHeaders
+        capMatReduced = Matrix(CapMat(self.qSys).capMat)
+        ansysCapMatHeaders = CapMat(self.qSys).ansysCapMatHeaders
 
         # Alter the resonator pad 2 capacitance to ground according to the lumped resonator model.
         for readoutResonatorIndex, readoutResonator in self.qSys.allReadoutResonatorsDict.items():
-            lumpedRSim = LumpedRSim(readoutResonatorIndex)(self.qSys)
+            lumpedRSim = LumpedR(readoutResonatorIndex)(self.qSys)
             index = ansysCapMatHeaders.index(readoutResonator.pad2.node.name)
             capMatReduced[index, index] = (capMatReduced[index, index]
                                            - sum(capMatReduced.row(index)) + lumpedRSim.equivC)
@@ -514,11 +517,11 @@ class CapMat(Simulation):
 class Quantize(Simulation):
     def __init__(self, qSys):
         super().__init__(qSys, "quantize")
-        self.CapMatGESim = CapMatGESimulation(self.qSys)
+        self.CapMatGESim = CapMatGE(self.qSys)
 
     def initialize(self):
         quantizeList = "["
-        for component in CapMatGESimulation(self.qSys).postGEComponentList:
+        for component in CapMatGE(self.qSys).postGEComponentList:
             quantizeList += component.name + ":"
         quantizeList = quantizeList[0:-1] + "]"
         simParamsDict = {"QuantizeList": quantizeList, "NumResonatorPhotons": 5, "NumQubitPhotons": 5,
@@ -548,11 +551,11 @@ class Quantize(Simulation):
     def QSecondQuant(self, component):
         QSecondQuant = None
         if issubclass(type(component), Qubit):
-            EC = ECQSim(component.index)(self.qSys).EC
+            EC = ECQ(component.index)(self.qSys).EC
             QSecondQuant = 1j * np.sqrt(1 / (2 * component.Z(EC))) * (self.aDagger(component) - self.a(component))
         elif isinstance(component, ReadoutResonator):
-            equivL = LumpedRSim(component.index)(self.qSys).equivL
-            EC = ECRSim(component.index)(self.qSys).EC
+            equivL = LumpedR(component.index)(self.qSys).equivL
+            EC = ECR(component.index)(self.qSys).EC
             QSecondQuant = 1j * np.sqrt(1 / (2 * component.Z(equivL, EC))) * (self.aDagger(component)
                                                                               - self.a(component))
         return QSecondQuant
@@ -560,11 +563,11 @@ class Quantize(Simulation):
     def PhiSecondQuant(self, component):
         PhiSecondQuant = None
         if issubclass(type(component), Qubit):
-            EC = ECQSim(component.index)(self.qSys).EC
+            EC = ECQ(component.index)(self.qSys).EC
             PhiSecondQuant = np.sqrt(1 * component.Z(EC) / 2) * (self.aDagger(component) + self.a(component))
         elif isinstance(component, ReadoutResonator):
-            equivL = LumpedRSim(component.index)(self.qSys).equivL
-            EC = ECRSim(component.index)(self.qSys).EC
+            equivL = LumpedR(component.index)(self.qSys).equivL
+            EC = ECR(component.index)(self.qSys).EC
             PhiSecondQuant = np.sqrt(1 * component.Z(equivL, EC) / 2) * (self.aDagger(component) + self.a(component))
         return PhiSecondQuant
 
@@ -616,7 +619,7 @@ class Quantize(Simulation):
                     H -= (component.EJ / hbarConst) * cosTerm
                     print("cos x^" + str(2 * i) + " term Frobenius norm: ", cosTerm.norm(norm="fro"))
             elif isinstance(component, ReadoutResonator):
-                lumpedRSim = LumpedRSim(component.index)(self.qSys)
+                lumpedRSim = LumpedR(component.index)(self.qSys)
                 term = self.PhiSecondQuant(component) ** 2 / (2 * lumpedRSim.equivL)
                 H += term
         endTime = time.time()
@@ -787,9 +790,11 @@ def LumpedR(index):
             self.index = index
             self.Y11RSimName = "Y11R" + str(self.index)
             self.YRestRSimName = "YRestR" + str(self.index)
+            CapMatObj=CapMat(self.qSys)
             self.circuitSims = {
-                self.Y11RSimName: Y11RSimulation(self.Y11RSimName, self.directoryPath, qSys, self.index),
-                self.YRestRSimName: YRestRSimulation(self.YRestRSimName, self.directoryPath, qSys, self.index)}
+                self.Y11RSimName: Y11RSimulation(self.index, self.Y11RSimName, self.directoryPath, qSys, CapMatObj),
+                self.YRestRSimName: YRestRSimulation(self.index, self.YRestRSimName,
+                                                     self.directoryPath, qSys, CapMatObj)}
 
         def initialize(self):
             simParamsDict = S21_params
@@ -837,10 +842,13 @@ def ECQ(index):
             super(ECQSimulation, self).__init__(qSys, "ECQ" + str(index))
             self.index = index
 
+        def initialize(self):
+            self.createDirectory()
+
         def postProcess(self):
             self.deleteUnneededFiles()
 
-            CapMatGESim = CapMatGESimulation(self.qSys)
+            CapMatGESim = CapMatGE(self.qSys)
             postGEComponentList = CapMatGESim.postGEComponentList
 
             qubitObj = self.qSys.allQubitsDict[self.index]
@@ -869,8 +877,11 @@ def ECR(index):
             super(ECRSimulation, self).__init__(qSys, "ECR" + str(index))
             self.index = index
 
+        def initialize(self):
+            self.createDirectory()
+
         def postProcess(self):
-            CapMatGESim = CapMatGESimulation(self.qSys)
+            CapMatGESim = CapMatGE(self.qSys)
             postGEComponentList = CapMatGESim.postGEComponentList
             readoutResonatorObj = self.qSys.allReadoutResonatorsDict[self.index]
             resonatorColumnIndex = postGEComponentList.index(readoutResonatorObj)

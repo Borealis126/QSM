@@ -1,14 +1,13 @@
-import simulations
 import qSysObjects
 from ansysAPI import aedtEdit
 from copy import deepcopy
 
 
 class CircuitSim:  # Y11R, YRest are CircuitSims.
-    def __init__(self, circuitSimName, simDirectory, qSys):
-        qSys.loadDesignFiles()
+    def __init__(self, circuitSimName, simDirectory, qSys, CapMatObj):
         self.name = circuitSimName
         self.qSys = qSys
+        self.capMatObj=CapMatObj
         self.aedtPath = simDirectory / (circuitSimName + ".aedt")
         self.netlistPath = simDirectory / (circuitSimName + "_" + "Netlist.txt")
         self.ansysRunSimulatorPath = simDirectory / (circuitSimName + "_" + "ansysRunSimulator.py")
@@ -27,8 +26,8 @@ class CircuitSim:  # Y11R, YRest are CircuitSims.
             "Feedline Sections": dict()
         }
         # Everything that doesn't involve the feedline.
-        ansysCapMatHeaders = simulations.CapMatSimulation(self.qSys).ansysCapMatHeaders
-        capMat = simulations.CapMatSimulation(self.qSys).capMat
+        ansysCapMatHeaders = self.capMatObj.ansysCapMatHeaders
+        capMat = self.capMatObj.capMat
         for index1, node1Name in enumerate(ansysCapMatHeaders):  # Iterate through the capacitance matrix
             for node2Name in ansysCapMatHeaders[index1:]:  # So it's like (0,0),(0,1),(0,2),(1,1),(1,2),(2,2).
                 if "CL0" not in node1Name and "CL0" not in node2Name:
@@ -136,8 +135,8 @@ class CircuitSim:  # Y11R, YRest are CircuitSims.
 
 
 class Y11RSimulation(CircuitSim):
-    def __init__(self, circuitSimName, simDirectory, qSys, index):
-        super(Y11RSimulation, self).__init__(circuitSimName, simDirectory, qSys)
+    def __init__(self, index, circuitSimName, simDirectory, qSys, CapMatObj):
+        super(Y11RSimulation, self).__init__(circuitSimName, simDirectory, qSys, CapMatObj)
         self.index = index
 
     @property
@@ -192,8 +191,8 @@ class Y11RSimulation(CircuitSim):
 
 
 class YRestRSimulation(CircuitSim):
-    def __init__(self, circuitSimName, simDirectory, qSys, index):
-        super(YRestRSimulation, self).__init__(circuitSimName, simDirectory, qSys)
+    def __init__(self, index, circuitSimName, simDirectory, qSys, CapMatObj):
+        super(YRestRSimulation, self).__init__(circuitSimName, simDirectory, qSys, CapMatObj)
         self.index = index
 
     @property
@@ -252,7 +251,7 @@ class YRestRSimulation(CircuitSim):
         return portsLines
 
     @staticmethod
-    def netlistSimulationLines(self, simParams):  # Contains simulation-specific info
+    def netlistSimulationLines(simParams):  # Contains simulation-specific info
         return [
             ".LNA\n",
             "+ LIN " + str(simParams["LNA_counts"]) + " " + str(simParams["LNA_start (GHz)"] * 1e9)

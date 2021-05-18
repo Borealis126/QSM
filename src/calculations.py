@@ -7,7 +7,7 @@ def L_iQ(qSys, qubitIndex):
     return 1 / (qubit.omega_i(EC) ** 2 * eConst ** 2 / (2 * EC))
 
 
-def ZZQ_Calc(qSys, q1Index, q2Index):
+def ZZQ(qSys, q1Index, q2Index):
     QuantizeObj = Quantize(qSys)
     q1QuantizeIndex = QuantizeObj.quantizeIndex(qSys.allQubitsDict[q1Index])
     q2QuantizeIndex = QuantizeObj.quantizeIndex(qSys.allQubitsDict[q2Index])
@@ -22,13 +22,9 @@ def ZZQ_Calc(qSys, q1Index, q2Index):
     E10 = QuantizeObj.HEval(stateList10)
     E01 = QuantizeObj.HEval(stateList01)
 
-    print("E11 (GHz):", E11)
-    print("E10 (GHz):", E10)
-    print("E01 (GHz):", E01)
-
     gz = E11 - E01 - E10
 
-    print("gz" + str(q1Index) + "-" + str(q2Index) + "(MHz): ", gz * 1000)
+    return gz * 1000  # In MHz
 
 
 def anharmonicityQ(qSys, qubitIndex):
