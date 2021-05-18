@@ -227,8 +227,9 @@ and calculations will also be added periodically.
 
 License
 =======
-This software package was developed Colorado School of Mines and the National Institute of Standards and Technology in Boulder, CO. 
-It is free for public use with proper credit/attribution. 
+This software package was a joint project by the Singh group at the Colorado School of Mines and the Pappas group at
+the National Institute of Standards and Technology in Boulder, CO.
+It is free for public use with proper credit/attribution.
 
 
 .. toctree::

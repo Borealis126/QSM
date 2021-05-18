@@ -19,7 +19,7 @@ import sphinx_rtd_theme
 # -- Project information -----------------------------------------------------
 
 project = 'QSM'
-copyright = '2021, Joel Howard'
+copyright = '2021, Colorado School of Mines / NIST'
 author = 'Joel Howard'
 
 # The full version, including alpha/beta/rc tags

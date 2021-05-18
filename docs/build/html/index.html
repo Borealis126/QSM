@@ -99,6 +99,7 @@
 <li><a class="reference internal" href="#details">Details</a><ul>
 <li><a class="reference internal" href="#id1">Layout</a></li>
 <li><a class="reference internal" href="#simulations-calculations">Simulations/Calculations</a></li>
+<li><a class="reference internal" href="#extensibility">Extensibility</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#license">License</a></li>
@@ -180,7 +181,7 @@ superconducting qubits and resonators. It is designed to be highly modular and a
 but by default it uses those found in Chapter 4 of Junling Long’s doctoral thesis found
 <a class="reference external" href="https://sites.google.com/view/junlings-research-homepage/thesis?authuser=0">here</a>.</p>
 <p>It is written in Python with external calls to the Ansys HFSS, Q3D, and Nexxim simulators.</p>
-<p>Two examples are included for reference.</p>
+<p>An example is included for reference.</p>
 </div>
 <div class="section" id="overview">
 <h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
@@ -296,10 +297,12 @@ They are simply called e.g.</p>
 <ul>
 <li><p>systemParameters</p>
 <ul class="simple">
-<li><p>Material -&gt; perfector conductor, aluminum, etc. -&gt; see Ansys material list.</p></li>
-<li><p>Flip Chip?, Simulate Feedline? -&gt; Yes, No</p></li>
+<li><p>Material -&gt; perfect conductor, aluminum, etc. -&gt; see Ansys material list.</p></li>
+<li><p>Flip Chip? -&gt; Currently just No, will be available shortly.</p></li>
+<li><p>Simulate Feedline? -&gt; Yes, No. This determines if the feedline is included in the capacitance matrix simulation.
+For designs with known capacitances to the feedline it is faster to set this to No.</p></li>
 <li><p>Chip Markers -&gt; Pappas, Schmidt</p></li>
-<li><p>Simulation -&gt; 2D,3D</p></li>
+<li><p>Simulation -&gt; 2D,3D. 3D is slower but likely more accurate for components that aren’t approximately flat.</p></li>
 </ul>
 </li>
 <li><p>componentParameters</p>
@@ -349,17 +352,27 @@ can be strung together to generate an arbitrary meander.</p></li>
 <li><p>L_iQ(i) for each qubit index (to verify consistency of L_i in componentParams)</p></li>
 <li><p>Quantize</p></li>
 </ul>
-<p>The following calculations are also available for convenience:</p>
+<p>See QSM_Quantization.pdf for more details.</p>
+<p>The following calculations (in calculations.py) are also available for convenience:</p>
 <ul class="simple">
-<li><p>ZZQ_Calc</p></li>
+<li><p>ZZQ</p></li>
 <li><p>anharmonicityQ</p></li>
 <li><p>dispersiveShiftR</p></li>
 </ul>
 </div>
+<div class="section" id="extensibility">
+<h2>Extensibility<a class="headerlink" href="#extensibility" title="Permalink to this headline">¶</a></h2>
+<p>To define new geometries, the user needs to define the parameters of that geometry, then add a corresponding
+section to the node class in node.py.</p>
+<p>QSM currently contains API methods for Ansys Q3D and Circuit simulations, so adding analyses that
+require variations of these should be straightforward. HFSS APIs will be coming shortly. Other NIST simulations
+and calculations will also be added periodically.</p>
+</div>
 </div>
 <div class="section" id="license">
 <h1>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h1>
-<p>This software package was developed Colorado School of Mines and the National Institute of Standards and Technology in Boulder, CO.
+<p>This software package was a joint project by the Singh group at the Colorado School of Mines and the Pappas group at
+the National Institute of Standards and Technology in Boulder, CO.
 It is free for public use with proper credit/attribution.</p>
 <div class="toctree-wrapper compound">
 </div>
@@ -383,7 +396,7 @@ It is free for public use with proper credit/attribution.</p>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2021, Joel Howard.
+        &#169; Copyright 2021, Colorado School of Mines / NIST.
 
     </p>
   </div>
