@@ -335,7 +335,7 @@ def YReportLines(resultsFile):
         "        \"Y Component:=\"		, [\"Y(1,1)\"]\n",
         "    ], [])\n",
         (
-                "oModuleReport.ExportToFile(\"Y Parameter Table 1\", \""
+                "oModuleReport.ExportToFile(\"Y Parameter Table 1\", r\""
                 + str(resultsFile)
                 + "\", False)\n"
         )
