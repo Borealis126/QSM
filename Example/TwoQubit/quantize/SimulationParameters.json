@@ -1,6 +1,0 @@
-{
- "QuantizeList": "[Q0:Q1:R0:R1]",
- "NumResonatorPhotons": 5,
- "NumQubitPhotons": 5,
- "TrigOrder": 10
-}
