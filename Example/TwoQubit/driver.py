@@ -41,10 +41,10 @@ needs to be run before every command. Once geometries are completed (i.e., now) 
 # CapMat(qSys).initialize() # -> Normally populate, but use the default values for now.
 # CapMat(qSys).run()
 # CapMat(qSys).postProcess()
-
+#
 # for readoutResonatorIndex, readoutResonator in qSys.allReadoutResonatorsDict.items():
 #     LumpedR(readoutResonatorIndex)(qSys).initialize() # -> Populate the simParams inside the LumpedR folder.
-
+#
 # for readoutResonatorIndex, readoutResonator in qSys.allReadoutResonatorsDict.items():
 #     LumpedR(readoutResonatorIndex)(qSys).run()
 
@@ -63,7 +63,7 @@ json populating or ansys simulations."""
 # for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.items():
 #     ECR(readoutResonatorIndex)(qSys).initialize()
 #     ECR(readoutResonatorIndex)(qSys).postProcess()
-
+#
 # Quantize(qSys).initialize() # -> Populate
 # Quantize(qSys).postProcess()
 #

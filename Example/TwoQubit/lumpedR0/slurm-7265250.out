@@ -1,0 +1,19 @@
+7265250
+Starting SLURM job ansys.7265250
+Number of NODES:1
+Number of Processors:16
+nodelist found this many CPUs:36
+ANSYS Electromagnetics 21.1 Configuration
+=========================================
+Hostname: c007
+User:     joelhoward
+
+> Running first-time configuration...
+  - *** Skipping dependency verification test ***
+  - Retrieving user settings... Done
+  - Applying user settings... Done
+  - Configuring OCX files... Done
+  - Retrieving machine settings... Done
+  - Applying machine settings... Done
+  - Configuring binaries... Done
+First-time configuration completed successfully.

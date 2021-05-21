@@ -871,6 +871,7 @@ def ECQ(index):
             return self.resultsDict["EC"]
     return ECQSimulation
 
+
 def ECR(index):
     class ECRSimulation(Simulation):
         def __init__(self, qSys):
