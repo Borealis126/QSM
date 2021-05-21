@@ -12,7 +12,7 @@ import json
 from dataIO import jsonRead, jsonWrite
 
 
-def generateSystemParametersFile(folder):
+def generateSystemParams(folder):
     sysParamsDict = {"Chip Description": "description",
                      "Number of Qubits": 1, "Number of Readout Resonators": 1, "Number of Control Lines": 1,
                      "Material": "perfect conductor",
@@ -22,13 +22,13 @@ def generateSystemParametersFile(folder):
 
 
 def initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=False):
-    qSys = loadSystemParametersFile(projectFolder, computeLocation, QSMSourceFolder)
+    qSys = loadSystemParams(projectFolder, computeLocation, QSMSourceFolder)
     if layoutCompleted:
         qSys.loadDesignFiles()
     return qSys
 
 
-def loadSystemParametersFile(projectFolder, computeLocation, QSMSourceFolder):
+def loadSystemParams(projectFolder, computeLocation, QSMSourceFolder):
     sysParams = jsonRead(projectFolder / "systemParameters.json")
     sysParams["Project Folder"] = projectFolder
     sysParams["Compute Location"] = computeLocation
