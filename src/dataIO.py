@@ -1,6 +1,6 @@
 import csv
 from math import floor
-from ansysAPI import ansysOutputToComplex
+from generalAnsysLines import ansysOutputToComplex
 from constants import GHzToOmega
 from scipy.interpolate import interp1d
 import json

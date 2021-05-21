@@ -9,7 +9,7 @@ from calculations import *
 projectFolder = Path(__file__).parent.absolute()
 
 """Start here. Uncomment the following line and run this file."""
-# QSM.generateSystemParametersFile(projectFolder)  # First, run just this command to generate the systemParameters file.
+# QSM.generateSystemParams(projectFolder)  # First, run just this command to generate the systemParameters file.
 
 """Now populate the system parameters (see reference jsons)"""
 

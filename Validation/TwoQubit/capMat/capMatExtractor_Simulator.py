@@ -7456,7 +7456,7 @@ oModuleAnalysis.InsertSetup("Matrix",
     [
         "NAME:capSim",
         "AdaptiveFreq:="	, "5GHz",
-        "SaveFields:="		, False,
+        "SaveFields:="		, True,
         "Enabled:="		, True,
         [
             "NAME:Cap",
@@ -7469,6 +7469,19 @@ oModuleAnalysis.InsertSetup("Matrix",
             "SolutionOrder:="	, "High",
             "Solver Type:="		, "Iterative"
         ]
+    ])
+oModule = oDesign.GetModule("RadField")
+oModule.InsertBoxSetup(
+    [
+        "NAME:Box1",
+        "UseCustomRadiationSurface:=", False,
+        "Length:="		, "2mm",
+        "Width:="		, "2mm",
+        "LengthSamples:="	, 21,
+        "WidthSamples:="	, 21,
+        "CoordSystem:="		, "Global",
+        "Height:="		, "2mm",
+        "HeightSamples:="	, 21
     ])
 oDesign.AnalyzeAll()
 oDesign.ExportMatrixData("/beegfs/scratch/joelhoward/QSMSimulations/QSMSource/Validation/TwoQubit/capMat/capMatExtractor_Results.csv", "C", "", "capSim:LastAdaptive", "Original", "ohm", "nH", "pF", "mSie", 5000000000, "Maxwell,Spice,Couple", 0, False, 5, 8, 0)

@@ -39,6 +39,7 @@ To use the QSM the user needs to have a python 3 environment with the following 
 * shapely
 * matplotlib
 * pathlib
+* qutip
 
 To begin a design, make a fresh directory containing the template version of “driver.py” (found in the source
 directory). In the header there is a variable called "computeLocation". This is used to differentiate between running

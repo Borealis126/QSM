@@ -1,5 +1,4 @@
 import qSysObjects
-from ansysAPI import aedtEdit
 from copy import deepcopy
 
 
@@ -340,3 +339,15 @@ def YReportLines(resultsFile):
                 + "\", False)\n"
         )
     ]
+
+
+def aedtEdit(line):
+    """This function edits the aedt file lines to add a backslash before each single quote.
+    Needed for loading in the netlist"""
+    returnLine = ""
+    for char in line:
+        if char == "\'":
+            returnLine = returnLine + "\\" + char
+        else:
+            returnLine = returnLine + char
+    return returnLine

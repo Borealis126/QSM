@@ -184,7 +184,7 @@ $begin 'AnsoftProject'
 		$end 'Scripts'
 		$begin 'Symbols'
 			$begin 'capMatExtractor'
-				ModTime=1621289661
+				ModTime=1621479331
 				Library=''
 				ModSinceLib=false
 				LibLocation='Project'
@@ -212,7 +212,7 @@ $begin 'AnsoftProject'
 		$end 'Symbols'
 		$begin 'DefInfo'
 			Netlist(1002, 0, 17, 0, '', 1600375107, '', 'Netlist', '', '', '', '', '', 'Design.bmp', '', 'Project', '', '', 1600375107, '', 0, 0)
-			capMatExtractor(1002, 0, 0, 0, '', 1621289661, '', 'capMatExtractor', '', '', '', '', '', 'Design.bmp', '', 'Project', '', '', 1621289661, '', 0, 0)
+			capMatExtractor(1002, 0, 0, 0, '', 1621479331, '', 'capMatExtractor', '', '', '', '', '', 'Design.bmp', '', 'Project', '', '', 1621479331, '', 0, 0)
 		$end 'DefInfo'
 		$begin 'Compdefs'
 			$begin 'Netlist'
@@ -266,7 +266,7 @@ $begin 'AnsoftProject'
 			WorkflowName=''
 			SpecName=''
 			TemplateName=''
-			LibLoc=11050
+			LibLoc=11018
 		$end 'Workflow'
 		$begin 'DesignDatasets'
 			NextUniqueID=0
@@ -310,7 +310,7 @@ $begin 'AnsoftProject'
 		Notes=$begin_cdata$ $end_cdata$
 		$begin 'AnimationSetups'
 		$end 'AnimationSetups'
-		CacheHeaderFile='HDRA8P1mM57011162128979519.tmp'
+		CacheHeaderFile='HDRS831Jm214383162147999819.tmp'
 	$end 'NexximNetlist'
 	$begin 'Q3DModel'
 		RepRewriteV2=true
@@ -22059,7 +22059,7 @@ $begin 'AnsoftProject'
 					ID=0
 					SetupType='Matrix'
 					AdaptiveFreq='5GHz'
-					SaveFields=false
+					SaveFields=true
 					Enabled=true
 					$begin 'Cap'
 						MaxPass=99
@@ -22106,7 +22106,7 @@ $begin 'AnsoftProject'
 				Line_Discretization=1000
 			$end 'FieldsCalculator'
 			$begin 'PlotDefaults'
-				Default_SolutionId=163
+				Default_SolutionId=162
 				Default_PlotFolder='Automatic'
 				Default_Phase='0deg'
 				Default_Freq='5GHz'
@@ -22130,7 +22130,7 @@ $begin 'AnsoftProject'
 		$end 'FieldsReporter'
 		$begin 'RadField'
 			$begin 'FarFieldSetups'
-				NextUniqueID=0
+				NextUniqueID=2
 				MoveBackwards=false
 			$end 'FarFieldSetups'
 			$begin 'ArraySetup'
@@ -22162,11 +22162,24 @@ $begin 'AnsoftProject'
 				$end 'CustomArray'
 			$end 'ArraySetup'
 			$begin 'NearFieldSetups'
-				NextUniqueID=0
+				NextUniqueID=2
 				MoveBackwards=false
+				$begin 'Box1'
+					Type='Near Box'
+					ID=1
+					VersionID=0
+					UseCustomRadiationSurface=false
+					Length='2mm'
+					Width='2mm'
+					LengthSamples=21
+					WidthSamples=21
+					CoordSystem='Global'
+					Height='2mm'
+					HeightSamples=21
+				$end 'Box1'
 			$end 'NearFieldSetups'
 			RadFieldComputationVersion=1.7
-			RadfieldHeaderFile='RADT95mRv57011162128979520.tmp'
+			RadfieldHeaderFile='RADtLwjQK214383162148000020.tmp'
 			RadPowerMethod=0
 		$end 'RadField'
 		$begin 'SolutionManager'
@@ -22177,17 +22190,6 @@ $begin 'AnsoftProject'
 				$begin 'Solution'
 					ID=162
 					Name='LastAdaptive'
-					$begin 'SimDataExtractor'
-						$begin 'QuantityIDs'
-							NextUniqueID=0
-							MoveBackwards=false
-							IDMap()
-						$end 'QuantityIDs'
-					$end 'SimDataExtractor'
-				$end 'Solution'
-				$begin 'Solution'
-					ID=163
-					Name='AdaptivePass'
 					$begin 'SimDataExtractor'
 						$begin 'QuantityIDs'
 							NextUniqueID=0
@@ -22244,6 +22246,17 @@ $begin 'AnsoftProject'
 						$end 'Sweeps'
 					$end 'SimDataExtractor'
 				$end 'Solution'
+				$begin 'Solution'
+					ID=163
+					Name='AdaptivePass'
+					$begin 'SimDataExtractor'
+						$begin 'QuantityIDs'
+							NextUniqueID=0
+							MoveBackwards=false
+							IDMap()
+						$end 'QuantityIDs'
+					$end 'SimDataExtractor'
+				$end 'Solution'
 			$end 'SimSetup'
 			$begin 'Version ID Map'
 				V=158
@@ -22276,7 +22289,7 @@ $begin 'AnsoftProject'
 		Notes=$begin_cdata$ $end_cdata$
 		$begin 'AnimationSetups'
 		$end 'AnimationSetups'
-		CacheHeaderFile='HDR8Ybeyf57011162128979521.tmp'
+		CacheHeaderFile='HDRCbPbe9214383162148000021.tmp'
 	$end 'Q3DModel'
 	$begin 'DataInstances'
 		DesignEditor='TopLevel'

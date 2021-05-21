@@ -2,9 +2,10 @@ import numpy as np
 import os
 import time
 from dataIO import jsonRead, jsonWrite, csvRead, arrayNoBlanks, readY11Data
-from ansysAPI import *
+from generalAnsysLines import *
 import subprocess
 from q3dSimulations import Q3DExtractor
+from hfssSimulations import *
 from circuitSimulations import *
 from sympy import symbols
 from constants import *
@@ -112,30 +113,11 @@ class Simulation:
             simulatorFileInstance.writelines(lines)
             simulatorFileInstance.close()
             self.runAnsysSimulator(circuitSim.aedtPath, circuitSim.ansysRunSimulatorPath, 3)  # CircuitSims are fast.
-
-    def deleteUnneededFiles(self):
-        # Check if all simulations have completed. Delete Ansys folders.
-        if self.qSys.sysParams["Compute Location"] == "Cluster":
-            proceed = False
-            while not proceed:
-                proceed = True
-                for q3dSimName, q3dSim in self.q3dSims.items():
-                    if not os.path.exists(q3dSim.resultsFilePath):
-                        proceed = False
-                for hfssSimName, hfssSim in self.hfssSims.items():
-                    if not os.path.exists(hfssSim.resultsFilePath):
-                        proceed = False
-                for circuitSimName, circuitSim in self.circuitSims.items():
-                    if not os.path.exists(circuitSim.resultsFilePath):
-                        proceed = False
-        time.sleep(1)
-        # Delete all Ansys results folders (~90MB for capMat)
-        for q3dSimName, q3dSim in self.q3dSims.items():
-            self.qSys.deleteFolder(str(q3dSim.aedtFolderPath))
-        for circuitSimName, circuitSim in self.circuitSims.items():
-            resultsFolder = str(circuitSim.aedtFolderPath)
-            if os.path.exists(resultsFolder):
-                self.qSys.deleteFolder(resultsFolder)
+        for hfssSimName, hfssSim in self.hfssSims.items():
+            self.copyAnsysFile(hfssSim.aedtPath)
+            simulatorFileInstance = open(hfssSim.simulatorPath, "w+", newline='')
+            simulatorFileInstance.writelines(hfssSim.lines)
+            simulatorFileInstance.close()
 
     def copyAnsysFile(self, ansysPath):
         if os.path.exists(str(ansysPath)):
@@ -155,12 +137,25 @@ class Simulation:
         subprocess.call(copyAEDTTemplateCommand, shell=True)
 
 
+class HFSSModel(Simulation):
+    def __init__(self, qSys):
+        super().__init__(qSys, "HFSSModel")
+        hfssSimName = "hfssModel"
+        self.hfssSims = {hfssSimName: HFSSModeler(hfssSimName, self.directoryPath)}
+
+    def initialize(self):
+        self.createDirectory()
+
+    def run(self):
+        self.hfssSims["hfssModel"].updateLines(self.capMatLayout_Lines())
+        self.runAllSims()
+
+
 class CapMat(Simulation):
     def __init__(self, qSys):
         super().__init__(qSys, "capMat")
         q3dSimName = "capMatExtractor"
         self.q3dSims = {q3dSimName: Q3DExtractor(q3dSimName, self.directoryPath)}
-
     def initialize(self):
         simParamsDict = {"Dimension": "2D", "PerRefine": "100", "MaxPass": "99"}
         self.generateParams(simParamsDict)
@@ -171,7 +166,6 @@ class CapMat(Simulation):
 
     def postProcess(self):
         # Converts Ansys output data to JSON
-        self.deleteUnneededFiles()
         capMatResultsFileLines = csvRead(self.q3dSims["capMatExtractor"].resultsFilePath)
         capMatHeaderLineIndex = 0
         for index, line in enumerate(capMatResultsFileLines):
@@ -362,7 +356,6 @@ class CapMatGE(Simulation):
         self.createDirectory()
 
     def postProcess(self):
-        self.deleteUnneededFiles()
         header = [component.name for component in self.postGEComponentList]
 
         capMat_GE, phiMat, RHS = self.gaussianElimination()
@@ -529,7 +522,6 @@ class Quantize(Simulation):
         self.generateParams(simParamsDict)
 
     def postProcess(self):
-        self.deleteUnneededFiles()
         self.quantizeSimulation()
 
     @property
@@ -804,7 +796,6 @@ def LumpedR(index):
             self.runAllSims()
 
         def postProcess(self):
-            self.deleteUnneededFiles()
             equivL_val, equivC_val = self.calculateLumpedResonator()
             resultsDict = {"equivL(H):": equivL_val, "equivC(F):": equivC_val}
             jsonWrite(self.resultsFilePath, resultsDict)
@@ -846,8 +837,6 @@ def ECQ(index):
             self.createDirectory()
 
         def postProcess(self):
-            self.deleteUnneededFiles()
-
             CapMatGESim = CapMatGE(self.qSys)
             postGEComponentList = CapMatGESim.postGEComponentList
 
@@ -870,6 +859,7 @@ def ECQ(index):
         def EC(self):
             return self.resultsDict["EC"]
     return ECQSimulation
+
 
 def ECR(index):
     class ECRSimulation(Simulation):
