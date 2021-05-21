@@ -8,7 +8,7 @@ from simulations import *
 from calculations import *
 projectFolder = Path(__file__).parent.absolute()
 
-# QSM.generateSystemParametersFile(projectFolder)  # First, run just this command to generate the systemParameters file.
+# QSM.generateSystemParams(projectFolder)  # First, run just this command to generate the systemParameters file.
 
 # qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=False)
 
