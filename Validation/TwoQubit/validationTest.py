@@ -33,6 +33,9 @@ def copyFile(sourceFile, destinationFile):
 # Once systemParameters is available and filled out, ALWAYS run this command first.
 qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=True)
 
+# HFSSModel(qSys).initialize()
+HFSSModel(qSys).run()
+
 # qSys.generateComponentParams()
 # copyFile(copyDir/"componentParametersFile.json", projectFolder/"componentParametersFile.json")
 
@@ -42,7 +45,7 @@ qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCom
 # qSys.generateGDS(addMesh=True)
 
 # CapMat(qSys).initialize()
-CapMat(qSys).run()
+# CapMat(qSys).run()
 # CapMat(qSys).postProcess()
 
 # for readoutResonatorIndex, readoutResonator in qSys.allReadoutResonatorsDict.items():

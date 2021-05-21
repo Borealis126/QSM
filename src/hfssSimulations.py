@@ -1,3 +1,6 @@
+from generalAnsysLines import *
+
+
 class HFSSSim:
     def __init__(self, simName, simDirectory):
         # "capMatExtractor" is the name, but the type is q3dExtractor

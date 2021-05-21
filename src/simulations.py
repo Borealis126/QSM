@@ -5,6 +5,7 @@ from dataIO import jsonRead, jsonWrite, csvRead, arrayNoBlanks, readY11Data
 from ansysAPI import *
 import subprocess
 from q3dSimulations import Q3DExtractor
+from hfssSimulations import *
 from circuitSimulations import *
 from sympy import symbols
 from constants import *
@@ -154,6 +155,18 @@ class Simulation:
             )
         subprocess.call(copyAEDTTemplateCommand, shell=True)
 
+
+class HFSSModel(Simulation):
+    def __init__(self, qSys):
+        super().__init__(qSys, "HFSSModel")
+        hfssSimName = "HFSSModel"
+        self.hfssSims = {hfssSimName: HFSSModeler(hfssSimName, self.directoryPath)}
+
+    def initialize(self):
+        self.createDirectory()
+
+    def run(self):
+        self.hfssSims["HFSSModel"].updateLines(CapMat(self.qSys).capMatLayout_Lines())
 
 class CapMat(Simulation):
     def __init__(self, qSys):
