@@ -42,7 +42,7 @@ qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCom
 # qSys.generateGDS(addMesh=True)
 
 # CapMat(qSys).initialize()
-# CapMat(qSys).run()
+CapMat(qSys).run()
 # CapMat(qSys).postProcess()
 
 # for readoutResonatorIndex, readoutResonator in qSys.allReadoutResonatorsDict.items():
@@ -62,10 +62,10 @@ qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCom
 # Quantize(qSys).initialize()
 # Quantize(qSys).postProcess()
 
-print(ZZQ(qSys, 0, 1))
-
-print(L_iQ(qSys, 0))
-
-print(anharmonicityQ(qSys, 0))
-
-print(dispersiveShiftR(qSys, 0))
+# print(ZZQ(qSys, 0, 1))
+#
+# print(L_iQ(qSys, 0))
+#
+# print(anharmonicityQ(qSys, 0))
+#
+# print(dispersiveShiftR(qSys, 0))

@@ -112,7 +112,7 @@ def capMatAnalysisLines(maxPass, perRefine, resultsFile):
         "        ]\n",
         "    ])\n",
         "oDesign.AnalyzeAll()\n",
-        "oDesign.ExportMatrixData(\""
+        "oDesign.ExportMatrixData(r\""
         + str(resultsFile)
         + "\", \"C\", \"\", \"capSim:LastAdaptive\", \"Original\", \"ohm\", \"nH\", \"pF\", \"mSie\", 5000000000, \"Maxwell,Spice,Couple\", 0, False, 5, 8, 0)\n"
     ]
