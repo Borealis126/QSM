@@ -39,7 +39,7 @@ projectFolder = Path(__file__).parent.absolute()
 needs to be run before every command. Once geometries are completed (i.e., now) switch layoutCompleted to True"""
 
 """Now uncomment this and leave it uncommented."""
-qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=True)
+# qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=True)
 
 """Run the following analyses"""
 
