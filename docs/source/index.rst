@@ -127,7 +127,7 @@ Calculation
 Because calculations do not involve ansys or cluster simulations, they are methods rather than classes.
 They are simply called e.g. ::
 
-	anharmonicityQCalc(qSys, q1Index, q2Index)
+	anharmonicityQ(qSys, 0)
 
 
 Details
