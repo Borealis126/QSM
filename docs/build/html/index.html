@@ -178,7 +178,7 @@
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
 <p>The Qubit Simulation Module (QSM) is a software package that facilitates the full design process for
 superconducting qubits and resonators. It is designed to be highly modular and accommodate any user-defined models,
-but by default it uses those found in Chapter 4 of Junling Long’s doctoral thesis found
+but by default it uses those found in Chapter 4 of Dr. Long’s doctoral thesis found
 <a class="reference external" href="https://sites.google.com/view/junlings-research-homepage/thesis?authuser=0">here</a>.</p>
 <p>It is written in Python with external calls to the Ansys HFSS, Q3D, and Nexxim simulators.</p>
 <p>An example is included for reference.</p>
@@ -262,7 +262,7 @@ sole argument:</p>
 </div>
 <p>Methods of this object then perform the various stages of the simulation:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">myFooSim</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span> <span class="c1"># Creates the simulation directory and parameters file that requires user input</span>
-<span class="n">myFooSim</span><span class="o">.</span><span class="n">run</span><span class="p">()</span> <span class="c1"># Runs all associated ansys simulations</span>
+<span class="n">myFooSim</span><span class="o">.</span><span class="n">run</span><span class="p">()</span> <span class="c1"># Runs all associated ansys simulations. Not available for simulations that don&#39;t need Ansys.</span>
 <span class="n">myFooSim</span><span class="o">.</span><span class="n">postProcess</span><span class="p">()</span> <span class="c1"># Runs all post processing steps once the ansys simulations are completed.</span>
 </pre></div>
 </div>
@@ -353,12 +353,14 @@ can be strung together to generate an arbitrary meander.</p></li>
 <li><p>Quantize</p></li>
 </ul>
 <p>See QSM_Quantization.pdf for more details.</p>
-<p>The following calculations (in calculations.py) are also available for convenience:</p>
+<p>The following calculations (in calculations.py) are also available:</p>
 <ul class="simple">
 <li><p>ZZQ</p></li>
 <li><p>anharmonicityQ</p></li>
 <li><p>dispersiveShiftR</p></li>
 </ul>
+<p>Additionally, the simulation HFSSModel will create an HFSS version of the layout in Ansys that the user
+can do with what they please.</p>
 </div>
 <div class="section" id="extensibility">
 <h2>Extensibility<a class="headerlink" href="#extensibility" title="Permalink to this headline">¶</a></h2>

@@ -720,11 +720,6 @@ oEditor.Subtract(
         "NAME:SubtractParameters",
         "KeepOriginals:="	, False
     ])
-oModuleBoundary.AssignSignalNet(
-    [
-        "NAME:Q0Pad1",
-        "Objects:="		, ["Q0Pad1"]
-    ])
 oEditor.CreatePolyline(
     [
         "NAME:PolylineParameters",
@@ -1443,11 +1438,6 @@ oEditor.Subtract(
     [
         "NAME:SubtractParameters",
         "KeepOriginals:="	, False
-    ])
-oModuleBoundary.AssignSignalNet(
-    [
-        "NAME:Q0Pad2",
-        "Objects:="		, ["Q0Pad2"]
     ])
 oEditor.CreatePolyline(
     [
@@ -2168,11 +2158,6 @@ oEditor.Subtract(
         "NAME:SubtractParameters",
         "KeepOriginals:="	, False
     ])
-oModuleBoundary.AssignSignalNet(
-    [
-        "NAME:Q1Pad1",
-        "Objects:="		, ["Q1Pad1"]
-    ])
 oEditor.CreatePolyline(
     [
         "NAME:PolylineParameters",
@@ -2891,11 +2876,6 @@ oEditor.Subtract(
     [
         "NAME:SubtractParameters",
         "KeepOriginals:="	, False
-    ])
-oModuleBoundary.AssignSignalNet(
-    [
-        "NAME:Q1Pad2",
-        "Objects:="		, ["Q1Pad2"]
     ])
 oEditor.CreatePolyline(
     [
@@ -3827,11 +3807,6 @@ oEditor.Subtract(
     [
         "NAME:SubtractParameters",
         "KeepOriginals:="	, False
-    ])
-oModuleBoundary.AssignSignalNet(
-    [
-        "NAME:R0Pad1",
-        "Objects:="		, ["R0Pad1"]
     ])
 oEditor.CreatePolyline(
     [
@@ -4865,11 +4840,6 @@ oEditor.Subtract(
         "NAME:SubtractParameters",
         "KeepOriginals:="	, False
     ])
-oModuleBoundary.AssignSignalNet(
-    [
-        "NAME:R0Pad2",
-        "Objects:="		, ["R0Pad2"]
-    ])
 oEditor.CreatePolyline(
     [
         "NAME:PolylineParameters",
@@ -5901,11 +5871,6 @@ oEditor.Subtract(
     [
         "NAME:SubtractParameters",
         "KeepOriginals:="	, False
-    ])
-oModuleBoundary.AssignSignalNet(
-    [
-        "NAME:R1Pad1",
-        "Objects:="		, ["R1Pad1"]
     ])
 oEditor.CreatePolyline(
     [
@@ -6939,11 +6904,6 @@ oEditor.Subtract(
         "NAME:SubtractParameters",
         "KeepOriginals:="	, False
     ])
-oModuleBoundary.AssignSignalNet(
-    [
-        "NAME:R1Pad2",
-        "Objects:="		, ["R1Pad2"]
-    ])
 oEditor.CreatePolyline(
     [
         "NAME:PolylineParameters",
@@ -7445,6 +7405,46 @@ oModuleBoundary.AssignThinConductor(
         "Objects:="		, ["G0"],
         "Material:="		, "perfect conductor",
         "Thickness:="		, "0.1um"
+    ])
+oModuleBoundary.AssignSignalNet(
+    [
+        "NAME:Q0Pad1",
+        "Objects:="		, ["Q0Pad1"]
+    ])
+oModuleBoundary.AssignSignalNet(
+    [
+        "NAME:Q0Pad2",
+        "Objects:="		, ["Q0Pad2"]
+    ])
+oModuleBoundary.AssignSignalNet(
+    [
+        "NAME:Q1Pad1",
+        "Objects:="		, ["Q1Pad1"]
+    ])
+oModuleBoundary.AssignSignalNet(
+    [
+        "NAME:Q1Pad2",
+        "Objects:="		, ["Q1Pad2"]
+    ])
+oModuleBoundary.AssignSignalNet(
+    [
+        "NAME:R0Pad1",
+        "Objects:="		, ["R0Pad1"]
+    ])
+oModuleBoundary.AssignSignalNet(
+    [
+        "NAME:R0Pad2",
+        "Objects:="		, ["R0Pad2"]
+    ])
+oModuleBoundary.AssignSignalNet(
+    [
+        "NAME:R1Pad1",
+        "Objects:="		, ["R1Pad1"]
+    ])
+oModuleBoundary.AssignSignalNet(
+    [
+        "NAME:R1Pad2",
+        "Objects:="		, ["R1Pad2"]
     ])
 oModuleBoundary.AssignGroundNet(
     [

@@ -16,6 +16,9 @@ projectFolder = Path(__file__).parent.absolute()
 # qSys.generateGeometries()
 # qSys.generateGDS(addMesh=False)
 
+# HFSSModel(qSys).initialize()
+# HFSSModel(qSys).run()
+
 # CapMat(qSys).initialize()
 # CapMat(qSys).run()
 # CapMat(qSys).postProcess()

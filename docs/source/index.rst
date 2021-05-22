@@ -88,7 +88,8 @@ On populating componentParams the user needs to generate and populate componentG
 Once all three layout files are populated the user can generate the layout GDS via: ::
 
 	qSys.generateGDS(addMesh=False, invertGDS=False)
-	
+
+
 Finally, the user switches layoutCompleted to True and can begin running analyses.
 
 Simulation
@@ -102,7 +103,7 @@ sole argument: ::
 Methods of this object then perform the various stages of the simulation: ::
 
     myFooSim.initialize() # Creates the simulation directory and parameters file that requires user input
-    myFooSim.run() # Runs all associated ansys simulations
+    myFooSim.run() # Runs all associated ansys simulations. Not available for simulations that don't need Ansys.
     myFooSim.postProcess() # Runs all post processing steps once the ansys simulations are completed.
 
 Note that because initialize() is typically followed by user input, and postProcess() can only be run once all
@@ -206,13 +207,16 @@ The NIST quantization model involves running the following analyses in order:
 
 See QSM_Quantization.pdf for more details.
 
-The following calculations (in calculations.py) are also available for convenience:
+The following calculations (in calculations.py) are also available:
 
 * ZZQ
 
 * anharmonicityQ
 
 * dispersiveShiftR
+
+Additionally, the simulation HFSSModel will create an HFSS version of the layout in Ansys that the user
+can do with what they please.
 
 Extensibility
 ^^^^^^^^^^^^^

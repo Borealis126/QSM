@@ -83,6 +83,13 @@ class Simulation:
             simulatorFileInstance.writelines(q3dSim.lines)
             simulatorFileInstance.close()
             self.runAnsysSimulator(q3dSim.aedtPath, q3dSim.simulatorPath, 60)
+        for hfssSimName, hfssSim in self.hfssSims.items():
+            self.copyAnsysFile(hfssSim.aedtPath)
+            simulatorFileInstance = open(hfssSim.simulatorPath, "w+", newline='')
+            simulatorFileInstance.writelines(hfssSim.lines)
+            simulatorFileInstance.close()
+            self.runAnsysSimulator(hfssSim.aedtPath, hfssSim.simulatorPath, 60)
+
         for circuitSimName, circuitSim in self.circuitSims.items():
             """"Initialize all circuit simulations for the given simulation."""
             self.copyAnsysFile(circuitSim.aedtPath)
@@ -166,7 +173,9 @@ class HFSSModel(Simulation):
         self.createDirectory()
 
     def run(self):
-        self.hfssSims["HFSSModel"].updateLines(CapMat(self.qSys).capMatLayout_Lines())
+        self.hfssSims["HFSSModel"].updateLines(ansysDrawNodes(self.qSys, "3D"))
+        self.runAllSims()
+
 
 class CapMat(Simulation):
     def __init__(self, qSys):
@@ -219,96 +228,10 @@ class CapMat(Simulation):
         return allNodes
 
     def capMatLayout_Lines(self):
-        lines = ["oEditor = oDesign.SetActiveEditor(\"3D Modeler\")\n",
-                 "oModuleBoundary = oDesign.GetModule(\"BoundarySetup\")\n"]
+        lines = ansysDrawNodes(self.qSys, self.simParams["Dimension"])
         for chipIndex, chip in self.qSys.chipDict.items():
-            # Draw substrate
-            lines += ansysPolyline_Lines(
-                name=chip.substrate.name,
-                color=chip.substrate.node.color,
-                material=chip.substrate.node.material,
-                polyline3D=[[point[0], point[1], chip.substrate.node.Z]
-                            for point in chip.substrate.node.polyline]
-            )
-            lines += ansysSweepAlongVector_Lines(chip.substrate.node)
-            # Draw ground(s)
-            lines += ansysPolyline_Lines(
-                name=chip.ground.outlineNode.name,
-                color=chip.ground.outlineNode.color,
-                material=chip.ground.outlineNode.material,
-                polyline3D=[[point[0], point[1], chip.ground.outlineNode.Z]
-                            for point in chip.ground.outlineNode.polyline]
-            )
-            # Draw qubits,resonators,controlLines,launchpads
-
-            for thisNode in self.getChipNNodes_CapMat(chip.index):
-                lines += ansysPolyline_Lines(
-                    name=thisNode.name,
-                    color=thisNode.color,
-                    material=thisNode.material,
-                    polyline3D=[[point[0], point[1], thisNode.Z] for point in
-                                thisNode.polyline]
-                )
-                lines += ansysQ3DMake3D(self.simParams["Dimension"], thisNode)
-                # Trench round 1
-                addTrenchNodeLines, subtractTrenchPeripheryLines, makeTrenchComponent3DLines = ansysTrench(
-                    componentNode=thisNode, trench=self.qSys.CPW.geometryParams["Trench"], chip=chip)
-                lines += addTrenchNodeLines + subtractTrenchPeripheryLines  # Trench
-
+            for thisNode in getChipNNodes_ansysModeler(self.qSys, chip.index):
                 lines += ansysSignalLine_Lines(thisNode)
-                """Subtract the periphery from the ground. 
-                Still subtract the launchpad peripheries so the control lines aren't shorted to ground."""
-                for index, peripheryPolyline in enumerate(thisNode.peripheryPolylines):
-                    peripheryName = thisNode.name + "periphery" + str(index)
-                    lines += ansysPolyline_Lines(
-                        name=peripheryName,
-                        color=thisNode.color,
-                        material=thisNode.material,
-                        polyline3D=[[point[0], point[1], thisNode.Z]
-                                    for point in peripheryPolyline]
-                    )  # First make the boundary
-                    """Then subtract it from ground"""
-                    lines += ansysSubtract_Lines(chip.ground.outlineNode.name, peripheryName)
-            for thisNode in self.getChipNNodes_CapMat(chip.index):  # Trench round 2.
-                addTrenchNodeLines, subtractTrenchPeripheryLines, makeTrenchComponent3DLines = ansysTrench(
-                    componentNode=thisNode, trench=self.qSys.CPW.geometryParams["Trench"], chip=chip)
-                lines += makeTrenchComponent3DLines
-            # For grounded qubits unite pad 2 with ground.
-            for qubitIndex, qubit in self.qSys.allQubitsDict.items():
-                if isinstance(qubit, qSysObjects.GroundedQubit):
-                    lines += ansysUniteNodes([chip.ground.outlineNode, qubit.pad2.node])
-            # For control lines unite trace and launchpads, also unite flux bias if applicable.
-            for controlLineIndex, controlLine in self.qSys.chipDict[chip.index].controlLineDict.items():
-                if (controlLine.lineType == "feedline"
-                        and self.qSys.sysParams["Simulate Feedline?"] == "Yes"):
-                    uniteNodeList = [controlLine.lineNode]
-                    for launchPadName, launchPadNode in controlLine.launchPadNodeDict.items():
-                        uniteNodeList.append(launchPadNode)
-                    lines += ansysUniteNodes(uniteNodeList)
-                    if controlLine.lineType == "fluxBias":
-                        lines += ansysUniteNodes([self.chipDict[0].ground.outlineNode, controlLine.lineNode])
-            # Make the ground 3D
-            lines += ansysQ3DMake3D(self.simParams["Dimension"], chip.ground.outlineNode)
-        # Draw bumps if flip chip, and join the ground nodes via the bumps
-        if self.qSys.sysParams["Flip Chip?"] == "Yes":
-            uniteNodeList = [self.qSys.chipDict[0].ground.outlineNode, self.qSys.chipDict[1].ground.outlineNode]
-            for thisBump in self.bumpsDict["Bumps"]:
-                for thisNode in [
-                    thisBump.underBumpBottomNode,
-                    thisBump.bumpMetalBottomNode,
-                    thisBump.bumpMetalTopNode,
-                    thisBump.underBumpTopNode
-                ]:
-                    lines += ansysPolyline_Lines(
-                        name=thisNode.name,
-                        color=thisNode.color,
-                        material=thisNode.material,
-                        polyline3D=[[point[0], point[1], thisNode.Z] for point in
-                                    thisNode.polyline]
-                    )
-                    lines += ansysSweepAlongVector_Lines(thisNode)
-                    uniteNodeList.append(thisNode)
-            lines += ansysUniteNodes(uniteNodeList)  # Resulting single node is ground1
         # Assign ground signal line (independent of flip chip)
         lines += ansysGroundSignalLine_Lines(self.qSys.chipDict[0].ground)
 
@@ -803,7 +726,7 @@ def LumpedR(index):
             self.index = index
             self.Y11RSimName = "Y11R" + str(self.index)
             self.YRestRSimName = "YRestR" + str(self.index)
-            CapMatObj=CapMat(self.qSys)
+            CapMatObj = CapMat(self.qSys)
             self.circuitSims = {
                 self.Y11RSimName: Y11RSimulation(self.index, self.Y11RSimName, self.directoryPath, qSys, CapMatObj),
                 self.YRestRSimName: YRestRSimulation(self.index, self.YRestRSimName,
@@ -911,3 +834,5 @@ def ECR(index):
         def EC(self):
             return self.resultsDict["EC"]
     return ECRSimulation
+
+

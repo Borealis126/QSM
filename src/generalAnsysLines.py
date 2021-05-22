@@ -1,5 +1,6 @@
 from constants import lengthUnits
 from node import Node
+from qSysObjects import GroundedQubit, FloatingQubit, ReadoutResonator, Qubit
 
 ansysSimulatorPreamb = [
     "import ScriptEnv\n",
@@ -156,9 +157,6 @@ def aedtEdit(line):
         else:
             returnLine = returnLine + char
     return returnLine
-
-
-
 
 
 def ansysOutputToComplex(complexString):
@@ -347,9 +345,6 @@ def ansysTrench(componentNode, trench, chip):
     return addTrenchNodeLines, subtractTrenchPeripheryLines, makeTrenchComponent3DLines
 
 
-
-
-
 def ansysQ3DMake3D(simType, node):
     """This function makes the node 3D either by actually making it truly 3D,
         or assigning the thin conductor boundary condition (if simulation="2D")"""
@@ -357,3 +352,109 @@ def ansysQ3DMake3D(simType, node):
         return ansysSweepAlongVector_Lines(node)
     elif simType == "2D":
         return ansysThinConductor(node)
+
+
+def ansysDrawNodes(qSys, dimension):
+    lines = ["oEditor = oDesign.SetActiveEditor(\"3D Modeler\")\n",
+             "oModuleBoundary = oDesign.GetModule(\"BoundarySetup\")\n"]
+    for chipIndex, chip in qSys.chipDict.items():
+        # Draw substrate
+        lines += ansysPolyline_Lines(
+            name=chip.substrate.name,
+            color=chip.substrate.node.color,
+            material=chip.substrate.node.material,
+            polyline3D=[[point[0], point[1], chip.substrate.node.Z]
+                        for point in chip.substrate.node.polyline]
+        )
+        lines += ansysSweepAlongVector_Lines(chip.substrate.node)
+        # Draw ground(s)
+        lines += ansysPolyline_Lines(
+            name=chip.ground.outlineNode.name,
+            color=chip.ground.outlineNode.color,
+            material=chip.ground.outlineNode.material,
+            polyline3D=[[point[0], point[1], chip.ground.outlineNode.Z]
+                        for point in chip.ground.outlineNode.polyline]
+        )
+        # Draw qubits,resonators,controlLines,launchpads
+
+        for thisNode in getChipNNodes_ansysModeler(qSys, chip.index):
+            lines += ansysPolyline_Lines(
+                name=thisNode.name,
+                color=thisNode.color,
+                material=thisNode.material,
+                polyline3D=[[point[0], point[1], thisNode.Z] for point in
+                            thisNode.polyline]
+            )
+            lines += ansysQ3DMake3D(dimension, thisNode)
+            # Trench round 1
+            addTrenchNodeLines, subtractTrenchPeripheryLines, makeTrenchComponent3DLines = ansysTrench(
+                componentNode=thisNode, trench=qSys.CPW.geometryParams["Trench"], chip=chip)
+            lines += addTrenchNodeLines + subtractTrenchPeripheryLines  # Trench
+            """Subtract the periphery from the ground. 
+            Still subtract the launchpad peripheries so the control lines aren't shorted to ground."""
+            for index, peripheryPolyline in enumerate(thisNode.peripheryPolylines):
+                peripheryName = thisNode.name + "periphery" + str(index)
+                lines += ansysPolyline_Lines(
+                    name=peripheryName,
+                    color=thisNode.color,
+                    material=thisNode.material,
+                    polyline3D=[[point[0], point[1], thisNode.Z]
+                                for point in peripheryPolyline]
+                )  # First make the boundary
+                """Then subtract it from ground"""
+                lines += ansysSubtract_Lines(chip.ground.outlineNode.name, peripheryName)
+        for thisNode in getChipNNodes_ansysModeler(qSys, chip.index):  # Trench round 2.
+            addTrenchNodeLines, subtractTrenchPeripheryLines, makeTrenchComponent3DLines = ansysTrench(
+                componentNode=thisNode, trench=qSys.CPW.geometryParams["Trench"], chip=chip)
+            lines += makeTrenchComponent3DLines
+        # For grounded qubits unite pad 2 with ground.
+        for qubitIndex, qubit in qSys.allQubitsDict.items():
+            if isinstance(qubit, GroundedQubit):
+                lines += ansysUniteNodes([chip.ground.outlineNode, qubit.pad2.node])
+        # For control lines unite trace and launchpads, also unite flux bias if applicable.
+        for controlLineIndex, controlLine in qSys.chipDict[chip.index].controlLineDict.items():
+            if (controlLine.lineType == "feedline"
+                    and qSys.sysParams["Simulate Feedline?"] == "Yes"):
+                uniteNodeList = [controlLine.lineNode]
+                for launchPadName, launchPadNode in controlLine.launchPadNodeDict.items():
+                    uniteNodeList.append(launchPadNode)
+                lines += ansysUniteNodes(uniteNodeList)
+                if controlLine.lineType == "fluxBias":
+                    lines += ansysUniteNodes([self.chipDict[0].ground.outlineNode, controlLine.lineNode])
+        # Make the ground 3D
+        lines += ansysQ3DMake3D(dimension, chip.ground.outlineNode)
+    # Draw bumps if flip chip, and join the ground nodes via the bumps
+    if qSys.sysParams["Flip Chip?"] == "Yes":
+        uniteNodeList = [qSys.chipDict[0].ground.outlineNode, qSys.chipDict[1].ground.outlineNode]
+        for thisBump in self.bumpsDict["Bumps"]:
+            for thisNode in [
+                thisBump.underBumpBottomNode,
+                thisBump.bumpMetalBottomNode,
+                thisBump.bumpMetalTopNode,
+                thisBump.underBumpTopNode
+            ]:
+                lines += ansysPolyline_Lines(
+                    name=thisNode.name,
+                    color=thisNode.color,
+                    material=thisNode.material,
+                    polyline3D=[[point[0], point[1], thisNode.Z] for point in
+                                thisNode.polyline]
+                )
+                lines += ansysSweepAlongVector_Lines(thisNode)
+                uniteNodeList.append(thisNode)
+        lines += ansysUniteNodes(uniteNodeList)  # Resulting single node is ground1
+    return lines
+
+
+def getChipNNodes_ansysModeler(qSys, N):
+    allNodes = []
+    for qubitIndex, qubit in qSys.chipDict[N].qubitDict.items():
+        allNodes += [pad.node for pad in qubit.padListGeom]
+    for readoutResonatorIndex, readoutResonator in qSys.chipDict[N].readoutResonatorDict.items():
+        allNodes += [readoutResonator.pad1.node, readoutResonator.pad2.node]
+    for controlLineIndex, controlLine in qSys.chipDict[N].controlLineDict.items():
+        if controlLine.lineType == "feedline" and qSys.sysParams["Simulate Feedline?"] == "Yes":
+            allNodes.append(controlLine.lineNode)
+            for launchPadName, launchPad in controlLine.launchPadNodeDict.items():
+                allNodes.append(launchPad)
+    return allNodes

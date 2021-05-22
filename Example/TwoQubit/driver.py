@@ -29,6 +29,11 @@ projectFolder = Path(__file__).parent.absolute()
 # qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=True)
 # qSys.generateGDS(addMesh=False)
 
+"""Generate the HFSS Model"""
+# qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=True)
+# HFSSModel(qSys).initialize()
+# HFSSModel(qSys).run()
+
 """Populate the generated file. The layout phase is now done and analyses can be performed."""
 """You may notice that we keep calling QSM.initialize. This is because after systemParameters is populated, this
 needs to be run before every command. Once geometries are completed (i.e., now) switch layoutCompleted to True"""
