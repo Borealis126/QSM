@@ -214,7 +214,7 @@ class CapMat(Simulation):
         resultsDict = {"Header": ansysCapMatHeaders, "capMat (F)": capMat.tolist()}
         jsonWrite(self.resultsFilePath, resultsDict)
 
-    def getChipNNodes_CapMat(self, N):
+    def getChipNSignalNodes(self, N):
         allNodes = []
         for qubitIndex, qubit in self.qSys.chipDict[N].qubitDict.items():
             allNodes += [pad.node for pad in qubit.padListGeom]
@@ -223,14 +223,12 @@ class CapMat(Simulation):
         for controlLineIndex, controlLine in self.qSys.chipDict[N].controlLineDict.items():
             if controlLine.lineType == "feedline" and self.qSys.sysParams["Simulate Feedline?"] == "Yes":
                 allNodes.append(controlLine.lineNode)
-                for launchPadName, launchPad in controlLine.launchPadNodeDict.items():
-                    allNodes.append(launchPad)
         return allNodes
 
     def capMatLayout_Lines(self):
         lines = ansysDrawNodes(self.qSys, self.simParams["Dimension"])
         for chipIndex, chip in self.qSys.chipDict.items():
-            for thisNode in getChipNNodes_ansysModeler(self.qSys, chip.index):
+            for thisNode in self.getChipNSignalNodes(chip.index):
                 lines += ansysSignalLine_Lines(thisNode)
         # Assign ground signal line (independent of flip chip)
         lines += ansysGroundSignalLine_Lines(self.qSys.chipDict[0].ground)

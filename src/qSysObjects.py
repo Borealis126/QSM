@@ -171,6 +171,7 @@ class ControlLine:  # Similar to node, except netlist name is a function of qubi
             launchPad1Node.meshPeripheryPolylines.append(launchPadMeshPeriphery1)
             launchPad1Node.Z = self.lineNode.Z
             launchPad1Node.height = self.lineNode.height
+            launchPad1Node.material = self.lineNode.material
             self.launchPadNodeDict[launchPad1Node.name] = launchPad1Node
         if self.lineType == "feedline":
             launchPad2, launchPadPeriphery2, launchPadMeshPeriphery2 = launchPadPolylines(
@@ -184,6 +185,7 @@ class ControlLine:  # Similar to node, except netlist name is a function of qubi
             launchPad2Node.meshPeripheryPolylines.append(launchPadMeshPeriphery2)
             launchPad2Node.Z = self.lineNode.Z
             launchPad2Node.height = self.lineNode.height
+            launchPad2Node.material = self.lineNode.material
             self.launchPadNodeDict[launchPad2Node.name] = launchPad2Node
 
 

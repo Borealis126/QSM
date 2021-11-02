@@ -254,6 +254,7 @@ class QubitSystem:
             chip.ground.geometryParams = groundComponentsDict[str(chipIndex)]
             chip.ground.outlineNode.height = chip.ground.geometryParams["Height"]
             chip.ground.outlineNode.polyline = chip.substrate.node.polyline  # Ground covers the full substrate
+            chip.ground.outlineNode.material = self.sysParams["Material"]
             if chipIndex == 0:
                 chip.ground.outlineNode.Z = self.chipDict[0].substrate.node.height
             elif chipIndex == 1:
@@ -443,6 +444,7 @@ class QubitSystem:
                 for qubitPad in qubit.padListGeom:
                     qubitPad.node.polylineShapeParams["Mesh Boundary"] = chip.ground.geometryParams["Mesh Boundary"]
                     qubitPad.node.updatePolylines()
+                    qubitPad.node.material = self.sysParams["Material"]
                     # Z values
                     if chipIndex == 0:
                         qubitPad.node.Z = self.chipDict[0].substrate.node.height
@@ -516,6 +518,7 @@ class QubitSystem:
 
                 # Pad T
                 for thisNode in [pad1Node, pad2Node]:
+                    thisNode.material = self.sysParams["Material"]
                     shapeParams = thisNode.polylineShapeParams
                     shapeParams["Finger Spacing"] = 0
                     shapeParams["Finger 0 Stem Length"] = geoms["Pad T Stem Length"] / 2
@@ -653,6 +656,7 @@ class QubitSystem:
                                          + lineNode.polyline[insertIndex + 1:])
                     """Plus one is because the corner point is included in loopPolylineRaw"""
 
+                lineNode.material = self.sysParams["Material"]
                 # Z values
                 if chipIndex == 0:
                     lineNode.Z = self.chipDict[0].substrate.node.height
