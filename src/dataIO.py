@@ -29,7 +29,10 @@ def readY11Data(file):
     dataLinesNumeric = [[float(line[0]), complex(ansysOutputToComplex(line[1]))] for line in
                         dataLines]  # line[0] is the frequency in GHz, line[1] is Y value
     freq = [i[0] * GHzToOmega for i in dataLinesNumeric]  # Convert to angular frequency.
-    Y11 = [i[1] * 1e-3 for i in dataLinesNumeric]  # Convert from mSie to Sie
+    if "mSie" in fileLines[0][1]:
+        Y11 = [i[1] * 1e-3 for i in dataLinesNumeric]  # Convert from mSie to Sie
+    else:
+        Y11 = [i[1] for i in dataLinesNumeric]
     return freq, Y11, interp1d(freq, Y11)
 
 

@@ -42,6 +42,18 @@ def anharmonicityQ(qSys, qubitIndex):
     return (E2-2*E1)*1000  # In MHz
 
 
+def quantizedFreqQ(qSys, qubitIndex):
+    QuantizeObj = Quantize(qSys)
+    return QuantizeObj.HEval(QuantizeObj.stateList([[QuantizeObj.quantizeIndex(qSys.allQubitsDict[qubitIndex]), 1]]))
+
+
+def quantizedFreqR(qSys, qubitIndex):
+    QuantizeObj = Quantize(qSys)
+    return QuantizeObj.HEval(QuantizeObj.stateList([
+        [QuantizeObj.quantizeIndex(qSys.allReadoutResonatorsDict[qubitIndex]), 1]
+    ]))
+
+
 def dispersiveShiftR(qSys, resonatorIndex):
     QuantizeObj = Quantize(qSys)
     readoutResonator = qSys.allReadoutResonatorsDict[resonatorIndex]

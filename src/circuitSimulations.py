@@ -190,6 +190,67 @@ class Y11RSimulation(CircuitSim):
         return YReportLines(self.resultsFilePath)
 
 
+class Y11QSimulation(CircuitSim):
+    def __init__(self, index, circuitSimName, simDirectory, qSys, CapMatObj):
+        super(Y11QSimulation, self).__init__(circuitSimName, simDirectory, qSys, CapMatObj)
+        self.index = index
+
+    @property
+    def netlistComponents(self):
+        netlistComponents = deepcopy(self.generalNetlistComponents)
+
+        # Add matching resistors to feedline if there are no ports on either end
+        netlistComponents["Resistors"]["RFL"] = {
+            "node1NetlistName": self.netlistName("G"),
+            "node2NetlistName": self.netlistName("FL"),
+            "R": 50  # 50 ohm
+        }
+        netlistComponents["Resistors"]["RFR"] = {
+            "node1NetlistName": self.netlistName("G"),
+            "node2NetlistName": self.netlistName("FR"),
+            "R": 50
+        }
+        return netlistComponents
+
+    def netlistName(self, nodeName):
+        if nodeName == self.qSys.allQubitsDict[self.index].pad1.node.name:
+            return "Port1"
+        if nodeName == "G":
+            return "0"
+        return "net_" + nodeName
+
+    @property
+    def netlistPortsLines(self):
+        portNet2Dict = dict()
+        """One grounded port on one node"""
+        portNet2Dict[1] = self.netlistName("G")
+        portsLines = []
+        for portIndex, portNet2 in portNet2Dict.items():
+            portsLines += [("RPort" + str(portIndex) + " Port" + str(portIndex)
+                            + " " + portNet2 + " PORTNUM=" + str(portIndex) + " RZ=50\n"),
+                           (".PORT Port" + str(portIndex) + " " + portNet2
+                            + " " + str(portIndex) + " RPort" + str(portIndex) + "\n")]
+        return portsLines
+
+    @staticmethod
+    def netlistSimulationLines(simParams):  # Contains simulation-specific info
+        return [
+            ".LNA\n",
+            "+ LIN " + str(simParams["LNA_counts"]) + " " + str(simParams["LNA_start (GHz)"] * 1e9)
+            + " " + str(simParams["LNA_stop (GHz)"] * 1e9) + "\n",
+            "+ FLAG=\'LNA\'\n"
+        ]
+
+    @property
+    def reportLines(self):
+        return YReportLines(self.resultsFilePath)
+
+
+
+
+
+
+
 class YRestRSimulation(CircuitSim):
     def __init__(self, index, circuitSimName, simDirectory, qSys, CapMatObj):
         super(YRestRSimulation, self).__init__(circuitSimName, simDirectory, qSys, CapMatObj)

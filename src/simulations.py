@@ -770,6 +770,41 @@ def LumpedR(index):
     return LumpedRSimulation
 
 
+def DecayQ(index):
+    class DecayQSimulation(Simulation):
+        def __init__(self, qSys):
+            super(DecayQSimulation, self).__init__(qSys, "DecayQ" + str(index))
+            self.index = index
+            self.Y11QSimName = "Y11Q" + str(self.index)
+            CapMatObj = CapMat(self.qSys)
+            self.circuitSims = {
+                self.Y11QSimName: Y11QSimulation(self.index, self.Y11QSimName, self.directoryPath, qSys, CapMatObj)}
+
+        def initialize(self):
+            simParamsDict = S21_params
+            self.generateParams(simParamsDict)
+
+        def run(self):
+            self.runAllSims()
+
+        def postProcess(self):
+            self.deleteUnneededFiles()
+            freq, Y11, Y11InterpFunc = readY11Data(self.circuitSims[self.Y11QSimName].resultsFilePath)
+            dressedFreq = calculateDressedFrequency(freq, Y11InterpFunc)
+            print(dressedFreq*omegaToGHz)
+            derivativeResolution = np.abs(freq[1] - freq[0])
+            T1 = np.imag(derivative(Y11InterpFunc, dressedFreq, derivativeResolution)) / \
+                 (2 * np.real(Y11InterpFunc(dressedFreq)))
+            print("T1(us):", T1*1e6)
+            jsonWrite(self.resultsFilePath, {"T1 (s):": T1})
+
+        @property
+        def T1(self):
+            return self.resultsDict["T1 (s):"]
+
+    return DecayQSimulation
+
+
 def ECQ(index):
     class ECQSimulation(Simulation):
         def __init__(self, qSys):
