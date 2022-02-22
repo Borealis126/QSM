@@ -1,6 +1,7 @@
 from polyline import pathPolyline, rectanglePolylineSet, rectanglePolyline, circlePolyline
 from basicGeometry import rotate, translate
 from constants import traceBuffer
+from abc import ABC
 
 
 class Node:  # A Node is any 3D element.
@@ -316,3 +317,26 @@ class Node:  # A Node is any 3D element.
     @property
     def centerY(self):  # Return the y component of the centroid of the polyline points.
         return sum([i[1] for i in self.polyline]) / len(self.polyline)
+
+
+class NodeShape(ABC):
+    @property
+    @abstractmethod
+    def params(self):
+        ...
+
+    @property
+    def initialParamsDict(self):
+        return dict({i: 0 for i in self.params})
+
+    def __init__(self):
+        self.paramsDict = self.initialParamsDict
+
+
+class Rectangle(NodeShape):
+    def __init__(self):
+        super().__init__()
+
+    @property
+    def params(self):
+        return ["Width", "Length", "Height", "BoundaryList"]

@@ -10,6 +10,7 @@ from qSysObjects import *
 from constants import *
 import json
 from dataIO import jsonRead, jsonWrite
+from qubitDesigns import interpretDesign
 
 
 def generateSystemParams(folder):
@@ -91,16 +92,12 @@ class QubitSystem:
         # Qubits
         if self.sysParams["Number of Qubits"] != 0:
             paramsDict = componentsDict["Qubits"]
-            for qubitIndexStr, params in paramsDict.items():
-                qubit = None
-                qubitIndex=int(qubitIndexStr)
-                if "Floating" in params["Type"]:
-                    qubit = FloatingQubit(qubitIndex, params)
-                elif "Grounded" in params["Type"]:
-                    qubit = GroundedQubit(qubitIndex, params)
+            for qubitIndexStr, componentParams in paramsDict.items():
+                qubitIndex = int(qubitIndexStr)
+                qubit = Qubit(qubitIndex, componentParams)
                 chipIndex = 0
                 if self.sysParams["Flip Chip?"] == "Yes":
-                    chipIndex = params["Chip"]
+                    chipIndex = componentParams["Chip"]
                 self.chipDict[chipIndex].qubitDict[qubitIndex] = qubit
         # Readout Resonators
         if self.sysParams["Number of Readout Resonators"] != 0:
@@ -136,7 +133,8 @@ class QubitSystem:
         # Qubits
         geometriesDict["Qubits"] = dict()
         for qubitIndex, qubit in self.allQubitsDict.items():
-            params = []
+            params += qubit.design.params
+
             if "rectangularPads" in qubit.qubitType:
                 if isinstance(qubit, FloatingQubit):
                     params += ["Angle", "Center X", "Center Y", "Pad Spacing",

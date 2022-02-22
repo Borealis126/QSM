@@ -1,12 +1,13 @@
 import numpy as np
-from sympy import symbols, MatrixSymbol
-from qutip import qeye, destroy, tensor
+from sympy import symbols
 from constants import Phi_0Const, hbarConst, eConst
 from basicGeometry import nearestPoint, distancePointPoint, midpoint, segmentBoundary, vertexBoundary
 from meander import meanderNodeGen
 from node import Node
 from polyline import launchPadPolylines
 from pointToLine import pnt2line
+from qubitDesigns import interpretDesign
+
 
 class JJGDS:
     def __init__(self, patchGDS, topElectrodeGDS, bottomElectrodeGDS, connectionsGDS):
@@ -16,51 +17,16 @@ class JJGDS:
         self.connectionsGDS = connectionsGDS
 
 
-class ComponentPad:
-    def __init__(self, componentName, padIndex):
-        self.index = padIndex
-        self.name = componentName + "Pad" + str(self.index)
-        self.node = Node(self.name)
-
-        self.quantCapMatIndex = 0  # Updated in quantizeSimulation
-
-        self.phiIndex = 0  # Updated in quantizeSimulation
-        self.phiSym = symbols("Phi_" + componentName + "P" + str(self.index))
-
-
 class Qubit:
     def __init__(self, index, componentParams):
         self.index = index
-        self.componentParams = componentParams
         self.name = "Q" + str(self.index)
-
-        self.pad1 = ComponentPad(componentName=self.name, padIndex=1)
-        self.pad2 = ComponentPad(componentName=self.name, padIndex=2)
-        self.padListGeom = [self.pad1,
-                            self.pad2]  # Even for grounded qubits there are two pads, one is just shorted to ground.
-        self.padList = []  # These are the actually distinct pads.
-
-        self.JJGDSs = []
-
-        self.geometryParams = dict()
+        self.design = interpretDesign(componentParams['Type'])(self.name)
+        self.componentParams = componentParams
 
         self.omegaSym = symbols("omega_Q" + str(self.index))
         self.omegaEffSym = symbols("omega_effQ" + str(self.index))  # Used for quantization RWA
         self.omegaEffVal = 0
-
-    @property
-    def fingers(self):
-        fingersDict=dict()
-        fingersStrings = [i for i in self.qubitType.split("-") if "Fingers" in i]
-        for fingersString in fingersStrings:  # Allowing both pads to have fingers
-            padIndex = int([i for i in fingersString.split("_") if "Pad" in i][0][3:])
-            numFingers = int([i for i in fingersString.split("_") if "Num" in i][0][3:])
-            fingersDict[padIndex] = numFingers
-        return fingersDict
-
-    @property
-    def qubitType(self):
-        return self.componentParams["Type"]
 
     @property
     def L_i_fixed(self):
@@ -82,18 +48,6 @@ class Qubit:
 
     def Z(self, EC):
         return self.omega_J(EC) * self.LJ
-
-
-class FloatingQubit(Qubit):
-    def __init__(self, index, componentParams):
-        super(FloatingQubit, self).__init__(index,componentParams)
-        self.padList = [self.pad1, self.pad2]
-
-
-class GroundedQubit(Qubit):
-    def __init__(self, index,componentParams):
-        super().__init__(index,componentParams)
-        self.padList = [self.pad1]
 
 
 class ControlLine:  # Similar to node, except netlist name is a function of qubit index.
