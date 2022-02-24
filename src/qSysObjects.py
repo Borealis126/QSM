@@ -6,22 +6,15 @@ from meander import meanderNodeGen
 from node import Node
 from polyline import launchPadPolylines
 from pointToLine import pnt2line
-from qubitDesigns import interpretDesign
-
-
-class JJGDS:
-    def __init__(self, patchGDS, topElectrodeGDS, bottomElectrodeGDS, connectionsGDS):
-        self.patchGDS = patchGDS
-        self.topElectrodeGDS = topElectrodeGDS
-        self.bottomElectrodeGDS = bottomElectrodeGDS
-        self.connectionsGDS = connectionsGDS
+import qubitDesigns
+import resonatorDesigns
 
 
 class Qubit:
     def __init__(self, index, componentParams):
         self.index = index
         self.name = "Q" + str(self.index)
-        self.design = interpretDesign(componentParams['Type'])(self.name)
+        self.design = qubitDesigns.interpretDesign(componentParams['Type'])(self.name)
         self.componentParams = componentParams
 
         self.omegaSym = symbols("omega_Q" + str(self.index))
@@ -56,7 +49,7 @@ class ControlLine:  # Similar to node, except netlist name is a function of qubi
         self.componentParams=componentParams
         self.name = "CL" + str(self.index)
         self.geometryParams = dict()
-        self.lineNode = Node(name=self.name + "lineNode")
+        self.lineNode = Node(self.name + "lineNode", 'Path')
         self.launchPadNodeDict = dict()
 
     @property
@@ -148,17 +141,7 @@ class CPWResonator:
         self.index = index
         self.componentParams = componentParams
         self.name = "R" + str(self.index)
-
-        self.pad1 = ComponentPad(componentName=self.name, padIndex=1)
-        self.pad2 = ComponentPad(componentName=self.name, padIndex=2)  # Only pad 2 should be used in quantization.
-
-        self.meanderNode = dict()
-        self.meanderStartPoint = []
-        self.meanderStartAngle = 0
-        self.meanderEndPoint = []
-        self.meanderEndAngle = 0
-
-        self.geometryParams = dict()
+        self.design = resonatorDesigns.interpretDesign(componentParams['Type'])(self.name)
 
         self.omegaSym = symbols("omega_R" + str(self.index))
         self.omegaEffSym = symbols("omega_effR" + str(self.index))
@@ -166,36 +149,8 @@ class CPWResonator:
         self.omegaEffVal = 0
         self.omegaVal = 0
 
-    def padType(self,N):
-        return self.componentParams["Pad "+str(N)+" Type"]
-
     def omega(self, equivL, EC):
         return 1 / np.sqrt(equivL * eConst ** 2 / (2 * EC))
-
-    def updateMeanderNode(self, CPW_obj):
-        endAngles = [self.geometryParams["Pad 1 Curve Angle"], self.geometryParams["Pad 2 Curve Angle"]]
-        self.meanderNode, self.meanderStartPoint, self.meanderStartAngle, self.meanderEndPoint, self.meanderEndAngle = \
-            meanderNodeGen(
-                name=self.name + "Meander",
-                turnRadius=self.geometryParams["Meander Turn Radius"],
-                length=(self.geometryParams["Length"] -
-                        self.geometryParams["Pad 1 Length"] -
-                        self.geometryParams["Pad 2 Length"] - 2 *
-                        self.geometryParams["Pad T Stem Length"]),
-                endSeparation=(self.geometryParams["Pad Separation"]
-                               - self.geometryParams["Pad 1 Length"] / 2
-                               - self.geometryParams["Pad 2 Length"] / 2
-                               - 2 * self.geometryParams["Pad T Stem Length"]),
-                meanderToEndMinDist=self.geometryParams["Meander To Pad Minimum Distance"],
-                endAngles=endAngles,
-                angle=self.geometryParams["Angle"],
-                centerX=self.geometryParams["Center X"],
-                centerY=self.geometryParams["Center Y"],
-                height=self.geometryParams["Pad 1 Height"],
-                Z=self.pad1.node.Z,
-                meshBoundary=self.pad1.node.polylineShapeParams["Mesh Boundary"],
-                CPWObj=CPW_obj
-            )
 
     def bareFreq(self, CPW_obj):
         return CPW_obj.vp() / (2 * self.length)
@@ -231,7 +186,7 @@ class Substrate:
     def __init__(self, index):
         self.index = index
         self.name = "S" + str(self.index)
-        self.node = Node(name=self.name)
+        self.node = Node(self.name, "Rectangle")
         self.node.color = "(143 175 143)"
         self.geometryParams = dict()
 
@@ -240,7 +195,7 @@ class Ground:
     def __init__(self, index):
         self.index = index
         self.name = "G" + str(self.index)
-        self.outlineNode = Node(name=self.name)  # The polyline of this node is the outer outine of the ground.
+        self.outlineNode = Node(self.name, "Rectangle")  # The polyline of this node is the outer outine of the ground.
         self.contourHolePolylines = []
         self.contourHoleNodes = []
 

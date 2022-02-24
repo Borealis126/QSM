@@ -1,0 +1,56 @@
+{
+ "Qubits": {
+  "0": {
+   "Angle": 0,
+   "Center X": -331,
+   "Center Y": -454,
+   "Pad Spacing": 30,
+   "Pad 1 Width": 500,
+   "Pad 1 Length": 140,
+   "Pad 1 Height": 0.1,
+   "Pad 1 Boundaries": [100, 100, 100, 100],
+   "Pad 2 Width": 500,
+   "Pad 2 Length": 140,
+   "Pad 2 Height": 0.1,
+   "Pad 2 Boundaries": [100, 100, 100, 100],
+   "JJ Location": 0,
+   "JJ Stem Boundary": 30,
+   "JJ Stem Width": 4,
+   "JJ Patch Width": 6,
+   "JJ Patch Length": 8,
+   "JJ Top Electrode Width": 0.52,
+   "JJ Bottom Electrode Width": 0.4
+  }
+ },
+ "Readout Resonators": {},
+ "CPW": {
+  "Width": 10,
+  "Gap": 6,
+  "Trench": 0.1,
+  "Height": 0.1
+ },
+ "Ground(s)": {
+  "0": {
+   "Height": 0.1,
+   "Mesh Boundary": 40,
+   "Mesh Spacing": 50,
+   "Mesh Size": 5
+  }
+ },
+ "Substrate(s)": {
+  "0": {
+   "Material": "silicon",
+   "Thickness": 500,
+   "Width": 9500,
+   "Length": 7500
+  }
+ },
+ "NIST Logo": {
+  "Center X": 2000,
+  "Center Y": -3000
+ },
+ "Chip Description": {
+  "Start X": 1500,
+  "Start Y": -2500
+ }
+}

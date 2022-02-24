@@ -1,6 +1,5 @@
 from constants import lengthUnits
 from node import Node
-from qSysObjects import GroundedQubit, FloatingQubit, ReadoutResonator, Qubit
 
 ansysSimulatorPreamb = [
     "import ScriptEnv\n",

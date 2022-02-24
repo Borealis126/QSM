@@ -1,0 +1,19 @@
+{
+ "CPW": {
+  "Phase Velocity(um/s)": 0
+ },
+ "Qubits": {
+  "0": {
+   "Type": "FloatingRectangularTransmonSingleJJ",
+   "L_J(H)": 1.15E-08,
+   "L_I(H)": 1.25E-08
+  }
+ },
+ "Readout Resonators": {
+  "0": {
+   "Type": "CPWResonatorWithT",
+   "Capacitance to Feedline (F)": 0,
+   "Feedline Pad Capacitance to Ground (F)": 0
+  }
+ }
+}

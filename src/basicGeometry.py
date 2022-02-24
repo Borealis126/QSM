@@ -80,12 +80,17 @@ def pointInPolyline(point, polyline):
 
 
 def rotate(point, angle):  # Rotates a point in [x,y] format about the point [0,0] and returns in [x,y] format.
-    rotationMatrix = [[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]]
-    return np.transpose(np.matmul(rotationMatrix, point))
+    rotationMatrix = np.array([[np.cos(angle), -np.sin(angle)],
+                               [np.sin(angle), np.cos(angle)]])
+    return np.transpose(np.matmul(rotationMatrix, point.transpose()))
+
+def rotatePolyline(polyline, angle):
+
+    return np.array([rotate(point, angle) for point in polyline])
 
 
-def translate(point, x, y):
-    return [point[0] + x, point[1] + y]
+def translate(point, x, y): #Point is an np array
+    return point + np.array([x, y])
 
 
 def arcLength(radius, angle):

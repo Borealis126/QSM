@@ -38,13 +38,14 @@ def launchPadPolylines(tipPoint, angle, CPW, meshPeriphery):  # startPoint is th
     return padTranslated, peripheryTranslated, meshPeripheryTranslated
 
 
-def pathPolyline(width, startPoint, startAngle, sectionCode):
+def pathPolyline(width, sectionCode):
+    startPoint = [0, 0]
     interpretedSectionCode = interpretSectionCode(sectionCode)
     # Paths are restricted to alternating straight and turn segments.
     # Commands are of the form [[length],[radius,angle],[length],[radius,angle],...]
     polylineLeft = []
     polylineRight = []
-    angle = startAngle
+    angle = 0
     # First points
     polylineLeft.append(translate(rotate([0, width / 2], angle), startPoint[0], startPoint[1]))
     polylineRight.append(translate(rotate([0, -width / 2], angle), startPoint[0], startPoint[1]))
@@ -95,45 +96,8 @@ def pathPolyline(width, startPoint, startAngle, sectionCode):
     return polylineLeft + polylineRight, endPoint, endAngle
 
 
-def rectanglePolylineSet(centerX, centerY, width, length, side1Boundary, side2Boundary, side3Boundary, side4Boundary,
-                         meshBoundary, angle):
-    peripheryCenterX = centerX + (side1Boundary - side3Boundary) / 2
-    peripheryCenterY = centerY + (side2Boundary - side4Boundary) / 2
-    peripheryWidth = width + side1Boundary + side3Boundary
-    meshPeripheryWidth = peripheryWidth + 2 * meshBoundary
-    peripheryLength = length + side2Boundary + side4Boundary
-    meshPeripheryLength = peripheryLength + 2 * meshBoundary
-
-    polyline = rectanglePolyline(centerX, centerY, width, length, angle)
-    peripheryPolyline = rectanglePolyline(peripheryCenterX, peripheryCenterY, peripheryWidth, peripheryLength, angle)
-    meshPeripheryPolyline = rectanglePolyline(peripheryCenterX, peripheryCenterY, meshPeripheryWidth,
-                                              meshPeripheryLength, angle)
-    return polyline, peripheryPolyline, meshPeripheryPolyline
-
-
-def rectanglePolyline(centerX, centerY, width, length, angle):
-    seed = [
-        [-width / 2, -length / 2],
-        [-width / 2, length / 2],
-        [width / 2, length / 2],
-        [width / 2, -length / 2]
-    ]
-    rotated = [rotate(point, angle) for point in seed]
-    translated = [translate(point, centerX, centerY) for point in rotated]
-    return translated
-
-
-def circlePolyline(centerX, centerY, diameter):
-    points = []
-    numPoints = 10
-    radius = diameter / 2
-    for angle in np.linspace(0, 2 * np.pi, numPoints):
-        points.append([centerX + radius * np.cos(angle), centerY + radius * np.sin(angle)])
-    return points
-
-
 def multiplyPolyline(polyline, factor):
-    return [[i[0] * factor, i[1] * factor] for i in polyline]
+    return polyline*factor
 
 
 def interpretSectionCode(code):

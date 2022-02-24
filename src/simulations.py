@@ -13,7 +13,7 @@ from misc import *
 from quantumState import stateFromHeader, baseRepresentation, H_Header
 from scipy.misc import derivative
 from sympy import Matrix, zeros, sin
-from qSysObjects import GroundedQubit, FloatingQubit, ReadoutResonator, Qubit
+from qSysObjects import ReadoutResonator, Qubit
 from qutip import state_number_index, qzero, ket, bra, tensor, destroy, qeye
 
 """Simulations are anything that is saved to a folder. 

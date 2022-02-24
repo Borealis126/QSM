@@ -4,12 +4,12 @@
  },
  "Qubits": {
   "0": {
-   "Type": "Floating-rectangularPads-singleJJ",
+   "Type": "FloatingRectangularTransmonSingleJJ",
    "L_J(H)": 1.15E-08,
    "L_I(H)": 1.25E-08
   },
   "1": {
-   "Type": "Floating-rectangularPads-singleJJ",
+   "Type": "FloatingRectangularTransmonSingleJJ",
    "L_J(H)": 1.15E-08,
    "L_I(H)": 1.25E-08
   }

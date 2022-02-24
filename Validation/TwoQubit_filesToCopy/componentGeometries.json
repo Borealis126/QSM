@@ -125,10 +125,7 @@
  },
  "Ground(s)": {
   "0": {
-   "Height": 0.1,
-   "Mesh Boundary": 40,
-   "Mesh Spacing": 50,
-   "Mesh Size": 5
+   "Height": 0.1
   }
  },
  "Substrate(s)": {

@@ -4,13 +4,9 @@ import os
 import gdspy
 from ChipElements import OtherComponents
 from basicGeometry import pointInPolyline, rotate, translate
-from node import Node
-from polyline import rectanglePolyline, multiplyPolyline
 from qSysObjects import *
 from constants import *
-import json
 from dataIO import jsonRead, jsonWrite
-from qubitDesigns import interpretDesign
 
 
 def generateSystemParams(folder):
@@ -60,7 +56,7 @@ class QubitSystem:
     def generateComponentParams(self):
         componentsDict = {"CPW": {"Phase Velocity(um/s)": 0}}
         qubitParams = ["Type", "L_J(H)", "L_I(H)"]
-        readoutResonatorParams = ["Pad 1 Type", "Pad 2 Type"]
+        readoutResonatorParams = ["Type"]
 
         controlLineParams = ["Type"]
         if self.sysParams["Flip Chip?"] == "Yes":
@@ -113,7 +109,7 @@ class QubitSystem:
         if self.sysParams["Number of Control Lines"] != 0:
             controlLinesDict = componentsDict["Control Lines"]
             for indexStr, params in controlLinesDict.items():
-                index=int(indexStr)
+                index = int(indexStr)
                 controlLine = ControlLine(index, params)
                 controlLineChipIndex = 0
                 if self.sysParams["Flip Chip?"] == "Yes":
@@ -133,70 +129,26 @@ class QubitSystem:
         # Qubits
         geometriesDict["Qubits"] = dict()
         for qubitIndex, qubit in self.allQubitsDict.items():
-            params += qubit.design.params
-
-            if "rectangularPads" in qubit.qubitType:
-                if isinstance(qubit, FloatingQubit):
-                    params += ["Angle", "Center X", "Center Y", "Pad Spacing",
-                               "Pad 1 Width", "Pad 1 Length", "Pad 1 Height", "Pad 1 Side 1 Boundary",
-                               "Pad 1 Side 2 Boundary", "Pad 1 Side 3 Boundary", "Pad 1 Side 4 Boundary",
-                               "Pad 2 Width", "Pad 2 Length", "Pad 2 Height", "Pad 2 Side 1 Boundary",
-                               "Pad 2 Side 2 Boundary", "Pad 2 Side 3 Boundary", "Pad 2 Side 4 Boundary", "JJ Location"]
-                    """JJ location is any number between 0 and 100 representing the location 
-                    of the JJ relative to the pads. 0 is on the left, 100 is on the right, 50 is in the middle."""
-                elif isinstance(qubit, GroundedQubit):
-                    params += ["Angle", "Center X", "Center Y",
-                               "Pad 1 Width", "Pad 1 Length", "Pad 1 Height", "Pad 1 Side 1 Boundary",
-                               "Pad 1 Side 2 Boundary", "Pad 1 Side 3 Boundary", "Pad 1 Side 4 Boundary",
-                               "JJ Location"]
-                if "doubleJJ" in qubit.qubitType:
-                    params += ["SQUID Stem Separation", "SQUID Stem Width", "SQUID Stem Length"
-                               "SQUID T Stem Width", "SQUID T Head Width", "SQUID T Head Length",
-                               "JJ Patch Length", "JJ Patch Width", "JJ Boundary"]
-                elif "singleJJ" in qubit.componentParams["Type"]:  # Default along the line of symmetry of pads.
-                    params += ["JJ Stem Boundary", "JJ Stem Width", "JJ Patch Width", "JJ Patch Length"]
-                params += ["JJ Top Electrode Width", "JJ Bottom Electrode Width"]
-                for padName, numFingers in qubit.fingers.items():
-                    if numFingers > 1:
-                        params += [padName + " Finger Spacing"]
-                    for fingerIndex in range(numFingers):
-                        params += [
-                            padName + " Finger " + str(fingerIndex) + " Stem Length",
-                            padName + " Finger " + str(fingerIndex) + " Stem Width",
-                            padName + " Finger Stem Boundary",
-                            padName + " Finger " + str(fingerIndex) + " T Head Length",
-                            padName + " Finger " + str(fingerIndex) + " T Width",
-                            padName + " Finger " + str(fingerIndex) + " T Side 1 Boundary",
-                            padName + " Finger " + str(fingerIndex) + " T Side 2 Boundary",
-                            padName + " Finger " + str(fingerIndex) + " T Side 3 Boundary",
-                            padName + " Finger " + str(fingerIndex) + " T Side 4 Boundary"
-                        ]
-            geometriesDict["Qubits"][qubitIndex] = {param: None for param in params}
+            geometriesDict["Qubits"][qubitIndex] = qubit.design.promptedParams
         # Readout resonators
         geometriesDict["Readout Resonators"] = dict()
         for readoutResonatorIndex, readoutResonator in self.allReadoutResonatorsDict.items():
-            params = ["Length", "Angle", "Center X", "Center Y", "Pad Separation", "Meander Turn Radius",
-                      "Pad T Stem Length", "Meander To Pad Minimum Distance", "Pad 1 Curve Angle", "Pad 2 Curve Angle"]
-            for padIndex in [1, 2]:
-                if "T" in readoutResonator.padType(padIndex).split("-"):
-                    params += ["Pad " + str(padIndex) + " " + i
-                               for i in ["Width", "Length", "Height", "Side 1 Boundary",
-                                         "Side 2 Boundary", "Side 3 Boundary", "Side 4 Boundary"]]
-            geometriesDict["Readout Resonators"][readoutResonatorIndex] = {param: None for param in params}
+            readoutResonator.design.paramsDict.pop('Mesh Boundary')
+            geometriesDict["Readout Resonators"][readoutResonatorIndex] = readoutResonator.design.promptedParams
 
-        # Control lines
-        geometriesDict["Control Lines"] = dict()
-        for controlLineIndex, controlLine in self.allControlLinesDict.items():
-            params = ["Start X", "Start Y", "Start Angle", "Section Code"]
-            if controlLine.lineType == "fluxBias":
-                params += ["loop" + i for i in ["Thickness", "Seg1Length", "Seg2Length", "Seg3Length", "Seg1Boundary",
-                                                "Seg2Boundary", "Seg3Boundary"]]
-            if controlLine.componentParams["Type"] == "drive":
-                params += ["End Gap"]
-            geometriesDict["Control Lines"][controlLineIndex] = {param: None for param in params}
+        # # Control lines
+        # geometriesDict["Control Lines"] = dict()
+        # for controlLineIndex, controlLine in self.allControlLinesDict.items():
+        #     params = ["Start X", "Start Y", "Start Angle", "Section Code"]
+        #     if controlLine.lineType == "fluxBias":
+        #         params += ["loop" + i for i in ["Thickness", "Seg1Length", "Seg2Length", "Seg3Length", "Seg1Boundary",
+        #                                         "Seg2Boundary", "Seg3Boundary"]]
+        #     if controlLine.componentParams["Type"] == "drive":
+        #         params += ["End Gap"]
+        #     geometriesDict["Control Lines"][controlLineIndex] = {param: None for param in params}
         # CPW.
         geometriesDict["CPW"] = {"Width": 10, "Gap": 6, "Trench": 0.1, "Height": 0.1}
-
+        #
         # Prompt for the ground/substrate
         geometriesDict["Ground(s)"] = dict()
         geometriesDict["Substrate(s)"] = dict()
@@ -205,15 +157,15 @@ class QubitSystem:
             geometriesDict["Ground(s)"][chipIndex] = groundParams
             substrateParams = {"Material": "silicon", "Thickness": 500, "Width": 9500, "Length": 7500}
             geometriesDict["Substrate(s)"][chipIndex] = substrateParams
-
+        #
         # NIST logo
         geometriesDict["NIST Logo"] = {"Center X": 2000, "Center Y": -3000}
         # Chip description
         geometriesDict["Chip Description"] = {"Start X": 1500, "Start Y": -2500}
-
-        # If flip chip, prompt for chip spacing
-        if self.sysParams["Flip Chip?"] == "Yes":
-            geometriesDict["Flip Chip"] = {"Chip Spacing": 1000}
+        #
+        # # If flip chip, prompt for chip spacing
+        # if self.sysParams["Flip Chip?"] == "Yes":
+        #     geometriesDict["Flip Chip"] = {"Chip Spacing": 1000}
 
         jsonWrite(self.componentGeometriesFile, geometriesDict)
 
@@ -237,300 +189,49 @@ class QubitSystem:
         for chipIndex, chip in self.chipDict.items():
             # Substrates
             chip.substrate.geometryParams = substrateParamsDict[str(chipIndex)]
-            chip.substrate.node.height = chip.substrate.geometryParams["Thickness"]
             chip.substrate.node.material = chip.substrate.geometryParams["Material"]
-            chip.substrate.node.polyline = rectanglePolyline(centerX=0,
-                                                             centerY=0,
-                                                             width=chip.substrate.geometryParams["Width"],
-                                                             length=chip.substrate.geometryParams["Length"],
-                                                             angle=0)
+            # X,Y, angle = 0
+            chip.substrate.node.shape.paramsDict["Width"] = chip.substrate.geometryParams["Width"]
+            chip.substrate.node.shape.paramsDict["Length"] = chip.substrate.geometryParams["Length"]
+            chip.substrate.node.shape.paramsDict["Height"] = chip.substrate.geometryParams["Thickness"]
+            chip.substrate.node.createPolylines()
+
             if chipIndex == 0:
                 chip.substrate.node.Z = 0  # Always 0 for substrate 0, convention
             elif chipIndex == 1:
                 chip.substrate.node.Z = self.chipDict[0].substrate.node.height + self.chipSpacing
             # Ground
             chip.ground.geometryParams = groundComponentsDict[str(chipIndex)]
-            chip.ground.outlineNode.height = chip.ground.geometryParams["Height"]
+            chip.ground.outlineNode.shape.paramsDict['Height'] = chip.ground.geometryParams["Height"]
             chip.ground.outlineNode.polyline = chip.substrate.node.polyline  # Ground covers the full substrate
             chip.ground.outlineNode.material = self.sysParams["Material"]
             if chipIndex == 0:
-                chip.ground.outlineNode.Z = self.chipDict[0].substrate.node.height
+                chip.ground.outlineNode.Z = self.chipDict[0].substrate.node.shape.paramsDict['Height']
             elif chipIndex == 1:
-                chip.ground.outlineNode.Z = self.chipDict[1].substrate.node.Z - chip.ground.outlineNode.height
+                chip.ground.outlineNode.Z = self.chipDict[1].substrate.node.Z - \
+                                            chip.ground.outlineNode.shape.paramsDict['Height']
             # Qubits
             for qubitIndex, qubit in chip.qubitDict.items():
-                qubit.geometryParams = componentsDict["Qubits"][str(qubitIndex)]
-                geoms = qubit.geometryParams
-                JJLoc_x, JJLoc_y = readJJLocation(geoms["JJ Location"])
-                pad1Node = qubit.pad1.node
-                pad2Node = qubit.pad2.node
-                # Polylines
-                if "rectangularPads" in qubit.componentParams["Type"]:
-                    padSpacing = 0
-                    centerX = 0  # X,Y coordinates of the symmetric center of the two-pad structure.
-                    centerY = 0
-                    pad1NormalizedCenterPoint = [0, 0]
-                    pad2NormalizedCenterPoint = [0, 0]
-                    if isinstance(qubit, FloatingQubit):
-                        padSpacing = geoms["Pad Spacing"]
-                        centerX = geoms["Center X"]
-                        centerY = geoms["Center Y"]
-                        pad1NormalizedCenterPoint = [0, padSpacing / 2 + geoms["Pad 1 Length"] / 2]
-                        pad2NormalizedCenterPoint = [0, -padSpacing / 2 - geoms["Pad 2 Length"] / 2]
-                        pad2Node.polylineShapeParams["JJ Stem X"] = -JJLoc_x
-                    if isinstance(qubit, GroundedQubit):
-                        # Pad 2 is a sliver that will be shorted to ground.
-                        pad2Node.polylineShape = "rectangle"
-                        geoms["Pad 2 Length"] = 0.01
-                        geoms["Pad 2 Height"] = geoms["Pad 1 Height"]
-                        geoms["Pad 2 Side 1 Boundary"] = 0
-                        geoms["Pad 2 Side 2 Boundary"] = 0
-                        geoms["Pad 2 Side 3 Boundary"] = 0
-                        geoms["Pad 2 Side 4 Boundary"] = 0
-
-                        padSpacing = (geoms["Pad 1 Side 4 Boundary"] - geoms["Pad 2 Length"])
-                        centerX = geoms["Center X"]
-                        centerY = (geoms["Center Y"] - geoms["Pad 1 Length"] / 2 - padSpacing / 2)
-                        pad1NormalizedCenterPoint = [0, padSpacing / 2 + geoms["Pad 1 Length"] / 2]
-                        pad2NormalizedCenterPoint = [JJLoc_x, -padSpacing / 2 - geoms["Pad 2 Length"] / 2]
-                        pad2Node.polylineShapeParams["JJ Stem X"] = 0
-                    for pad in qubit.padListGeom:
-                        pad.node.polylineShape = "rectangle"
-                    # Top pad
-                    pad1CenterPoint = translate(rotate(pad1NormalizedCenterPoint, geoms["Angle"]), centerX, centerY)
-                    pad1Node.polylineShapeParams["Body Center X"] = pad1CenterPoint[0]
-                    pad1Node.polylineShapeParams["Body Center Y"] = pad1CenterPoint[1]
-                    pad1Node.polylineShapeParams["Angle"] = geoms["Angle"]
-                    pad1Node.polylineShapeParams["JJ Stem X"] = JJLoc_x
-
-                    # Bottom pad
-                    pad2CenterPoint = translate(rotate(pad2NormalizedCenterPoint, geoms["Angle"]), centerX, centerY)
-                    pad2Node.polylineShapeParams["Body Center X"] = pad2CenterPoint[0]
-                    pad2Node.polylineShapeParams["Body Center Y"] = pad2CenterPoint[1]
-                    pad2Node.polylineShapeParams["Angle"] = geoms["Angle"] + np.pi
-                    """+pi is so stem points the right way"""
-
-                    # Add fingers if applicable
-                    if qubit.fingers != {}:  # If fingers for either pad 1 or pad 2 are specified:
-                        if "Pad 1" in qubit.fingers:
-                            pad1Node.polylineShape += "PlusFinger(s)"
-                            pad1Node.polylineShapeParams["Number of Fingers"] = qubit.fingers["Pad 1"]
-                        if "Pad 2" in qubit.fingers:
-                            pad2Node.polylineShape += "PlusFinger(s)"
-                            pad2Node.polylineShapeParams["Number of Fingers"] = qubit.fingers["Pad 2"]
-                        for padName, numFingers in qubit.fingers.items():
-                            thisNode = None
-                            if padName == "Pad 1":
-                                thisNode = pad1Node
-                            elif padName == "Pad 2":
-                                thisNode = pad2Node
-                            for fingerIndex in range(numFingers):
-                                shapeParams = thisNode.polylineShapeParams
-                                if numFingers > 1:
-                                    shapeParams["Finger Spacing"] = geoms[padName + " Finger Spacing"]
-                                else:
-                                    shapeParams["Finger Spacing"] = 0
-                                shapeParams["Finger " + str(fingerIndex) + " Stem Length"] = \
-                                    geoms[padName + " Finger " + str(fingerIndex) + " Stem Length"]
-                                shapeParams["Finger " + str(fingerIndex) + " Stem Width"] = \
-                                    geoms[padName + " Finger " + str(fingerIndex) + " Stem Width"]
-                                shapeParams["Finger Stem Boundary"] = geoms[padName + " Finger Stem Boundary"]
-                                shapeParams["Finger " + str(fingerIndex) + " T Head Length"] = \
-                                    geoms[padName + " Finger " + str(fingerIndex) + " T Head Length"]
-                                shapeParams["Finger " + str(fingerIndex) + " T Width"] = \
-                                    geoms[padName + " Finger " + str(fingerIndex) + " T Width"]
-                                shapeParams["Finger " + str(fingerIndex) + " T Side 1 Boundary"] = \
-                                    geoms[padName + " Finger " + str(fingerIndex) + " T Side 1 Boundary"]
-                                shapeParams["Finger " + str(fingerIndex) + " T Side 2 Boundary"] = \
-                                    geoms[padName + " Finger " + str(fingerIndex) + " T Side 2 Boundary"]
-                                shapeParams["Finger " + str(fingerIndex) + " T Side 3 Boundary"] = \
-                                    geoms[padName + " Finger " + str(fingerIndex) + " T Side 3 Boundary"]
-                                shapeParams["Finger " + str(fingerIndex) + " T Side 4 Boundary"] = \
-                                    geoms[padName + " Finger " + str(fingerIndex) + " T Side 4 Boundary"]
-                    # JJ additions
-                    if "singleJJ" in qubit.componentParams["Type"]:
-                        for pad in qubit.padListGeom:
-                            pad.node.polylineShape += "PlusSingleJJ"
-                        for i in [pad.node for pad in qubit.padListGeom]:
-                            i.polylineShapeParams["JJ Stem Width"] = geoms["JJ Stem Width"]
-                            i.polylineShapeParams["JJ Stem End Boundary"] = geoms["JJ Patch Length"] / 2
-                            i.polylineShapeParams["JJ Stem Side Boundary"] = geoms["JJ Stem Boundary"]
-
-                        pad1Node.polylineShapeParams["JJ Stem Length"] = ((padSpacing - geoms["JJ Patch Length"]) / 2
-                                                                          - JJLoc_y)
-                        pad2Node.polylineShapeParams["JJ Stem Length"] = ((padSpacing - geoms["JJ Patch Length"]) / 2
-                                                                          + JJLoc_y)
-                        if isinstance(qubit, GroundedQubit):
-                            geoms["Pad 2 Width"] = geoms["JJ Stem Width"]
-
-                        unrotatedCenter = [JJLoc_x, JJLoc_y]
-                        rotatedCenter = rotate(unrotatedCenter, geoms["Angle"])
-                        bottomElectrodeGDS, topElectrodeGDS, connectionsGDS, patchGDS = OtherComponents.JJGDSComponents(
-                            top_electrode_width=geoms["JJ Top Electrode Width"],
-                            bot_electrode_width=geoms["JJ Bottom Electrode Width"],
-                            rotate=geoms["Angle"],
-                            dx=rotatedCenter[0] + centerX,
-                            dy=rotatedCenter[1] + centerY,
-                            chip=chip.index,
-                            patchLength=geoms["JJ Patch Length"]
-                        )
-                        qubit.JJGDSs.append(JJGDS(patchGDS, topElectrodeGDS, bottomElectrodeGDS, connectionsGDS))
-                    elif "doubleJJ" in qubit.componentParams["Type"]:
-                        for pad in qubit.padListGeom:
-                            pad.node.polylineShape += "PlusDoubleJJ"
-                        pad1Node.polylineShapeParams["SQUID T Stem Length"] = (
-                                padSpacing / 2
-                                - geoms["JJ Patch Length"] / 2
-                                - geoms["SQUID Stem Length"]
-                                - geoms["SQUID T Head Length"]
-                                - JJLoc_y
-                        )
-                        pad2Node.polylineShapeParams["SQUID T Stem Length"] = (
-                                padSpacing / 2
-                                - geoms["JJ Patch Length"] / 2
-                                - geoms["SQUID Stem Length"]
-                                - geoms["SQUID T Head Length"]
-                                + JJLoc_y
-                        )
-                        if isinstance(qubit, GroundedQubit):
-                            geoms["Pad 2 Width"] = geoms["SQUID T Stem Width"]
-                        for i in [pad.node for pad in qubit.padListGeom]:
-                            i.polylineShapeParams["SQUID Stem Separation"] = geoms["SQUID Stem Separation"]
-                            i.polylineShapeParams["SQUID T Head Width"] = geoms["SQUID T Head Width"]
-                            i.polylineShapeParams["SQUID T Head Length"] = geoms["SQUID T Head Length"]
-                            i.polylineShapeParams["JJ Boundary"] = geoms["JJ Boundary"]
-                            i.polylineShapeParams["SQUID Stem Width"] = geoms["SQUID Stem Width"]
-                            i.polylineShapeParams["SQUID Stem Length"] = geoms["SQUID Stem Length"]
-                            i.polylineShapeParams["SQUID T Stem Width"] = geoms["SQUID T Stem Width"]
-
-                            # Left. Takes advantage of symmetry.
-                            unrotatedCenter = [JJLoc_x + geoms["SQUID Stem Separation"] / 2, JJLoc_y]
-                            rotatedCenter = rotate(unrotatedCenter, geoms["Angle"])
-                            bottomElectrodeGDS, topElectrodeGDS, connectionsGDS, patchGDS = \
-                                OtherComponents.JJGDSComponents(
-                                    top_electrode_width=geoms["JJ Top Electrode Width"],
-                                    bot_electrode_width=geoms["JJ Bottom Electrode Width"],
-                                    rotate=geoms["Angle"],
-                                    dx=rotatedCenter[0] + centerX,
-                                    dy=rotatedCenter[1] + centerY,
-                                    chip=chip.index,
-                                    patchLength=geoms["JJ Patch Length"]
-                                )
-                            qubit.JJGDSs.append(JJGDS(patchGDS, topElectrodeGDS, bottomElectrodeGDS, connectionsGDS))
-                            # Right
-                            unrotatedCenter = [JJLoc_x - geoms["SQUID Stem Separation"] / 2, JJLoc_y]
-                            rotatedCenter = rotate(unrotatedCenter, geoms["Angle"])
-                            bottomElectrodeGDS, topElectrodeGDS, connectionsGDS, patchGDS = \
-                                OtherComponents.JJGDSComponents(
-                                    top_electrode_width=geoms["JJ Top Electrode Width"],
-                                    bot_electrode_width=geoms["JJ Bottom Electrode Width"],
-                                    rotate=geoms["Angle"],
-                                    dx=rotatedCenter[0] + centerX,
-                                    dy=rotatedCenter[1] + centerY,
-                                    chip=chip.index,
-                                    patchLength=geoms["JJ Patch Length"]
-                                )
-                            qubit.JJGDSs.append(JJGDS(patchGDS, topElectrodeGDS, bottomElectrodeGDS, connectionsGDS))
-                    for pad in qubit.padListGeom:
-                        pad.node.polylineShapeParams["Body Width"] = geoms["Pad " + str(pad.index) + " Width"]
-                        pad.node.polylineShapeParams["Body Length"] = geoms["Pad " + str(pad.index) + " Length"]
-                        pad.node.height = geoms["Pad " + str(pad.index) + " Height"]
-                        for side in [1, 2, 3, 4]:
-                            pad.node.polylineShapeParams["Side " + str(side) + " Boundary"] = \
-                                geoms["Pad " + str(pad.index) + " Side " + str(side) + " Boundary"]
-                # Common to all qubit geometries
-                for qubitPad in qubit.padListGeom:
-                    qubitPad.node.polylineShapeParams["Mesh Boundary"] = chip.ground.geometryParams["Mesh Boundary"]
-                    qubitPad.node.updatePolylines()
-                    qubitPad.node.material = self.sysParams["Material"]
-                    # Z values
-                    if chipIndex == 0:
-                        qubitPad.node.Z = self.chipDict[0].substrate.node.height
-                    elif chipIndex == 1:
-                        qubitPad.node.Z = self.chipDict[1].substrate.node.Z - qubitPad.node.height
+                qubit.design.paramsDict['Mesh Boundary'] = chip.ground.geometryParams['Mesh Boundary']
+                qubit.design.paramsDict['Z'] = self.chipDict[0].substrate.node.shape.paramsDict["Height"] #Flip chip?
+                for key, val in componentsDict["Qubits"][str(qubitIndex)].items():
+                    if key in qubit.design.paramsDict:
+                        qubit.design.paramsDict[key] = val
+                    else:
+                        raise ValueError(str(key) + ' not in design dict')
+                qubit.design.updateNodes()
             # Readout Resonators
             for readoutResonatorIndex, readoutResonator in chip.readoutResonatorDict.items():
-                readoutResonator.geometryParams = componentsDict["Readout Resonators"][str(readoutResonatorIndex)]
-                geoms = readoutResonator.geometryParams
-                pad1Node = readoutResonator.pad1.node
-                pad2Node = readoutResonator.pad2.node
-                # Z values
-                for resonatorPadNode in [pad1Node, pad2Node]:
-                    if chipIndex == 0:
-                        resonatorPadNode.Z = self.chipDict[0].substrate.node.height
-                    elif chipIndex == 1:
-                        resonatorPadNode.Z = self.chipDict[1].substrate.node.Z - resonatorPadNode.height
-                # Mesh boundary
-                pad1Node.polylineShapeParams["Mesh Boundary"] = chip.ground.geometryParams["Mesh Boundary"]
-                pad2Node.polylineShapeParams["Mesh Boundary"] = chip.ground.geometryParams["Mesh Boundary"]
-                # Meanders
-                readoutResonator.updateMeanderNode(self.CPW)
-                # Height
-                pad1Node.height = geoms["Pad 1 Height"]
-                pad2Node.height = geoms["Pad 2 Height"]
-                # Pad Polylines
-                pad1Node.polylineShape = "rectangle-PlusFinger(s)"
-                pad2Node.polylineShape = "rectangle-PlusFinger(s)"
-                pad1Node.polylineShapeParams["Number of Fingers"] = 1
-                pad2Node.polylineShapeParams["Number of Fingers"] = 1
-
-                pad1RealCenterPoint = translate(
-                    rotate(
-                        [0, geoms["Pad 1 Length"] / 2 + geoms["Pad T Stem Length"]],
-                        readoutResonator.meanderStartAngle + np.pi / 2
-                    ),
-                    readoutResonator.meanderStartPoint[0],
-                    readoutResonator.meanderStartPoint[1]
-                )
-                pad2RealCenterPoint = translate(
-                    rotate(
-                        [0, geoms["Pad 2 Length"] / 2 + geoms["Pad T Stem Length"]],
-                        readoutResonator.meanderEndAngle + 3 * np.pi / 2),
-                    readoutResonator.meanderEndPoint[0],
-                    readoutResonator.meanderEndPoint[1]
-                )
-
-                pad1Node.polylineShapeParams["Body Center X"] = pad1RealCenterPoint[0]
-                pad1Node.polylineShapeParams["Body Center Y"] = pad1RealCenterPoint[1]
-                pad1Node.polylineShapeParams["Angle"] = (readoutResonator.meanderStartAngle + 3 * np.pi / 2)
-                pad2Node.polylineShapeParams["Body Center X"] = pad2RealCenterPoint[0]
-                pad2Node.polylineShapeParams["Body Center Y"] = pad2RealCenterPoint[1]
-                pad2Node.polylineShapeParams["Angle"] = readoutResonator.meanderEndAngle + np.pi / 2
-
-                pad1Node.polylineShapeParams["Body Width"] = geoms["Pad 1 Width"]
-                pad1Node.polylineShapeParams["Body Length"] = geoms["Pad 1 Length"]
-                pad1Node.polylineShapeParams["Body Height"] = geoms["Pad 1 Height"]
-                pad1Node.polylineShapeParams["Side 1 Boundary"] = geoms["Pad 1 Side 1 Boundary"]
-                pad1Node.polylineShapeParams["Side 2 Boundary"] = geoms["Pad 1 Side 2 Boundary"]
-                pad1Node.polylineShapeParams["Side 3 Boundary"] = geoms["Pad 1 Side 3 Boundary"]
-                pad1Node.polylineShapeParams["Side 4 Boundary"] = geoms["Pad 1 Side 4 Boundary"]
-
-                # pad2Params=[param for param in geoms if param[0:5]=="Pad 2"]
-                pad2Node.polylineShapeParams["Body Width"] = geoms["Pad 2 Width"]
-                pad2Node.polylineShapeParams["Body Length"] = geoms["Pad 2 Length"]
-                pad2Node.polylineShapeParams["Body Height"] = geoms["Pad 2 Height"]
-                pad2Node.polylineShapeParams["Side 1 Boundary"] = geoms["Pad 2 Side 1 Boundary"]
-                pad2Node.polylineShapeParams["Side 2 Boundary"] = geoms["Pad 2 Side 2 Boundary"]
-                pad2Node.polylineShapeParams["Side 3 Boundary"] = geoms["Pad 2 Side 3 Boundary"]
-                pad2Node.polylineShapeParams["Side 4 Boundary"] = geoms["Pad 2 Side 4 Boundary"]
-
-                # Pad T
-                for thisNode in [pad1Node, pad2Node]:
-                    thisNode.material = self.sysParams["Material"]
-                    shapeParams = thisNode.polylineShapeParams
-                    shapeParams["Finger Spacing"] = 0
-                    shapeParams["Finger 0 Stem Length"] = geoms["Pad T Stem Length"] / 2
-                    shapeParams["Finger 0 Stem Width"] = self.CPW.geometryParams["Width"]
-                    shapeParams["Finger Stem Boundary"] = self.CPW.geometryParams["Gap"]
-                    shapeParams["Finger 0 T Head Length"] = geoms["Pad T Stem Length"] / 2
-                    shapeParams["Finger 0 T Width"] = self.CPW.geometryParams["Width"]
-                    shapeParams["Finger 0 T Side 1 Boundary"] = self.CPW.geometryParams["Gap"]
-                    shapeParams["Finger 0 T Side 2 Boundary"] = 1
-                    shapeParams["Finger 0 T Side 3 Boundary"] = self.CPW.geometryParams["Gap"]
-                    shapeParams["Finger 0 T Side 4 Boundary"] = 1
-
-                pad1Node.updatePolylines()
-                pad2Node.updatePolylines()
+                #Load data into the design
+                readoutResonator.design.paramsDict['Mesh Boundary'] = chip.ground.geometryParams['Mesh Boundary']
+                readoutResonator.design.paramsDict['Z'] = self.chipDict[0].substrate.node.shape.paramsDict["Height"]
+                for key, val in componentsDict["Readout Resonators"][str(readoutResonatorIndex)].items():
+                    if key in readoutResonator.design.paramsDict:
+                        readoutResonator.design.paramsDict[key] = val
+                    else:
+                        raise ValueError(str(key) + ' not in design dict')
+                readoutResonator.design.CPW = self.CPW
+                readoutResonator.design.updateNodes()
             # Control Lines
             for controlLineIndex, controlLine in chip.controlLineDict.items():
                 controlLine.geometryParams = componentsDict["Control Lines"][str(controlLineIndex)]
@@ -691,9 +392,9 @@ class QubitSystem:
                 peripheries = peripheries + node.peripheryPolylines
                 meshPeripheries = meshPeripheries + node.meshPeripheryPolylines
             for component in components:
-                addToMain.append(gdspy.Polygon(multiplyPolyline(component, unitChange), layer=chip.index))
+                addToMain.append(gdspy.Polygon(component * unitChange, layer=chip.index))
             for periphery in peripheries:
-                subtractFromGround.append(gdspy.Polygon(multiplyPolyline(periphery, unitChange), layer=chip.index))
+                subtractFromGround.append(gdspy.Polygon(periphery * unitChange, layer=chip.index))
             # Dice Gap
             diceGap = OtherComponents.create_dice_gap(
                 chip_size_x=chip.substrate.geometryParams["Width"] * unitChange,
@@ -792,17 +493,17 @@ class QubitSystem:
                 for item in addToMain:
                     GND = gdspy.fast_boolean(GND, item, 'not', layer=chip.index)
                 Main.add(GND)
-            JJGDSList = []
-            for qubitIndex, qubit in self.chipDict[chip.index].qubitDict.items():  # Add the JJ components
-                JJGDSList = JJGDSList + qubit.JJGDSs
-            for thisJJGDS in JJGDSList:
-                Main.add(thisJJGDS.patchGDS)
-                patchCopy = gdspy.copy(thisJJGDS.patchGDS)
-                patchCopy.layers = [chip.index]
-                Main.add(patchCopy)
-                Main.add(thisJJGDS.topElectrodeGDS)
-                Main.add(thisJJGDS.bottomElectrodeGDS)
-                Main.add(thisJJGDS.connectionsGDS)
+            # JJGDSList = []
+            # for qubitIndex, qubit in self.chipDict[chip.index].qubitDict.items():  # Add the JJ components
+            #     JJGDSList = JJGDSList + qubit.JJGDSs
+            # for thisJJGDS in JJGDSList:
+            #     Main.add(thisJJGDS.patchGDS)
+            #     patchCopy = gdspy.copy(thisJJGDS.patchGDS)
+            #     patchCopy.layers = [chip.index]
+            #     Main.add(patchCopy)
+            #     Main.add(thisJJGDS.topElectrodeGDS)
+            #     Main.add(thisJJGDS.bottomElectrodeGDS)
+            #     Main.add(thisJJGDS.connectionsGDS)
 
             Main.add(GND)
         # Add bumps if flip chip
@@ -928,7 +629,7 @@ class QubitSystem:
     def getChipNNodes(self, N):  # Doesn't include ground,substrate, or launchPads
         allNodes = []
         for qubitIndex, qubit in self.chipDict[N].qubitDict.items():
-            allNodes += [pad.node for pad in qubit.padListGeom]
+            allNodes += [pad.node for pad in qubit.design.padListGeom]
         for readoutResonatorIndex, readoutResonator in self.chipDict[N].readoutResonatorDict.items():
             allNodes += [readoutResonator.pad1.node, readoutResonator.pad2.node, readoutResonator.meanderNode]
         for controlLineIndex, controlLine in self.chipDict[N].controlLineDict.items():

@@ -26,19 +26,19 @@ def copyFile(sourceFile, destinationFile):
     subprocess.call(copyCommand, shell=True)
 
 
-QSM.generateSystemParametersFile(projectFolder)  # Run this command to generate the systemParameters file.
-copyFile(copyDir / "systemParameters.csv", projectFolder / "systemParameters.csv")
-
-# Once systemParameters is available and filled out, ALWAYS run this command first.
-qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=False)
-
-qSys.generateComponentParams()
-copyFile(copyDir/"componentParameters.json", projectFolder/"componentParameters.json")
-
-qSys.generateGeometries()
+# QSM.generateSystemParams(projectFolder)  # Run this command to generate the systemParameters file.
+# copyFile(copyDir / "systemParameters.csv", projectFolder / "systemParameters.csv")
+#
+# # Once systemParameters is available and filled out, ALWAYS run this command first.
+qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=True)
+#
+# qSys.generateComponentParams()
+# copyFile(copyDir/"componentParameters.json", projectFolder/"componentParameters.json")
+#
+# qSys.generateGeometries()
 # copyFile(copyDir/"componentGeometries.json", projectFolder/"componentGeometries.json")
 
-# qSys.generateGDS(addMesh=True)
+qSys.generateGDS(addMesh=False)
 
 # HFSSModel(qSys).initialize()
 # HFSSModel(qSys).run()
