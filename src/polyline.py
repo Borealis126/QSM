@@ -38,17 +38,16 @@ def launchPadPolylines(tipPoint, angle, CPW, meshPeriphery):  # startPoint is th
     return padTranslated, peripheryTranslated, meshPeripheryTranslated
 
 
-def pathPolyline(width, sectionCode):
-    startPoint = [0, 0]
+def pathPolyline(width, startPoint, startAngle, sectionCode):
     interpretedSectionCode = interpretSectionCode(sectionCode)
     # Paths are restricted to alternating straight and turn segments.
     # Commands are of the form [[length],[radius,angle],[length],[radius,angle],...]
     polylineLeft = []
     polylineRight = []
-    angle = 0
+    angle = startAngle
     # First points
-    polylineLeft.append(translate(rotate([0, width / 2], angle), startPoint[0], startPoint[1]))
-    polylineRight.append(translate(rotate([0, -width / 2], angle), startPoint[0], startPoint[1]))
+    polylineLeft.append(translate(rotate(np.array([0, width / 2]), angle), startPoint[0], startPoint[1]))
+    polylineRight.append(translate(rotate(np.array([0, -width / 2]), angle), startPoint[0], startPoint[1]))
     for section in interpretedSectionCode:
         if section["Type"] == "Segment":
             polylineLeft.append(nextPointSegment(polylineLeft[-1], angle, section["Length"]))
@@ -93,7 +92,7 @@ def pathPolyline(width, sectionCode):
                 (polylineLeft[-1][1] + polylineRight[-1][1]) / 2, ]  # Average of the two end X and Y values.
     endAngle = angle
     polylineRight.reverse()
-    return polylineLeft + polylineRight, endPoint, endAngle
+    return np.array(polylineLeft + polylineRight), np.array(endPoint), endAngle
 
 
 def multiplyPolyline(polyline, factor):

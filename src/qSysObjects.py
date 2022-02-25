@@ -8,6 +8,7 @@ from polyline import launchPadPolylines
 from pointToLine import pnt2line
 import qubitDesigns
 import resonatorDesigns
+import controlLineDesigns
 
 
 class Qubit:
@@ -46,94 +47,9 @@ class Qubit:
 class ControlLine:  # Similar to node, except netlist name is a function of qubit index.
     def __init__(self, index, componentParams):
         self.index = index
-        self.componentParams=componentParams
+        self.componentParams = componentParams
         self.name = "CL" + str(self.index)
-        self.geometryParams = dict()
-        self.lineNode = Node(self.name + "lineNode", 'Path')
-        self.launchPadNodeDict = dict()
-
-    @property
-    def lineType(self):
-        return self.componentParams["Type"]
-
-    def pathLengthFromStartToPoint(self, point):
-        leftLine = self.lineNode.polyline[0:int(len(self.lineNode.polyline) / 2)]
-        rightLine = self.lineNode.polyline[int(len(self.lineNode.polyline) / 2):]
-        rightLine.reverse()
-        cumulativeLength = 0
-        nearestApproachPointToLine = distancePointPoint(point, midpoint(leftLine[0], rightLine[0]))
-        pathLengthToNearestApproachPointToLine = 0
-        for i in range(1, len(leftLine)):
-            nearestApproachPointToSegment, pointOfNearestApproach = pnt2line(
-                point + [0],
-                midpoint(leftLine[i - 1], rightLine[i - 1]) + [0],
-                midpoint(leftLine[i], rightLine[i]) + [0]
-            )
-            if nearestApproachPointToSegment < nearestApproachPointToLine:
-                pathLengthToNearestApproachPointToLine = cumulativeLength + distancePointPoint(
-                    midpoint(leftLine[i - 1], rightLine[i - 1]), pointOfNearestApproach)
-                nearestApproachPointToLine = nearestApproachPointToSegment
-            cumulativeLength += distancePointPoint(midpoint(leftLine[i - 1], rightLine[i - 1]),
-                                                   midpoint(leftLine[i], rightLine[i]))
-        return pathLengthToNearestApproachPointToLine
-
-    def pathLengthFromEndToPoint(self, point):
-        leftLine = self.lineNode.polyline[0:int(len(self.lineNode.polyline) / 2)]
-        leftLine.reverse()
-        rightLine = self.lineNode.polyline[int(len(self.lineNode.polyline) / 2):]
-        cumulativeLength = 0
-        nearestApproachPointToLine = distancePointPoint(point, midpoint(leftLine[0], rightLine[0]))
-        pathLengthToNearestApproachPointToLine = 0
-        for i in range(1, len(leftLine)):
-            nearestApproachPointToSegment, pointOfNearestApproach = pnt2line(
-                point + [0],
-                midpoint(leftLine[i - 1], rightLine[i - 1]) + [0],
-                midpoint(leftLine[i], rightLine[i]) + [0]
-            )
-            if nearestApproachPointToSegment < nearestApproachPointToLine:
-                pathLengthToNearestApproachPointToLine = cumulativeLength + distancePointPoint(
-                    midpoint(leftLine[i - 1], rightLine[i - 1]), pointOfNearestApproach)
-                nearestApproachPointToLine = nearestApproachPointToSegment
-            cumulativeLength += distancePointPoint(midpoint(leftLine[i - 1], rightLine[i - 1]),
-                                                   midpoint(leftLine[i], rightLine[i]))
-        return pathLengthToNearestApproachPointToLine
-
-    def pathLengthPointToPoint(self, point1, point2):
-        return np.abs(self.pathLengthFromStartToPoint(point2) - self.pathLengthFromStartToPoint(point1))
-
-    def updateLaunchPadNodes(self):
-        startPoint = [self.lineNode.polylineShapeParams["Start X"], self.lineNode.polylineShapeParams["Start Y"]]
-        startAngle = self.lineNode.polylineShapeParams["Start Angle"]
-        endPoint = self.lineNode.endPoint
-        endAngle = self.lineNode.endAngle
-        if (self.lineType == "fluxBias" or self.lineType == "feedline" or
-                self.lineType == "drive"):
-            launchPad1, launchPadPeriphery1, launchPadMeshPeriphery1 = launchPadPolylines(
-                startPoint, startAngle,
-                self.lineNode.polylineShapeParams["CPW"], self.lineNode.polylineShapeParams["Mesh Boundary"]
-            )
-            launchPad1Node = Node(name=self.name + "launchPad1Node")
-            launchPad1Node.polyline = launchPad1
-            launchPad1Node.peripheryPolylines.append(launchPadPeriphery1)
-            launchPad1Node.meshPeripheryPolylines.append(launchPadMeshPeriphery1)
-            launchPad1Node.Z = self.lineNode.Z
-            launchPad1Node.height = self.lineNode.height
-            launchPad1Node.material = self.lineNode.material
-            self.launchPadNodeDict[launchPad1Node.name] = launchPad1Node
-        if self.lineType == "feedline":
-            launchPad2, launchPadPeriphery2, launchPadMeshPeriphery2 = launchPadPolylines(
-                endPoint, endAngle + np.pi,
-                self.lineNode.polylineShapeParams["CPW"],
-                self.lineNode.polylineShapeParams["Mesh Boundary"]
-            )  # +pi is so the launch pad is facing the right way.
-            launchPad2Node = Node(name=self.name + "launchPad2Node")
-            launchPad2Node.polyline = launchPad2
-            launchPad2Node.peripheryPolylines.append(launchPadPeriphery2)
-            launchPad2Node.meshPeripheryPolylines.append(launchPadMeshPeriphery2)
-            launchPad2Node.Z = self.lineNode.Z
-            launchPad2Node.height = self.lineNode.height
-            launchPad2Node.material = self.lineNode.material
-            self.launchPadNodeDict[launchPad2Node.name] = launchPad2Node
+        self.design = controlLineDesigns.interpretDesign(componentParams['Type'])(self.name)
 
 
 class CPWResonator:

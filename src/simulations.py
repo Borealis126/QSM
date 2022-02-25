@@ -15,6 +15,8 @@ from scipy.misc import derivative
 from sympy import Matrix, zeros, sin
 from qSysObjects import ReadoutResonator, Qubit
 from qutip import state_number_index, qzero, ket, bra, tensor, destroy, qeye
+from qubitDesigns import FloatingRectangularTransmonSingleJJ, GroundedRectangularTransmonSingleJJ
+from controlLineDesigns import FeedLine
 
 """Simulations are anything that is saved to a folder. 
 These are anything requiring Ansys and anything with a non-trivial calculation time (matrix inversion, etc.)"""
@@ -217,12 +219,12 @@ class CapMat(Simulation):
     def getChipNSignalNodes(self, N):
         allNodes = []
         for qubitIndex, qubit in self.qSys.chipDict[N].qubitDict.items():
-            allNodes += [pad.node for pad in qubit.padListGeom]
+            allNodes += [pad.node for pad in qubit.design.padListGeom]
         for readoutResonatorIndex, readoutResonator in self.qSys.chipDict[N].readoutResonatorDict.items():
-            allNodes += [readoutResonator.pad1.node, readoutResonator.pad2.node]
+            allNodes += [readoutResonator.design.pad1.node, readoutResonator.design.pad2.node]
         for controlLineIndex, controlLine in self.qSys.chipDict[N].controlLineDict.items():
-            if controlLine.lineType == "feedline" and self.qSys.sysParams["Simulate Feedline?"] == "Yes":
-                allNodes.append(controlLine.lineNode)
+            if isinstance(controlLine.design, FeedLine) and self.qSys.sysParams["Simulate Feedline?"] == "Yes":
+                allNodes.append(controlLine.design.lineNode)
         return allNodes
 
     def capMatLayout_Lines(self):
@@ -253,12 +255,12 @@ class CapMat(Simulation):
             newCapMat.append([0]*(len(capMat)+1))
 
             feedlineIndex = numNodes
-            self.ansysCapMatHeaders.append(self.qSys.allControlLinesDict[0].lineNode.name)
+            self.ansysCapMatHeaders.append(self.qSys.allControlLinesDict[0].design.lineNode.name)
 
             # Add resonator capacitances
             for readoutResonatorIndex, readoutResonator in self.qSys.allReadoutResonatorsDict.items():
                 componentParams = readoutResonator.componentParams
-                pad1Index = self.ansysCapMatHeaders.index(readoutResonator.pad1.node.name)
+                pad1Index = self.ansysCapMatHeaders.index(readoutResonator.design.pad1.node.name)
                 # Capacitance to the feedline
                 newCapMat[pad1Index][feedlineIndex] = -componentParams["Capacitance to Feedline (F)"]
                 newCapMat[feedlineIndex][pad1Index] = -componentParams["Capacitance to Feedline (F)"]
@@ -278,17 +280,17 @@ class CapMatGE(Simulation):
         self.preGECapMatHeaders = []
         self.postGEComponentList = []
         for qubitIndex, qubit in self.qSys.allQubitsDict.items():
-            qubit.pad1.quantCapMatIndex = nonGECapMatIndex
-            self.preGECapMatHeaders.append(qubit.pad1.name)
+            qubit.design.pad1.quantCapMatIndex = nonGECapMatIndex
+            self.preGECapMatHeaders.append(qubit.design.pad1.name)
             nonGECapMatIndex += 1
-            if isinstance(qubit, FloatingQubit):
-                qubit.pad2.quantCapMatIndex = nonGECapMatIndex
+            if isinstance(qubit.design, FloatingRectangularTransmonSingleJJ):
+                qubit.design.pad2.quantCapMatIndex = nonGECapMatIndex
                 nonGECapMatIndex += 1
-                self.preGECapMatHeaders.append(qubit.pad2.name)
+                self.preGECapMatHeaders.append(qubit.design.pad2.name)
             self.postGEComponentList.append(qubit)
         for readoutResonatorIndex, readoutResonator in self.qSys.allReadoutResonatorsDict.items():
-            readoutResonator.pad2.quantCapMatIndex = nonGECapMatIndex  # Only pad2 is included in quantization
-            self.preGECapMatHeaders.append(readoutResonator.pad2.node.name)
+            readoutResonator.design.pad2.quantCapMatIndex = nonGECapMatIndex  # Only pad2 is included in quantization
+            self.preGECapMatHeaders.append(readoutResonator.design.pad2.node.name)
             self.postGEComponentList.append(readoutResonator)
             nonGECapMatIndex += 1
 
@@ -315,7 +317,7 @@ class CapMatGE(Simulation):
         # Alter the resonator pad 2 capacitance to ground according to the lumped resonator model.
         for readoutResonatorIndex, readoutResonator in self.qSys.allReadoutResonatorsDict.items():
             lumpedRSim = LumpedR(readoutResonatorIndex)(self.qSys)
-            index = ansysCapMatHeaders.index(readoutResonator.pad2.node.name)
+            index = ansysCapMatHeaders.index(readoutResonator.design.pad2.node.name)
             capMatReduced[index, index] = (capMatReduced[index, index]
                                            - sum(capMatReduced.row(index)) + lumpedRSim.equivC)
         """Remove all control lines and resonator pad1 from the capacitance matrix. This is under the assumption that
@@ -323,11 +325,11 @@ class CapMatGE(Simulation):
         thereby not affecting the system Hamiltonian."""
         indicesToRemove = []
         for nodeName in ansysCapMatHeaders:
-            if nodeName in [controlLine.lineNode.name for controlLine in self.qSys.allControlLinesDict.values()]:
+            if nodeName in [controlLine.design.lineNode.name for controlLine in self.qSys.allControlLinesDict.values()]:
                 index = ansysCapMatHeaders.index(nodeName)
                 indicesToRemove.append(index)
         for readoutResonatorIndex, readoutResonator in self.qSys.allReadoutResonatorsDict.items():
-            index = ansysCapMatHeaders.index(readoutResonator.pad1.node.name)
+            index = ansysCapMatHeaders.index(readoutResonator.design.pad1.node.name)
             indicesToRemove.append(index)
         indicesToRemove.sort(reverse=True)
 
@@ -351,24 +353,24 @@ class CapMatGE(Simulation):
         phiMat = zeros(dimPreGEQuant, 1)
         t = symbols('t')
         for component in self.postGEComponentList:
-            if isinstance(component, FloatingQubit):
-                RHS[component.pad1.quantCapMatIndex, 0] = I_c * sin((component.pad1.phiSym - component.pad2.phiSym)
+            if isinstance(component.design, FloatingRectangularTransmonSingleJJ):
+                RHS[component.design.pad1.quantCapMatIndex, 0] = I_c * sin((component.design.pad1.phiSym - component.design.pad2.phiSym)
                                                                     / Phi_0Const)
-                RHS[component.pad2.quantCapMatIndex, 0] = -RHS[component.pad1.quantCapMatIndex, 0]
-                phiMat[component.pad1.quantCapMatIndex, 0] = component.pad1.phiSym.diff(t, 2)
-                phiMat[component.pad2.quantCapMatIndex, 0] = component.pad2.phiSym.diff(t, 2)
-            elif isinstance(component, GroundedQubit):
-                RHS[component.pad1.quantCapMatIndex, 0] = I_c * sin(component.pad1.phiSym / Phi_0Const)
-                phiMat[component.pad1.quantCapMatIndex, 0] = component.pad1.phiSym.diff(t, 2)
+                RHS[component.design.pad2.quantCapMatIndex, 0] = -RHS[component.design.pad1.quantCapMatIndex, 0]
+                phiMat[component.design.pad1.quantCapMatIndex, 0] = component.design.pad1.phiSym.diff(t, 2)
+                phiMat[component.design.pad2.quantCapMatIndex, 0] = component.design.pad2.phiSym.diff(t, 2)
+            elif isinstance(component.design, GroundedRectangularTransmonSingleJJ):
+                RHS[component.design.pad1.quantCapMatIndex, 0] = I_c * sin(component.design.pad1.phiSym / Phi_0Const)
+                phiMat[component.design.pad1.quantCapMatIndex, 0] = component.design.pad1.phiSym.diff(t, 2)
             elif isinstance(component, ReadoutResonator):
-                RHS[component.pad2.quantCapMatIndex, 0] = component.pad2.phiSym / Phi_0Const
-                phiMat[component.pad2.quantCapMatIndex, 0] = component.pad2.phiSym.diff(t, 2)
+                RHS[component.design.pad2.quantCapMatIndex, 0] = component.design.pad2.phiSym / Phi_0Const
+                phiMat[component.design.pad2.quantCapMatIndex, 0] = component.design.pad2.phiSym.diff(t, 2)
         capMat_GE = self.capMatForGE
         # Perform the gaussian elimination on just the qubits.
         for componentIndex, component in enumerate(self.postGEComponentList):
-            if isinstance(component, FloatingQubit):
-                component.padToEliminate = component.pad1
-                component.padToKeep = component.pad2
+            if isinstance(component.design, FloatingRectangularTransmonSingleJJ):
+                component.padToEliminate = component.design.pad1
+                component.padToKeep = component.design.pad2
                 k = component.padToEliminate.quantCapMatIndex
                 s = component.padToKeep.quantCapMatIndex
                 O_c = zeros(dimPreGEQuant, dimPreGEQuant)
@@ -411,7 +413,7 @@ class CapMatGE(Simulation):
         first by column then by row."""
         kList = []
         for component in self.postGEComponentList:
-            if isinstance(component, FloatingQubit):
+            if isinstance(component.design, FloatingRectangularTransmonSingleJJ):
                 kList.append(component.padToEliminate.quantCapMatIndex)
         """By nature of how we performed GE it's the qubit pad1 that gets eliminated, 
         but the resulting pad is not really "pad2" anymore, it's just the single qubit pad."""

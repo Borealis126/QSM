@@ -1,6 +1,6 @@
-import qSysObjects
 from ansysAPI import aedtEdit
 from copy import deepcopy
+from qubitDesigns import FloatingRectangularTransmonSingleJJ, GroundedRectangularTransmonSingleJJ
 
 
 class CircuitSim:  # Y11R, YRest are CircuitSims.
@@ -48,7 +48,7 @@ class CircuitSim:  # Y11R, YRest are CircuitSims.
         # Feedline capacitance to resonator pad 1
         for readoutResonatorIndex, readoutResonator in self.qSys.allReadoutResonatorsDict.items():
             capVal = 0
-            node1Name = readoutResonator.pad1.node.name
+            node1Name = readoutResonator.design.pad1.node.name
             node1NetlistName = self.netlistName(node1Name)
             node2Name = "F" + str(readoutResonatorIndex)
             node2NetlistName = self.netlistName(node2Name)
@@ -66,11 +66,11 @@ class CircuitSim:  # Y11R, YRest are CircuitSims.
             }
         # Qubit inductances
         for qubitIndex, qubit in self.qSys.allQubitsDict.items():
-            node1Name = qubit.pad1.node.name
+            node1Name = qubit.design.pad1.node.name
             node1NetlistName = self.netlistName(node1Name)
-            node2Name = qubit.pad2.node.name
+            node2Name = qubit.design.pad2.node.name
             node2NetlistName = self.netlistName(node2Name)
-            if isinstance(qubit, qSysObjects.GroundedQubit):
+            if isinstance(qubit.design, GroundedRectangularTransmonSingleJJ):
                 node2Name = "G"
                 node2NetlistName = self.netlistName(node2Name)
 
@@ -83,15 +83,15 @@ class CircuitSim:  # Y11R, YRest are CircuitSims.
             }
         # Readout Resonators
         for readoutResonatorIndex, readoutResonator in self.qSys.allReadoutResonatorsDict.items():
-            node1Name = readoutResonator.pad1.node.name
+            node1Name = readoutResonator.design.pad1.node.name
             node1NetlistName = self.netlistName(node1Name)
-            node2Name = readoutResonator.pad2.node.name
+            node2Name = readoutResonator.design.pad2.node.name
             node2NetlistName = self.netlistName(node2Name)
             resonatorName = "T" + node1Name + "_" + node2Name
             netlistComponents["Transmission Lines"][resonatorName] = {
                 "node1NetlistName": node1NetlistName,
                 "node2NetlistName": node2NetlistName,
-                "TD": self.qSys.CPW.TD(readoutResonator.geometryParams["Length"])
+                "TD": self.qSys.CPW.TD(readoutResonator.design.paramsDict["Length"])
             }
         # Feedline--------------------------------------------------------------------------------------------------------------------
         """There are always N+1 feedline sections corresponding to segments between the nodes FL,F1,F2,...FN,FR"""
@@ -110,17 +110,17 @@ class CircuitSim:  # Y11R, YRest are CircuitSims.
             firstResonator = self.qSys.allReadoutResonatorsDict[0]
             lastResonator = self.qSys.allReadoutResonatorsDict[self.qSys.sysParams["Number of Readout Resonators"] - 1]
             if index == 0:  # If the first segment
-                length = feedline.pathLengthFromStartToPoint(
-                    [firstResonator.pad1.node.centerX, firstResonator.pad1.node.centerY])
+                length = feedline.design.pathLengthFromStartToPoint(
+                    [firstResonator.design.pad1.node.centerX, firstResonator.design.pad1.node.centerY])
             elif index == len(feedlineNodes) - 2:  # If the last segment...
-                length = feedline.pathLengthFromEndToPoint(
-                    [lastResonator.pad1.node.centerX, lastResonator.pad1.node.centerY])
+                length = feedline.design.pathLengthFromEndToPoint(
+                    [lastResonator.design.pad1.node.centerX, lastResonator.design.pad1.node.centerY])
             else:
-                length = feedline.pathLengthPointToPoint(
-                    [self.qSys.allReadoutResonatorsDict[index - 1].pad1.node.centerX,
-                     self.qSys.allReadoutResonatorsDict[index - 1].pad1.node.centerY],
-                    [self.qSys.allReadoutResonatorsDict[index].pad1.node.centerX,
-                     self.qSys.allReadoutResonatorsDict[index].pad1.node.centerY]
+                length = feedline.design.pathLengthPointToPoint(
+                    [self.qSys.allReadoutResonatorsDict[index - 1].design.pad1.node.centerX,
+                     self.qSys.allReadoutResonatorsDict[index - 1].design.pad1.node.centerY],
+                    [self.qSys.allReadoutResonatorsDict[index].design.pad1.node.centerX,
+                     self.qSys.allReadoutResonatorsDict[index].design.pad1.node.centerY]
                 )
             netlistComponents["Transmission Lines"][feedlineSectionName] = {
                 "node1NetlistName": node1NetlistName,
@@ -157,7 +157,7 @@ class Y11RSimulation(CircuitSim):
         return netlistComponents
 
     def netlistName(self, nodeName):
-        if nodeName == self.qSys.allReadoutResonatorsDict[self.index].pad2.node.name:
+        if nodeName == self.qSys.allReadoutResonatorsDict[self.index].design.pad2.node.name:
             return "Port1"
         if nodeName == "G":
             return "0"
@@ -213,7 +213,7 @@ class Y11QSimulation(CircuitSim):
         return netlistComponents
 
     def netlistName(self, nodeName):
-        if nodeName == self.qSys.allQubitsDict[self.index].pad1.node.name:
+        if nodeName == self.qSys.allQubitsDict[self.index].design.pad1.node.name:
             return "Port1"
         if nodeName == "G":
             return "0"
@@ -248,9 +248,6 @@ class Y11QSimulation(CircuitSim):
 
 
 
-
-
-
 class YRestRSimulation(CircuitSim):
     def __init__(self, index, circuitSimName, simDirectory, qSys, CapMatObj):
         super(YRestRSimulation, self).__init__(circuitSimName, simDirectory, qSys, CapMatObj)
@@ -273,8 +270,8 @@ class YRestRSimulation(CircuitSim):
         }
 
         readoutResonator = self.qSys.allReadoutResonatorsDict[self.index]
-        node1Name = readoutResonator.pad1.node.name
-        node2Name = readoutResonator.pad2.node.name
+        node1Name = readoutResonator.design.pad1.node.name
+        node2Name = readoutResonator.design.pad2.node.name
         resonatorName = "T" + node1Name + "_" + node2Name
         netlistComponents["Transmission Lines"].pop(resonatorName)  # Remove the resonator as per Junling's procedure.
         netlistComponents["Capacitances"]["CR" + str(self.index) + "Pad1_G"]["C"] = 0
@@ -292,7 +289,7 @@ class YRestRSimulation(CircuitSim):
         return netlistComponents
 
     def netlistName(self, nodeName):
-        if nodeName == self.qSys.allReadoutResonatorsDict[self.index].pad2.node.name:
+        if nodeName == self.qSys.allReadoutResonatorsDict[self.index].design.pad2.node.name:
             return "Port1"
         if nodeName == "G":
             return "0"

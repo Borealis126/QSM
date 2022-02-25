@@ -70,8 +70,10 @@ import numpy as np
 #                     meshPeripheryPolylines += [fingerStemMeshPeripheryPolyline, fingerTMeshPeripheryPolyline]
 #                 component = componentLeft + componentRight
 
-'''A node has an absolute location either on its own or relative to a design.'''
+
 class Node:
+    '''A node has an absolute location either on its own or relative to a design.'''
+
     def __init__(self, name, shapeName):
         self.name = name
         self.shape = interpretShape(shapeName)
@@ -88,7 +90,7 @@ class Node:
         self.angle = 0
         self.Z = 0  # Height above X-Y plane.
 
-    def createPolylines(self):
+    def orientShape(self):
         self.shape.createPolylines()
         self.polyline = np.array([translate(rotate(point, self.angle), self.centerX, self.centerY)
                                   for point in self.shape.polyline])
@@ -123,6 +125,7 @@ class Node:
 
 class NodeShape(ABC):
     '''A NodeShape is a 3D element. '''
+
     def __init__(self, params):
         self.paramsDict = dict({i: 0 for i in params})
         self.polyline = np.zeros(0)
@@ -151,10 +154,11 @@ class Rectangle(NodeShape):
         length = self.paramsDict['Length']
 
         self.polyline = np.array(rect(width, length))
-
         peripheryWidth = width + self.paramsDict['Boundaries'][0] + self.paramsDict['Boundaries'][2]
         peripheryLength = length + self.paramsDict['Boundaries'][1] + self.paramsDict['Boundaries'][3]
-        self.peripheryPolylines = [np.array(rect(peripheryWidth, peripheryLength))]
+        self.peripheryPolylines = [translate(np.array(rect(peripheryWidth, peripheryLength)),
+                                             (self.paramsDict['Boundaries'][2] - self.paramsDict['Boundaries'][0])/2,
+                                             (self.paramsDict['Boundaries'][1] - self.paramsDict['Boundaries'][3])/2)]
 
         meshPeripheryWidth = peripheryWidth + 2 * self.paramsDict['MeshBoundary']
         meshPeripheryLength = peripheryLength + 2 * self.paramsDict['MeshBoundary']
@@ -180,10 +184,15 @@ class RectanglePlusStem(Rectangle):
         stem.paramsDict['Width'] = self.paramsDict['StemWidth']
         stem.paramsDict['Length'] = self.paramsDict['StemLength']
         stem.paramsDict['Height'] = self.paramsDict['Height']
-        stem.paramsDict['Boundaries'] = [self.paramsDict['StemBoundary']]*4
+        stem.paramsDict['Boundaries'] = [self.paramsDict['StemBoundary']] * 4
         stem.paramsDict['MeshBoundary'] = self.paramsDict['MeshBoundary']
         stem.createPolylines()
-        stem.polyline = translate(stem.polyline, 0, -stem.paramsDict['Length']/2 - body.paramsDict['Length']/2)
+
+        stem.polyline = translate(stem.polyline, 0, -stem.paramsDict['Length'] / 2 - body.paramsDict['Length'] / 2)
+        stem.peripheryPolylines = [translate(i, 0, -stem.paramsDict['Length'] / 2 - body.paramsDict['Length'] / 2)
+                                   for i in stem.peripheryPolylines]
+        stem.meshPeripheryPolylines = [translate(i, 0, -stem.paramsDict['Length'] / 2 - body.paramsDict['Length'] / 2)
+                                       for i in stem.meshPeripheryPolylines]
 
         self.polyline = np.concatenate((body.polyline,
                                         np.array([stem.polyline[2],
@@ -196,28 +205,64 @@ class RectanglePlusStem(Rectangle):
 
 class Path(NodeShape):
     def __init__(self):
-        super().__init__(['Width', 'Gap', 'SectionCode', 'MeshBoundary'])
+        super().__init__(['Width', 'Gap', 'Height', 'SectionCode', 'MeshBoundary'])
         self.endPoint = []  # Only used for paths
         self.endAngle = []
 
     def createPolylines(self):
-        polyline, endPoint, endAngle = pathPolyline(self.paramsDict['Width'], self.paramsDict['SectionCode'])
+        startPoint = np.array([0, 0])
+        startAngle = 0
+        self.polyline, endPoint, endAngle = pathPolyline(self.paramsDict['Width'], startPoint, startAngle,
+                                                         self.paramsDict['SectionCode'])
         peripheryWidth = (self.paramsDict["Width"] + 2 * self.paramsDict["Gap"])
 
-        peripheryPolyline, _, _ = pathPolyline(
-            width=peripheryWidth,
-            sectionCode=self.paramsDict["SectionCode"] + "(S:" + str(traceBuffer) + ")"
-        )
-        meshPeripheryPolyline, _, _ = pathPolyline(
-            width=peripheryWidth + 2 * self.paramsDict["MeshBoundary"],
-            sectionCode=self.paramsDict["SectionCode"]
-        )
+        peripheryPolyline, _, _ = pathPolyline(peripheryWidth, startPoint, startAngle,
+                                               self.paramsDict["SectionCode"] + "(S:" + str(traceBuffer) + ")")
+        meshPeripheryPolyline, _, _ = pathPolyline(peripheryWidth + 2 * self.paramsDict["MeshBoundary"], startPoint,
+                                                   startAngle, self.paramsDict["SectionCode"])
 
         self.endPoint = endPoint
         self.endAngle = endAngle
-        self.polyline = np.array(polyline)
         self.peripheryPolylines = [peripheryPolyline]
         self.meshPeripheryPolylines = [meshPeripheryPolyline]
+
+    def orientEndPoint(self, centerX, centerY, angle):
+        return translate(rotate(self.endPoint, angle), centerX, centerY)
+
+
+class LaunchPad(NodeShape):
+    def __init__(self):
+        params = ["CPW", "MeshBoundary", "Height"]
+        super().__init__(params)
+        self.paramsDict['Boundaries'] = [0] * 4  # Default value
+
+    def createPolylines(self):
+        CPW = self.paramsDict['CPW']
+        meshPeriphery = self.paramsDict['MeshBoundary']
+        self.polyline = np.array([
+            [-400, -100],
+            [-400, 100],
+            [-200, 100],
+            [0, CPW.geometryParams["Width"] / 2],
+            [0, -CPW.geometryParams["Width"] / 2],
+            [-200, -100]
+        ])
+        self.peripheryPolylines = [np.array([
+            [-560, -260],
+            [-560, 260],
+            [-200, 260],
+            [0, CPW.geometryParams["Width"] / 2 + CPW.geometryParams["Gap"]],
+            [0, -CPW.geometryParams["Width"] / 2 - CPW.geometryParams["Gap"]],
+            [-200, -260]
+        ])]
+        self.meshPeripheryPolylines = [np.array([
+            [-560 - meshPeriphery, -260 - meshPeriphery],
+            [-560 - meshPeriphery, 260 + meshPeriphery],
+            [-200 + meshPeriphery, 260 + meshPeriphery],
+            [0 + meshPeriphery, CPW.geometryParams["Width"] / 2 + CPW.geometryParams["Gap"] + meshPeriphery],
+            [0 + meshPeriphery, -CPW.geometryParams["Width"] / 2 - CPW.geometryParams["Gap"] - meshPeriphery],
+            [-200 + meshPeriphery, -260 - meshPeriphery]
+        ])]
 
 
 def interpretShape(shapeName):
@@ -227,3 +272,5 @@ def interpretShape(shapeName):
         return RectanglePlusStem()
     elif shapeName == 'Path':
         return Path()
+    elif shapeName == 'LaunchPad':
+        return LaunchPad()

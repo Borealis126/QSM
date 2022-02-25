@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from sympy import symbols
 from node import Node
 from basicGeometry import translate, rotate
 import numpy as np
@@ -21,10 +20,6 @@ class ResonatorDesign(ABC):
         self.CPW = []
 
         self.meanderNode = dict()
-        self.meanderStartPoint = []
-        self.meanderStartAngle = 0
-        self.meanderEndPoint = []
-        self.meanderEndAngle = 0
 
         # Only pad 2 should be used in quantization (closest to qubit)
         self.pad1 = ComponentPad(componentName=self.name, padIndex=1)
@@ -36,6 +31,7 @@ class ResonatorDesign(ABC):
     @property
     def promptedParams(self):
         return {i: self.paramsDict[i] for i in self.paramsDict if i != "Mesh Boundary" and i != "Z"}
+
 
 class CPWResonatorWithT(ResonatorDesign):
 
@@ -55,51 +51,11 @@ class CPWResonatorWithT(ResonatorDesign):
         return self.padListGeom
 
     def updateNodes(self):
-        self.updateMeanderNode()
-
-        for padIndex, padNode in enumerate([self.pad1.node, self.pad2.node]):
-            padNode.shape.paramsDict['Width'] = self.paramsDict['Pad '+str(padIndex+1)+' Width']
-            padNode.shape.paramsDict['Length'] = self.paramsDict['Pad '+str(padIndex+1)+' Length']
-            padNode.shape.paramsDict['Height'] = self.paramsDict['Pad '+str(padIndex+1)+' Height']
-            padNode.shape.paramsDict['Boundaries'] = self.paramsDict['Pad '+str(padIndex+1)+' Boundaries']
-            padNode.shape.paramsDict['StemWidth'] = self.CPW.geometryParams["Width"]
-            padNode.shape.paramsDict['StemLength'] = self.paramsDict["Pad T Stem Length"]
-            padNode.shape.paramsDict['StemBoundary'] = self.CPW.geometryParams["Gap"]
-            padNode.shape.paramsDict['MeshBoundary'] = self.paramsDict['Mesh Boundary']
-            padNode.Z = self.paramsDict['Z']
-            padNode.createPolylines()
-
-        pad1RealCenterPoint = translate(
-            rotate(
-                np.array([0, self.paramsDict["Pad 1 Length"] / 2 + self.paramsDict["Pad T Stem Length"]]),
-                self.meanderStartAngle + np.pi / 2
-            ),
-            self.meanderStartPoint[0],
-            self.meanderStartPoint[1]
-        )
-        pad2RealCenterPoint = translate(
-            rotate(
-                np.array([0, self.paramsDict["Pad 2 Length"] / 2 + self.paramsDict["Pad T Stem Length"]]),
-                self.meanderEndAngle + 3 * np.pi / 2),
-            self.meanderEndPoint[0],
-            self.meanderEndPoint[1]
-        )
-
-        self.pad1.node.paramsDict["Center X"] = pad1RealCenterPoint[0]
-        self.pad1.node.paramsDict["Center Y"] = pad1RealCenterPoint[1]
-        self.pad1.node.paramsDict["Angle"] = (self.meanderStartAngle + 3 * np.pi / 2)
-        self.pad2.node.paramsDict["Center X"] = pad2RealCenterPoint[0]
-        self.pad2.node.paramsDict["Center Y"] = pad2RealCenterPoint[1]
-        self.pad2.node.paramsDict["Angle"] = self.meanderEndAngle + np.pi / 2
-
-        self.pad1.node.createPolylines()
-        self.pad2.node.createPolylines()
-
-
-    def updateMeanderNode(self):
         CPW_obj = self.CPW
         endAngles = [self.paramsDict["Pad 1 Curve Angle"], self.paramsDict["Pad 2 Curve Angle"]]
-        self.meanderNode, self.meanderStartPoint, self.meanderStartAngle, self.meanderEndPoint, self.meanderEndAngle = \
+
+        #We are bypassing the 'shape' aspect of the meanderNode due to already-existing code.
+        self.meanderNode, meanderStartPoint, meanderStartAngle, meanderEndPoint, meanderEndAngle = \
             meanderNodeGen(
                 name=self.name + "Meander",
                 turnRadius=self.paramsDict["Meander Turn Radius"],
@@ -118,14 +74,39 @@ class CPWResonatorWithT(ResonatorDesign):
                 centerY=self.paramsDict["Center Y"],
                 height=self.paramsDict["Pad 1 Height"],
                 Z=self.pad1.node.Z,
-                meshBoundary=self.pad1.node.shape.paramsDict["Mesh Boundary"],
+                meshBoundary=self.paramsDict["Mesh Boundary"],
                 CPWObj=CPW_obj
             )
-        for pad in [self.pad1, self.pad2]:
-            for polyline in [pad.node.polyline] + pad.node.peripheryPolylines + pad.node.meshPeripheryPolylines:
-                translate(rotate(polyline, self.paramsDict['Angle']),
-                          self.paramsDict['Center X'],
-                          self.paramsDict['Center Y'])
+
+        for padIndex, padNode in enumerate([self.pad1.node, self.pad2.node]):
+            padNode.shape.paramsDict['Width'] = self.paramsDict['Pad '+str(padIndex+1)+' Width']
+            padNode.shape.paramsDict['Length'] = self.paramsDict['Pad '+str(padIndex+1)+' Length']
+            padNode.shape.paramsDict['Height'] = self.paramsDict['Pad '+str(padIndex+1)+' Height']
+            padNode.shape.paramsDict['Boundaries'] = self.paramsDict['Pad '+str(padIndex+1)+' Boundaries']
+            padNode.shape.paramsDict['StemWidth'] = self.CPW.geometryParams["Width"]
+            padNode.shape.paramsDict['StemLength'] = self.paramsDict["Pad T Stem Length"]
+            padNode.shape.paramsDict['StemBoundary'] = self.CPW.geometryParams["Gap"]
+            padNode.shape.paramsDict['MeshBoundary'] = self.paramsDict['Mesh Boundary']
+            padNode.Z = self.paramsDict['Z']
+
+        pad1RealCenterPoint = translate(rotate(np.array([0, self.paramsDict["Pad 1 Length"] / 2
+                                                         + self.paramsDict["Pad T Stem Length"]]),
+                                               meanderStartAngle + np.pi / 2),
+                                        meanderStartPoint[0],
+                                        meanderStartPoint[1])
+        pad2RealCenterPoint = translate(rotate(np.array([0, self.paramsDict["Pad 2 Length"] / 2
+                                                         + self.paramsDict["Pad T Stem Length"]]),
+                                               meanderEndAngle + 3 * np.pi / 2),
+                                        meanderEndPoint[0],
+                                        meanderEndPoint[1])
+
+        self.pad1.node.centerX, self.pad1.node.centerY = pad1RealCenterPoint
+        self.pad1.node.angle = (meanderStartAngle - 3 * np.pi / 2)
+        self.pad2.node.centerX, self.pad2.node.centerY = pad2RealCenterPoint
+        self.pad2.node.angle = meanderEndAngle - np.pi / 2
+
+        self.pad1.node.orientShape()
+        self.pad2.node.orientShape()
 
 
 def interpretDesign(designName):

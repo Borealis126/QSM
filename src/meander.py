@@ -13,11 +13,11 @@ def meanderNodeGen(name, turnRadius, length, endSeparation, meanderToEndMinDist,
     whereas "Distance between pads" is between their midpoints."""
     # Each of the below equations are equal to zero.
     totalLengthEq = (
-        -length
-        + 2 * meanderToEnd + 2 * arcLength(R, np.pi / 2)
-        + 2 * (width / 2 - 2 * R)
-        + numLeftHumps * (arcLength(R, np.pi) + 2 * (width - 2 * R))
-        + (numLeftHumps + 1) * arcLength(R, np.pi)
+            -length
+            + 2 * meanderToEnd + 2 * arcLength(R, np.pi / 2)
+            + 2 * (width / 2 - 2 * R)
+            + numLeftHumps * (arcLength(R, np.pi) + 2 * (width - 2 * R))
+            + (numLeftHumps + 1) * arcLength(R, np.pi)
     )
     endSeparationEq = -endSeparation + 2 * meanderToEnd + 2 * R + (numLeftHumps * 2 + 1) * 2 * R
     eqn = totalLengthEq - endSeparationEq
@@ -58,7 +58,7 @@ def meanderNodeGen(name, turnRadius, length, endSeparation, meanderToEndMinDist,
     startAngle = angle + 3 * np.pi / 2
 
     sectionCode = ""
-    normalizedStartPoint = [0, endSeparation / 2 - lengthToPad]  # normalized = pre rotation.
+    normalizedStartPoint = np.array([0, endSeparation / 2 - lengthToPad])  # normalized = pre rotation.
     # Initial length
     curveAngle = endAngles[0]
     if curveAngle == 0:
@@ -73,8 +73,8 @@ def meanderNodeGen(name, turnRadius, length, endSeparation, meanderToEndMinDist,
         innerTheta = (np.pi - np.abs(curveAngle)) / 2
         deltaX = a * np.cos(innerTheta)
         deltaY = a * np.sin(innerTheta)
-        normalizedStartPoint = [normalizedStartPoint[0] - deltaX * curveAngle / np.abs(curveAngle),
-                                normalizedStartPoint[1] + deltaY]  # Corrects for sign of curveAngle
+        normalizedStartPoint = np.array([normalizedStartPoint[0] - deltaX * curveAngle / np.abs(curveAngle),
+                                         normalizedStartPoint[1] + deltaY])  # Corrects for sign of curveAngle
         sectionCode = sectionCode + turnCode(turnAngle=-curveAngle, turnRadius=R_seg)
         startAngle += curveAngle
 
@@ -109,12 +109,6 @@ def meanderNodeGen(name, turnRadius, length, endSeparation, meanderToEndMinDist,
     else:
         # Notation and equations from https://mathworld.wolfram.com/CircularSegment.html
         R_seg = np.abs(lengthToPad / curveAngle)
-        # r = R_seg * np.cos(curveAngle / 2)
-        # h = R_seg - r
-        # a = 2 * np.sqrt(h * (2 * R_seg - r))
-        # innerTheta = (np.pi - np.abs(curveAngle)) / 2
-        # deltaX = a * np.cos(innerTheta)
-        # deltaY = a * np.sin(innerTheta)
         sectionCode += turnCode(turnAngle=curveAngle, turnRadius=R_seg)
         angle += curveAngle
 
@@ -123,11 +117,11 @@ def meanderNodeGen(name, turnRadius, length, endSeparation, meanderToEndMinDist,
     meanderMeshPeripheryPolyline, endPoint, endAngle = pathPolyline(meshPeripheryWidth, startPoint, startAngle,
                                                                     sectionCode)
 
-    meanderNode = Node(name)
+    meanderNode = Node(name, 'Path')
     meanderNode.polyline = meanderTracePolyline
     meanderNode.peripheryPolylines.append(meanderPeripheryPolyline)
     meanderNode.meshPeripheryPolylines.append(meanderMeshPeripheryPolyline)
-    meanderNode.height = height
+    meanderNode.shape.paramsDict['Height'] = height
     meanderNode.Z = Z
     return meanderNode, startPoint, startAngle, endPoint, endAngle
 

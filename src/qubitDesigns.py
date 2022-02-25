@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from sympy import symbols
 from node import Node
-from basicGeometry import translate, rotatePolyline
+from basicGeometry import translate, rotate, rotatePolyline
 import numpy as np
+from copy import copy
 
 'A design consists of two pads. Each pad is a Node. A Node stores the absolute location of the element.'
 
@@ -37,8 +38,10 @@ class QubitDesign(ABC):
         self.geometryParams = dict()
 
         '''All qubits have two pads, for grounded qubits the second is shorted to ground'''
-        self.padListGeom = [ComponentPad(componentName=self.name, padIndex=1),
-                            ComponentPad(componentName=self.name, padIndex=2)]
+        self.pad1 = ComponentPad(componentName=self.name, padIndex=1)
+        self.pad2 = ComponentPad(componentName=self.name, padIndex=2)
+
+        self.padListGeom = [self.pad1, self.pad2]
 
     @property
     def promptedParams(self):
@@ -75,101 +78,93 @@ class FloatingRectangularTransmonSingleJJ(QubitDesign):
 
     def updateNodes(self):
         stemLength = (self.paramsDict['Pad Spacing'] - self.paramsDict["JJ Patch Length"]) / 2
-
+        #Update the shapes
         pad1, pad2 = self.padListGeom
         pad1.node.shape.paramsDict['Width'] = self.paramsDict['Pad 1 Width']
         pad1.node.shape.paramsDict['Length'] = self.paramsDict['Pad 1 Length']
         pad1.node.shape.paramsDict['Height'] = self.paramsDict['Pad 1 Height']
         pad1.node.shape.paramsDict['Boundaries'] = self.paramsDict['Pad 1 Boundaries']
-        pad1.node.shape.paramsDict['JJStemWidth'] = self.paramsDict['JJ Stem Width']
-        pad1.node.shape.paramsDict['JJStemLength'] = stemLength
+        pad1.node.shape.paramsDict['StemWidth'] = self.paramsDict['JJ Stem Width']
+        pad1.node.shape.paramsDict['StemLength'] = stemLength
         pad1.node.shape.paramsDict['MeshBoundary'] = self.paramsDict['Mesh Boundary']
-        pad1.node.Z = self.paramsDict['Z']
-        pad1.node.createPolylines()
 
         pad2.node.shape.paramsDict['Width'] = self.paramsDict['Pad 2 Width']
         pad2.node.shape.paramsDict['Length'] = self.paramsDict['Pad 2 Length']
         pad2.node.shape.paramsDict['Height'] = self.paramsDict['Pad 2 Height']
         pad2.node.shape.paramsDict['Boundaries'] = self.paramsDict['Pad 2 Boundaries']
-        pad2.node.shape.paramsDict['JJStemWidth'] = self.paramsDict['JJ Stem Width']
-        pad2.node.shape.paramsDict['JJStemLength'] = stemLength
+        pad2.node.shape.paramsDict['StemWidth'] = self.paramsDict['JJ Stem Width']
+        pad2.node.shape.paramsDict['StemLength'] = stemLength
         pad2.node.shape.paramsDict['MeshBoundary'] = self.paramsDict['Mesh Boundary']
+        #Update the nodes
+        pad1Center_design = np.array([0, pad1.node.shape.paramsDict['Length'] / 2
+                                     + self.paramsDict['Pad Spacing'] / 2])
+        pad1Center_absolute = translate(rotate(pad1Center_design, self.paramsDict['Angle']),
+                                    self.paramsDict['Center X'], self.paramsDict['Center Y'])
+        pad1.node.centerX, pad1.node.centerY = pad1Center_absolute
+        pad1.node.angle = self.paramsDict['Angle']
+        pad1.node.Z = self.paramsDict['Z']
+        pad1.node.orientShape()
+
+        pad2Center_design = np.array([0, -pad2.node.shape.paramsDict['Length'] / 2
+                                         - self.paramsDict['Pad Spacing'] / 2])
+        pad2Center_absolute = translate(rotate(pad2Center_design, self.paramsDict['Angle']),
+                                        self.paramsDict['Center X'], self.paramsDict['Center Y'])
+        pad2.node.centerX, pad2.node.centerY = pad2Center_absolute
+        pad2.node.angle = self.paramsDict['Angle']+np.pi
         pad2.node.Z = self.paramsDict['Z']
-        pad2.node.createPolylines()
-
-        def placePad1(polyline):
-            return translate(polyline, 0, pad1.node.shape.paramsDict['Length'] / 2 + self.paramsDict['Pad Spacing'] / 2)
-
-        pad1.node.polyline = placePad1(pad1.node.polyline)
-        pad1.node.peripheryPolylines = [placePad1(i) for i in pad1.node.peripheryPolylines]
-        pad1.node.meshPeripheryPolylines = [placePad1(i) for i in pad1.node.meshPeripheryPolylines]
-
-        def placePad2(polyline):
-            return translate(rotatePolyline(polyline, np.pi), 0,
-                             -pad2.node.shape.paramsDict['Length'] / 2 - self.paramsDict['Pad Spacing'] / 2)
-
-        pad2.node.polyline = placePad2(pad2.node.polyline)
-        pad2.node.peripheryPolylines = [placePad2(i) for i in pad2.node.peripheryPolylines]
-        pad2.node.meshPeripheryPolylines = [placePad2(i) for i in pad2.node.meshPeripheryPolylines]
-
-        # rotate and translate everything.
-        def placeDesign(polyline):
-            return translate(rotatePolyline(polyline, self.paramsDict['Angle']),
-                             self.paramsDict['Center X'],
-                             self.paramsDict['Center Y'])
-
-        for pad in [pad1, pad2]:
-            pad.node.polyline = placeDesign(pad.node.polyline)
-            pad.node.peripheryPolylines = [placeDesign(i) for i in pad.node.peripheryPolylines]
-            pad.node.meshPeripheryPolylines = [placeDesign(i) for i in pad.node.meshPeripheryPolylines]
+        pad2.node.orientShape()
 
 
 class GroundedRectangularTransmonSingleJJ(QubitDesign):
     def __init__(self, name):
         super().__init__(name, ["Angle", "Center X", "Center Y",
-                                "Pad 1 Width", "Pad 1 Length", "Pad 1 Height", "Pad 1 Boundaries",
-                                "JJ Location", "JJ Stem Boundary", "JJ Stem Width",
-                                "JJ Patch Width", "JJ Patch Length", "JJ Top Electrode Width",
-                                "JJ Bottom Electrode Width", "Mesh Boundary"])
+                                "Pad Width", "Pad Length", "Pad Height", "Pad Boundaries",
+                                "JJ Location", "JJ Stem Boundary", "JJ Stem Width", "JJ Patch Length", "Mesh Boundary"])
         pad1, pad2 = self.padListGeom
-        pad1.node = Node(pad1.name, 'RectanglePlusSingleJJ')
-        pad2.node = Node(pad2.name, 'RectanglePlusSingleJJ')
+        pad1.node = Node(pad1.name, 'RectanglePlusStem')
+        pad2.node = Node(pad2.name, 'Rectangle')
 
     @property
     def padList(self):
         return [self.padListGeom[0]]
 
     def updateNodes(self):
+        stemGap = self.paramsDict['Pad Boundaries'][3]
+        stemLength = (stemGap - self.paramsDict["JJ Patch Length"]) / 2
+        # Update the shapes
         pad1, pad2 = self.padListGeom
-        pad1.node.shape.paramsDict['Width'] = self.paramsDict['Pad 1 Width']
-        pad1.node.shape.paramsDict['Length'] = self.paramsDict['Pad 1 Length']
-        pad1.node.shape.paramsDict['Height'] = self.paramsDict['Pad 1 Height']
-        pad1.node.shape.paramsDict['Boundaries'] = self.paramsDict['Pad 1 Boundaries']
+        pad1.node.shape.paramsDict['Width'] = self.paramsDict['Pad Width']
+        pad1.node.shape.paramsDict['Length'] = self.paramsDict['Pad Length']
+        pad1.node.shape.paramsDict['Height'] = self.paramsDict['Pad Height']
+        pad1.node.shape.paramsDict['Boundaries'] = self.paramsDict['Pad Boundaries']
+        pad1.node.shape.paramsDict['StemWidth'] = self.paramsDict['JJ Stem Width']
+        pad1.node.shape.paramsDict['StemLength'] = stemLength
         pad1.node.shape.paramsDict['MeshBoundary'] = self.paramsDict['Mesh Boundary']
-        pad1.node.createPolylines()
 
-        pad2.node.shape.paramsDict['Width'] = self.paramsDict['Pad 2 Width']
-        pad2.node.shape.paramsDict['Length'] = self.paramsDict['Pad 2 Length']
-        pad2.node.shape.paramsDict['Height'] = self.paramsDict['Pad 2 Height']
-        pad2.node.shape.paramsDict['Boundaries'] = self.paramsDict['Pad 2 Boundaries']
+        pad2.node.shape.paramsDict['Width'] = self.paramsDict['JJ Stem Width']
+        pad2.node.shape.paramsDict['Length'] = stemLength
+        pad2.node.shape.paramsDict['Height'] = self.paramsDict['Pad Height']
+        pad2.node.shape.paramsDict['Boundaries'] = copy(self.paramsDict['Pad Boundaries'])
+        pad2.node.shape.paramsDict['Boundaries'][1] = pad2.node.shape.paramsDict['Boundaries'][3] = 0
         pad2.node.shape.paramsDict['MeshBoundary'] = self.paramsDict['Mesh Boundary']
-        pad2.node.createPolylines()
+        # Update the nodes
+        pad1Center_design = np.array([0, pad1.node.shape.paramsDict['Length'] / 2
+                                      + stemGap / 2])
+        pad1Center_absolute = translate(rotate(pad1Center_design, self.paramsDict['Angle']),
+                                        self.paramsDict['Center X'], self.paramsDict['Center Y'])
+        pad1.node.centerX, pad1.node.centerY = pad1Center_absolute
+        pad1.node.angle = self.paramsDict['Angle']
+        pad1.node.Z = self.paramsDict['Z']
+        pad1.node.orientShape()
 
-        for polyline in [pad1.node.polyline] + pad1.node.peripheryPolylines + pad1.node.meshPeripheryPolylines:
-            polyline = translate(polyline, 0,
-                                 pad1.node.shape.paramsDict['Length'] / 2 + self.paramsDict['Pad Spacing'] / 2)
-
-        for polyline in [pad2.polyline] + pad2.peripheryPolylines + pad2.meshPeripheryPolylines:
-            polyline = rotatePolyline(polyline, np.pi)
-            polyline = translate(polyline, 0,
-                                 -pad2.node.shape.paramsDict['Length'] / 2 - self.paramsDict['Pad Spacing'] / 2)
-
-        # rotate and translate everything.
-        for pad in [pad1, pad2]:
-            for polyline in [pad.node.polyline] + pad.node.peripheryPolylines + pad.node.meshPeripheryPolylines:
-                translate(rotatePolyline(polyline, self.paramsDict['Angle']),
-                          self.paramsDict['Center X'],
-                          self.paramsDict['Center Y'])
+        pad2Center_design = np.array([0, -pad2.node.shape.paramsDict['Length'] / 2
+                                      - self.paramsDict["JJ Patch Length"] / 2])
+        pad2Center_absolute = translate(rotate(pad2Center_design, self.paramsDict['Angle']),
+                                        self.paramsDict['Center X'], self.paramsDict['Center Y'])
+        pad2.node.centerX, pad2.node.centerY = pad2Center_absolute
+        pad2.node.angle = self.paramsDict['Angle'] + np.pi
+        pad2.node.Z = self.paramsDict['Z']
+        pad2.node.orientShape()
 
 
 def interpretDesign(designName):

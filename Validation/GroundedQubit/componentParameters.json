@@ -1,0 +1,12 @@
+{
+ "CPW": {
+  "Phase Velocity(um/s)": 0
+ },
+ "Qubits": {
+  "0": {
+   "Type": "GroundedRectangularTransmonSingleJJ",
+   "L_J(H)": 11e-9,
+   "L_I(H)": 11e-9
+  }
+ }
+}

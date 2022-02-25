@@ -111,10 +111,7 @@ class QubitSystem:
             for indexStr, params in controlLinesDict.items():
                 index = int(indexStr)
                 controlLine = ControlLine(index, params)
-                controlLineChipIndex = 0
-                if self.sysParams["Flip Chip?"] == "Yes":
-                    controlLineChipIndex = params["Chip"]
-                self.chipDict[controlLineChipIndex].controlLineDict[index] = controlLine
+                self.chipDict[0].controlLineDict[index] = controlLine
         # Load CPW info
         self.CPW.componentParams = componentsDict["CPW"]
         # Load bumps info
@@ -133,19 +130,10 @@ class QubitSystem:
         # Readout resonators
         geometriesDict["Readout Resonators"] = dict()
         for readoutResonatorIndex, readoutResonator in self.allReadoutResonatorsDict.items():
-            readoutResonator.design.paramsDict.pop('Mesh Boundary')
             geometriesDict["Readout Resonators"][readoutResonatorIndex] = readoutResonator.design.promptedParams
-
-        # # Control lines
-        # geometriesDict["Control Lines"] = dict()
-        # for controlLineIndex, controlLine in self.allControlLinesDict.items():
-        #     params = ["Start X", "Start Y", "Start Angle", "Section Code"]
-        #     if controlLine.lineType == "fluxBias":
-        #         params += ["loop" + i for i in ["Thickness", "Seg1Length", "Seg2Length", "Seg3Length", "Seg1Boundary",
-        #                                         "Seg2Boundary", "Seg3Boundary"]]
-        #     if controlLine.componentParams["Type"] == "drive":
-        #         params += ["End Gap"]
-        #     geometriesDict["Control Lines"][controlLineIndex] = {param: None for param in params}
+        geometriesDict["Control Lines"] = dict()
+        for controlLineIndex, controlLine in self.allControlLinesDict.items():
+            geometriesDict["Control Lines"][controlLineIndex] = controlLine.design.promptedParams
         # CPW.
         geometriesDict["CPW"] = {"Width": 10, "Gap": 6, "Trench": 0.1, "Height": 0.1}
         #
@@ -194,7 +182,8 @@ class QubitSystem:
             chip.substrate.node.shape.paramsDict["Width"] = chip.substrate.geometryParams["Width"]
             chip.substrate.node.shape.paramsDict["Length"] = chip.substrate.geometryParams["Length"]
             chip.substrate.node.shape.paramsDict["Height"] = chip.substrate.geometryParams["Thickness"]
-            chip.substrate.node.createPolylines()
+            chip.substrate.node.shape.createPolylines()
+            chip.substrate.node.orientShape() #Substrate is centered on the origin, so no need to update.
 
             if chipIndex == 0:
                 chip.substrate.node.Z = 0  # Always 0 for substrate 0, convention
@@ -234,135 +223,15 @@ class QubitSystem:
                 readoutResonator.design.updateNodes()
             # Control Lines
             for controlLineIndex, controlLine in chip.controlLineDict.items():
-                controlLine.geometryParams = componentsDict["Control Lines"][str(controlLineIndex)]
-                geoms = controlLine.geometryParams
-                lineNode = controlLine.lineNode
-                # Height
-                lineNode.height = self.CPW.geometryParams["Height"]
-                # Path Polyline
-                lineNode.polylineShape = "path"
-                lineNode.polylineShapeParams["CPW"] = self.CPW
-                lineNode.polylineShapeParams["Mesh Boundary"] = chip.ground.geometryParams["Mesh Boundary"]
-                for param in geoms:
-                    lineNode.polylineShapeParams[param] = geoms[param]
-                lineNode.updatePolylines()
-                # Drive line option
-                if controlLine.componentParams["Type"] == "drive":
-                    loopCutout1Width = geoms["End Gap"]
-                    loopCutout1Length = self.CPW.geometryParams["Width"] + 2 * self.CPW.geometryParams["Gap"]
-                    loopCutout1RawCenter = [loopCutout1Width / 2 - traceBuffer,
-                                            0]  # Raw=assuming path endpoint is at [0,0]
-                    loopCutout1RawPolyline = rectanglePolyline(
-                        centerX=loopCutout1RawCenter[0],
-                        centerY=loopCutout1RawCenter[1],
-                        width=loopCutout1Width,
-                        length=loopCutout1Length,
-                        angle=0
-                    )
-                    loopCutout1RotatedPolyline = [rotate(point, lineNode.endAngle) for point in loopCutout1RawPolyline]
-                    loopCutout1TranslatedPolyline = [translate(point, lineNode.endPoint[0], lineNode.endPoint[1])
-                                                     for point in loopCutout1RotatedPolyline]
-                    lineNode.peripheryPolylines.append(loopCutout1TranslatedPolyline)
-                # Flux bias option
-                if controlLine.componentParams["Type"] == "fluxBias":
-                    loopThickness = geoms["loopThickness"]
-                    loopSeg1Length = geoms["loopSeg1Length"]
-                    loopSeg2Length = geoms["loopSeg2Length"]
-                    loopSeg3Length = geoms["loopSeg3Length"]
-                    loopSeg1Boundary = geoms["loopSeg1Boundary"]
-                    loopSeg2Boundary = geoms["loopSeg2Boundary"]
-                    loopSeg3Boundary = geoms["loopSeg3Boundary"]
-
-                    loopCutout1Width = loopSeg1Length
-                    loopCutout1Length = loopSeg1Boundary + loopSeg2Length - loopThickness
-                    """Raw=assuming path endpoint is at [0,0]"""
-                    loopCutout1RawCenter = [
-                        loopCutout1Width / 2 - traceBuffer,
-                        - (
-                                loopSeg2Length
-                                - loopThickness
-                                - loopCutout1Length / 2
-                                - self.CPW.geometryParams["Width"] / 2
-                        )
-                    ]
-                    loopCutout1RawPolyline = rectanglePolyline(
-                        centerX=loopCutout1RawCenter[0],
-                        centerY=loopCutout1RawCenter[1],
-                        width=loopCutout1Width,
-                        length=loopCutout1Length,
-                        angle=0
-                    )
-                    loopCutout1RotatedPolyline = [rotate(point, lineNode.endAngle) for point in loopCutout1RawPolyline]
-                    loopCutout1TranslatedPolyline = [translate(point, lineNode.endPoint[0], lineNode.endPoint[1])
-                                                     for point in loopCutout1RotatedPolyline]
-                    lineNode.peripheryPolylines.append(loopCutout1TranslatedPolyline)
-
-                    loopCutout2Width = loopSeg3Length + loopSeg2Boundary
-                    loopCutout2Length = loopSeg2Length + loopSeg1Boundary + loopSeg3Boundary
-                    loopCutout2RawCenter = [
-                        loopSeg1Length - loopSeg3Length + loopCutout2Width / 2,
-                        (
-                                -loopCutout2Length / 2
-                                + self.CPW.geometryParams["Width"] / 2
-                                + loopSeg1Boundary
-                        )
-                    ]
-                    loopCutout2RawPolyline = rectanglePolyline(
-                        centerX=loopCutout2RawCenter[0],
-                        centerY=loopCutout2RawCenter[1],
-                        width=loopCutout2Width,
-                        length=loopCutout2Length,
-                        angle=0
-                    )
-                    loopCutout2RotatedPolyline = [rotate(point, lineNode.endAngle) for point in loopCutout2RawPolyline]
-                    loopCutout2TranslatedPolyline = [
-                        translate(point, lineNode.endPoint[0], lineNode.endPoint[1])
-                        for point in loopCutout2RotatedPolyline
-                    ]
-                    lineNode.peripheryPolylines.append(loopCutout2TranslatedPolyline)
-                    # Loop
-                    insertIndex = int(len(lineNode.polyline) / 2 - 1)  # -1 is for the short to ground
-                    seg3Buffer = 0  # May be needed when generating GDS
-                    loopSeg3Length += seg3Buffer
-
-                    # point1 = lineNode.polyline[insertIndex]
-                    # point2 = lineNode.polyline[insertIndex]
-                    shortThickness = loopThickness
-                    shortLength = self.CPW.geometryParams["Gap"]
-                    # shortPoint = [point2[0] - shortThickness * np.cos(lineNode.endAngle),
-                    #               point2[1] - shortThickness * np.sin(lineNode.endAngle)]
-
-                    loopPolylineRaw = [
-                        [-shortThickness, 0],
-                        [-shortThickness, shortLength],
-                        [0, shortLength],
-                        [0, 0],
-                        [loopSeg1Length, 0],
-                        [loopSeg1Length, -loopSeg2Length],
-                        [loopSeg1Length - loopSeg3Length, -loopSeg2Length],
-                        [loopSeg1Length - loopSeg3Length, -loopSeg2Length + loopThickness],
-                        [loopSeg1Length - loopThickness, -loopSeg2Length + loopThickness],
-                        [loopSeg1Length - loopThickness, -loopThickness],
-                        [0, -loopThickness]
-                    ]
-                    loopPolylineRotated = [rotate(point, lineNode.endAngle) for point in loopPolylineRaw]
-                    traceEdgePoint = translate(rotate([0, self.CPW.geometryParams["Width"] / 2], lineNode.endAngle),
-                                               lineNode.endPoint[0], lineNode.endPoint[1])
-                    loopPolylineTranslated = [translate(point, traceEdgePoint[0], traceEdgePoint[1])
-                                              for point in loopPolylineRotated]
-                    lineNode.polyline = (lineNode.polyline[0:insertIndex]
-                                         + loopPolylineTranslated
-                                         + lineNode.polyline[insertIndex + 1:])
-                    """Plus one is because the corner point is included in loopPolylineRaw"""
-
-                lineNode.material = self.sysParams["Material"]
-                # Z values
-                if chipIndex == 0:
-                    lineNode.Z = self.chipDict[0].substrate.node.height
-                elif chipIndex == 1:
-                    lineNode.Z = self.chipDict[1].substrate.node.Z - self.CPW.geometryParams["Height"]
-                # Launch pads
-                controlLine.updateLaunchPadNodes()
+                controlLine.design.paramsDict['Mesh Boundary'] = chip.ground.geometryParams['Mesh Boundary']
+                controlLine.design.paramsDict['Z'] = self.chipDict[0].substrate.node.shape.paramsDict["Height"]
+                for key, val in componentsDict["Control Lines"][str(controlLineIndex)].items():
+                    if key in controlLine.design.paramsDict:
+                        controlLine.design.paramsDict[key] = val
+                    else:
+                        raise ValueError(str(key) + ' not in design dict')
+                controlLine.design.CPW = self.CPW
+                controlLine.design.updateNodes()
         # If flip chip update bump nodes
         if self.sysParams["Flip Chip?"] == "Yes":
             self.updateBumpsDict()
@@ -631,10 +500,12 @@ class QubitSystem:
         for qubitIndex, qubit in self.chipDict[N].qubitDict.items():
             allNodes += [pad.node for pad in qubit.design.padListGeom]
         for readoutResonatorIndex, readoutResonator in self.chipDict[N].readoutResonatorDict.items():
-            allNodes += [readoutResonator.pad1.node, readoutResonator.pad2.node, readoutResonator.meanderNode]
+            allNodes += [readoutResonator.design.pad1.node,
+                         readoutResonator.design.pad2.node,
+                         readoutResonator.design.meanderNode]
         for controlLineIndex, controlLine in self.chipDict[N].controlLineDict.items():
-            allNodes.append(controlLine.lineNode)
-            for launchPadName, launchPad in controlLine.launchPadNodeDict.items():
+            allNodes.append(controlLine.design.lineNode)
+            for launchPadName, launchPad in controlLine.design.launchPadNodeDict.items():
                 allNodes.append(launchPad)
         return allNodes
 

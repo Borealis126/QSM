@@ -85,7 +85,6 @@ def rotate(point, angle):  # Rotates a point in [x,y] format about the point [0,
     return np.transpose(np.matmul(rotationMatrix, point.transpose()))
 
 def rotatePolyline(polyline, angle):
-
     return np.array([rotate(point, angle) for point in polyline])
 
 

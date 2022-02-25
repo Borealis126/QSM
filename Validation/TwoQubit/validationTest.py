@@ -26,19 +26,19 @@ def copyFile(sourceFile, destinationFile):
     subprocess.call(copyCommand, shell=True)
 
 
-QSM.generateSystemParametersFile(projectFolder)  # Run this command to generate the systemParameters file.
-copyFile(copyDir / "systemParameters.csv", projectFolder / "systemParameters.csv")
+# QSM.generateSystemParams(projectFolder)  # Run this command to generate the systemParameters file.
+# copyFile(copyDir / "systemParameters.csv", projectFolder / "systemParameters.csv")
 
 # Once systemParameters is available and filled out, ALWAYS run this command first.
-qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=False)
+qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=True)
 
-qSys.generateComponentParams()
-copyFile(copyDir/"componentParameters.json", projectFolder/"componentParameters.json")
-
-qSys.generateGeometries()
+# qSys.generateComponentParams()
+# copyFile(copyDir/"componentParameters.json", projectFolder/"componentParameters.json")
+#
+# qSys.generateGeometries()
 # copyFile(copyDir/"componentGeometries.json", projectFolder/"componentGeometries.json")
 
-# qSys.generateGDS(addMesh=True)
+# qSys.generateGDS(addMesh=False)
 
 # HFSSModel(qSys).initialize()
 # HFSSModel(qSys).run()
@@ -49,23 +49,26 @@ qSys.generateGeometries()
 # CapMat(qSys).postProcess()
 
 # for readoutResonatorIndex, readoutResonator in qSys.allReadoutResonatorsDict.items():
-    # LumpedR(readoutResonatorIndex)(qSys).initialize()
-    # LumpedR(readoutResonatorIndex)(qSys).run()
-    # LumpedR(readoutResonatorIndex)(qSys).postProcess()
+#     LumpedR(readoutResonatorIndex)(qSys).initialize()
+#     LumpedR(readoutResonatorIndex)(qSys).run()
+#     LumpedR(readoutResonatorIndex)(qSys).postProcess()
 
-# CapMatGE(qSys).postProcess()
+CapMatGE(qSys).initialize()
+CapMatGE(qSys).postProcess()
 #
-# for qubitIndex, qubit in qSys.allQubitsDict.items():
-#     ECQ(qubitIndex)(qSys).postProcess()
+for qubitIndex, qubit in qSys.allQubitsDict.items():
+    ECQ(qubitIndex)(qSys).initialize()
+    ECQ(qubitIndex)(qSys).postProcess()
+
+for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.items():
+    ECR(readoutResonatorIndex)(qSys).initialize()
+    ECR(readoutResonatorIndex)(qSys).postProcess()
 #
-# for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.items():
-#     ECR(readoutResonatorIndex)(qSys).postProcess()
-# #
 
-# Quantize(qSys).initialize()
-# Quantize(qSys).postProcess()
+Quantize(qSys).initialize()
+Quantize(qSys).postProcess()
 
-# print(ZZQ(qSys, 0, 1))
+print(ZZQ(qSys, 0, 1))
 #
 # print(L_iQ(qSys, 0))
 #
