@@ -1,0 +1,69 @@
+{
+ "Qubits": {
+  "0": {
+   "Angle": 0,
+   "Center X": -331,
+   "Center Y": -454,
+   "Pad Width": 500,
+   "Pad Length": 140,
+   "Pad Height": 0.1,
+   "Pad Boundaries": [100,100,200,200],
+   "JJ Location": 0,
+   "JJ Stem Boundary": 30,
+   "JJ Stem Width": 4,
+   "JJ Patch Length": 8
+  }
+ },
+ "Readout Resonators": {
+  "0": {
+   "Length": 9650,
+   "Angle": 0,
+   "Center X": -1095.54,
+   "Center Y": 876,
+   "Pad Separation": 3060,
+   "Meander Turn Radius": 100,
+   "Pad T Stem Length": 50,
+   "Meander To Pad Minimum Distance": 600,
+   "Pad 1 Width": 400,
+   "Pad 1 Length": 10,
+   "Pad 1 Curve Angle": 0,
+   "Pad 1 Height": 0.1,
+   "Pad 1 Boundaries": [24,6,24,6],
+   "Pad 2 Width": 100,
+   "Pad 2 Length": 30,
+   "Pad 2 Curve Angle": 1.5707,
+   "Pad 2 Height": 0.1,
+   "Pad 2 Boundaries": [30,30,30,30]
+  }
+ },
+ "CPW": {
+  "Width": 10,
+  "Gap": 6,
+  "Trench": 0.1,
+  "Height": 0.1
+ },
+ "Ground(s)": {
+  "0": {
+   "Height": 0.1,
+   "Mesh Boundary": 40,
+   "Mesh Spacing": 50,
+   "Mesh Size": 5
+  }
+ },
+ "Substrate(s)": {
+  "0": {
+   "Material": "silicon",
+   "Thickness": 500,
+   "Width": 9500,
+   "Length": 7500
+  }
+ },
+ "NIST Logo": {
+  "Center X": 2000,
+  "Center Y": -3000
+ },
+ "Chip Description": {
+  "Start X": 1500,
+  "Start Y": -2500
+ }
+}

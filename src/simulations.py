@@ -219,7 +219,7 @@ class CapMat(Simulation):
     def getChipNSignalNodes(self, N):
         allNodes = []
         for qubitIndex, qubit in self.qSys.chipDict[N].qubitDict.items():
-            allNodes += [pad.node for pad in qubit.design.padListGeom]
+            allNodes += [pad.node for pad in qubit.design.padList]
         for readoutResonatorIndex, readoutResonator in self.qSys.chipDict[N].readoutResonatorDict.items():
             allNodes += [readoutResonator.design.pad1.node, readoutResonator.design.pad2.node]
         for controlLineIndex, controlLine in self.qSys.chipDict[N].controlLineDict.items():

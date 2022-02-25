@@ -411,7 +411,7 @@ def ansysDrawNodes(qSys, dimension):
         # For grounded qubits unite pad 2 with ground.
         for qubitIndex, qubit in qSys.allQubitsDict.items():
             if isinstance(qubit.design, GroundedRectangularTransmonSingleJJ):
-                lines += ansysUniteNodes([chip.ground.outlineNode, qubit.pad2.node])
+                lines += ansysUniteNodes([chip.ground.outlineNode, qubit.design.pad2.node])
         # For control lines unite trace and launchpads, also unite flux bias if applicable.
         for controlLineIndex, controlLine in qSys.chipDict[chip.index].controlLineDict.items():
             if isinstance(controlLine.design, FeedLine) and qSys.sysParams["Simulate Feedline?"] == "Yes":

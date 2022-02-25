@@ -1,0 +1,26 @@
+$begin 'MatrixData'
+	Type='Cond'
+	HasTransMatrix=false
+	Frequency=5000000000
+	SolutionType='Adaptive'
+	Names(5, 6, 7)
+	$begin 'Matrix'
+		m=3
+		n=3
+		$begin 'r0'
+			c(0)
+			c(0)
+			c(0)
+		$end 'r0'
+		$begin 'r1'
+			c(0)
+			c(0)
+			c(0)
+		$end 'r1'
+		$begin 'r2'
+			c(0)
+			c(0)
+			c(0)
+		$end 'r2'
+	$end 'Matrix'
+$end 'MatrixData'

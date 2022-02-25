@@ -47,28 +47,31 @@ qSys = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCom
 # CapMat(qSys).initialize()
 # CapMat(qSys).run()
 # CapMat(qSys).postProcess()
-
+#
 # for readoutResonatorIndex, readoutResonator in qSys.allReadoutResonatorsDict.items():
-    # LumpedR(readoutResonatorIndex)(qSys).initialize()
-    # LumpedR(readoutResonatorIndex)(qSys).run()
-    # LumpedR(readoutResonatorIndex)(qSys).postProcess()
+#     LumpedR(readoutResonatorIndex)(qSys).initialize()
+#     LumpedR(readoutResonatorIndex)(qSys).run()
+#     LumpedR(readoutResonatorIndex)(qSys).postProcess()
 
-# CapMatGE(qSys).postProcess()
-#
-# for qubitIndex, qubit in qSys.allQubitsDict.items():
-#     ECQ(qubitIndex)(qSys).postProcess()
-#
-# for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.items():
-#     ECR(readoutResonatorIndex)(qSys).postProcess()
+CapMatGE(qSys).initialize()
+CapMatGE(qSys).postProcess()
+
+for qubitIndex, qubit in qSys.allQubitsDict.items():
+    ECQ(qubitIndex)(qSys).initialize()
+    ECQ(qubitIndex)(qSys).postProcess()
+
+for readoutResonatorIndex,readoutResonator in qSys.allReadoutResonatorsDict.items():
+    ECR(readoutResonatorIndex)(qSys).initialize()
+    ECR(readoutResonatorIndex)(qSys).postProcess()
 # #
 
-# Quantize(qSys).initialize()
-# Quantize(qSys).postProcess()
+Quantize(qSys).initialize()
+Quantize(qSys).postProcess()
 
 # print(ZZQ(qSys, 0, 1))
 #
 # print(L_iQ(qSys, 0))
 #
-# print(anharmonicityQ(qSys, 0))
-#
-# print(dispersiveShiftR(qSys, 0))
+print(anharmonicityQ(qSys, 0))
+
+print(dispersiveShiftR(qSys, 0))

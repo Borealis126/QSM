@@ -1,0 +1,42 @@
+capSim:LastAdaptive
+Problem Type:  C
+C Units:pF, G Units:mSie
+Reduce Matrix:  Original
+Frequency:  5GHz
+
+Capacitance Matrix
+,Q0Pad1,R0Pad1,R0Pad2,
+Q0Pad1, 0.10798,-0.00000,-0.01197
+R0Pad1,-0.00000, 0.07341,-0.00000
+R0Pad2,-0.01197,-0.00000, 0.02492
+
+Capacitance Matrix Coupling Coefficient
+,Q0Pad1,R0Pad1,R0Pad2,
+Q0Pad1, 1.00000, 0.00000, 0.23083
+R0Pad1, 0.00000, 1.00000, 0.00000
+R0Pad2, 0.23083, 0.00000, 1.00000
+
+Spice Capacitance Matrix
+,Q0Pad1,R0Pad1,R0Pad2,
+Q0Pad1, 0.09600, 0.00000, 0.01197
+R0Pad1, 0.00000, 0.07341, 0.00000
+R0Pad2, 0.01197, 0.00000, 0.01294
+
+Conductance Matrix
+,Q0Pad1,R0Pad1,R0Pad2,
+Q0Pad1, 0.00000, 0.00000, 0.00000
+R0Pad1, 0.00000, 0.00000, 0.00000
+R0Pad2, 0.00000, 0.00000, 0.00000
+
+Conductance Matrix Coupling Coefficient
+,Q0Pad1,R0Pad1,R0Pad2,
+Q0Pad1, 0.00000, 0.00000, 0.00000
+R0Pad1, 0.00000, 0.00000, 0.00000
+R0Pad2, 0.00000, 0.00000, 0.00000
+
+Spice Conductance Matrix
+,Q0Pad1,R0Pad1,R0Pad2,
+Q0Pad1, 0.00000,-0.00000,-0.00000
+R0Pad1,-0.00000, 0.00000,-0.00000
+R0Pad2,-0.00000,-0.00000, 0.00000
+

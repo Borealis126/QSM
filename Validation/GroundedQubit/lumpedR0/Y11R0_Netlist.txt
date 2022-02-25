@@ -1,0 +1,25 @@
+.option PARHIER='local'
+.option max_messages=1
+.option num_threads=4
+
+CQ0Pad1_G net_Q0Pad1 0 9.601000000000001e-14
+CQ0Pad1_R0Pad1 net_Q0Pad1 net_R0Pad1 0.0
+CQ0Pad1_R0Pad2 net_Q0Pad1 Port1 1.197e-14
+CR0Pad1_G net_R0Pad1 0 4.476e-14
+CR0Pad1_R0Pad2 net_R0Pad1 Port1 0.0
+CR0Pad2_G Port1 0 1.295e-14
+CR0Pad1_F0 net_R0Pad1 net_F0 8.84e-15
+LQ0Pad1_G net_Q0Pad1 0 1.25e-08
+RFL 0 net_FL 50
+RFR 0 net_FR 50
+TR0Pad1_R0Pad2 net_R0Pad1 0 Port1 0 Z0=50 TD=8.041666666666666e-11
+TFL_F0 net_FL 0 net_F0 0 Z0=50 TD=2.6898001191873398e-11
+TF0_FR net_F0 0 net_FR 0 Z0=50 TD=6.482552273036022e-11
+RPort1 Port1 0 PORTNUM=1 RZ=50
+.PORT Port1 0 1 RPort1
+
+.LNA
++ LIN 200 4000000000.0 7000000000.0
++ FLAG='LNA'
+
+.end

@@ -1,0 +1,30 @@
+ 
+ANSYS Electronics Desktop Version 2019.3.7, Build: 2019-11-19 10:57:41
+Location: C:\Program Files\AnsysEM\AnsysEM19.5\Win64\ansysedt.exe
+Batch Script: O:/68707/JoelHoward/ChipDesign/QSMSource_v2/QSM/Validation/GroundedQubit/capMat/capMatExtractor_Simulator.py
+Starting Batch Run: 11:05:39 AM  Feb 25, 2022
+Running as user: NIST\68707
+Temp directory: C:\Users\68707\AppData\Local\Temp
+Project directory: C:\Users\68707\Documents\Ansoft
+[warning] Project:capMatExtractor, Design:capMatExtractor,  'ThinCondQ0Pad2':  lost its assignment due to geometry modifications and has been deleted. (11:06:31 AM  Feb 25, 2022)
+[error] Project:capMatExtractor, Design:capMatExtractor, Script macro error: Net 'Q0Pad2': A geometry selection is required for assignment. (11:06:31 AM  Feb 25, 2022)
+[error] Error in command execution
+[error] Exception: AssignSignalNet(Structured Array dataArg)(IronPython.Runtime.List) - call failed. Logs or message window might have more details
+In file "O:/68707/JoelHoward/ChipDesign/QSMSource_v2/QSM/Validation/GroundedQubit/capMat/capMatExtractor_Simulator.py", line 2886 ---- While executing script: O:/68707/JoelHoward/ChipDesign/QSMSource_v2/QSM/Validation/GroundedQubit/capMat/capMatExtractor_Simulator.py
+Stopping Batch Run: 11:06:33 AM  Feb 25, 2022
+ 
+ANSYS Electronics Desktop Version 2019.3.7, Build: 2019-11-19 10:57:41
+Location: C:\Program Files\AnsysEM\AnsysEM19.5\Win64\ansysedt.exe
+Batch Script: O:/68707/JoelHoward/ChipDesign/QSMSource_v2/QSM/Validation/GroundedQubit/capMat/capMatExtractor_Simulator.py
+Starting Batch Run: 11:16:08 AM  Feb 25, 2022
+Running as user: NIST\68707
+Temp directory: C:\Users\68707\AppData\Local\Temp
+Project directory: C:\Users\68707\Documents\Ansoft
+[warning] Project:capMatExtractor, Design:capMatExtractor,  'ThinCondQ0Pad2':  lost its assignment due to geometry modifications and has been deleted. (11:16:50 AM  Feb 25, 2022)
+[warning] Project:capMatExtractor, Design:capMatExtractor, Bad quality triangles found in mesh. (11:17:00 AM  Feb 25, 2022)
+[warning] Project:capMatExtractor, Design:capMatExtractor, Bad quality triangles found in mesh. (11:17:10 AM  Feb 25, 2022)
+[warning] Project:capMatExtractor, Design:capMatExtractor, Bad quality triangles found in mesh. (11:17:20 AM  Feb 25, 2022)
+[warning] Project:capMatExtractor, Design:capMatExtractor, Bad quality triangles found in mesh. (11:17:32 AM  Feb 25, 2022)
+[warning] Project:capMatExtractor, Design:capMatExtractor, Bad quality triangles found in mesh. (11:17:51 AM  Feb 25, 2022)
+[info] Project:capMatExtractor, Design:capMatExtractor, Normal completion of simulation on server: Local Machine. (11:19:36 AM  Feb 25, 2022)
+Stopping Batch Run: 11:19:41 AM  Feb 25, 2022

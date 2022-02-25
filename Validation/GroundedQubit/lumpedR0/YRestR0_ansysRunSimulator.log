@@ -1,0 +1,12 @@
+ 
+ANSYS Electronics Desktop Version 2019.3.7, Build: 2019-11-19 10:57:41
+Location: C:\Program Files\AnsysEM\AnsysEM19.5\Win64\ansysedt.exe
+Batch Script: O:/68707/JoelHoward/ChipDesign/QSMSource_v2/QSM/Validation/GroundedQubit/lumpedR0/YRestR0_ansysRunSimulator.py
+Starting Batch Run: 11:25:27 AM  Feb 25, 2022
+Running as user: NIST\68707
+Temp directory: C:\Users\68707\AppData\Local\Temp
+Project directory: C:\Users\68707\Documents\Ansoft
+[info] Project:YRestR0, Design:Netlist, (info): Processing circuit for new analysis. (11:25:43 AM  Feb 25, 2022)
+[info] Project:YRestR0, Design:Netlist, (info): Starting analysis type LNA. (11:25:47 AM  Feb 25, 2022)
+[info] Project:YRestR0, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:03 (11:25:47 AM  Feb 25, 2022)
+Stopping Batch Run: 11:25:50 AM  Feb 25, 2022

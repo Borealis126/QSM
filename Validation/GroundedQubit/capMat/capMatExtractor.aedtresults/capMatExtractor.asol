@@ -1,0 +1,257 @@
+$begin '$base_index$'
+  $begin 'properties'
+    all_levels=000000000000
+    time(year=000000002022, month=000000000002, day=000000000025, hour=000000000011, min=000000000019, sec=000000000040)
+    version=000000000000
+  $end 'properties'
+  $begin '$base_index$'
+    $index$(pos=000000006332, lin=000000000235, lvl=000000000000)
+  $end '$base_index$'
+$end '$base_index$'
+$begin 'SolutionBlock1'
+	ProductName=''
+	CircuitName='capMatExtractor'
+	VersionID=58
+	PostProcess=false
+	LossLess=true
+	NextUniqueID=148
+	MoveBackwards=false
+	$begin 'VariationIDs'
+		Map(V='', ID=71)
+	$end 'VariationIDs'
+	VersionID2=65
+	$begin 'InitialSurfaceMeshes'
+		SM(VID=71, Ver=58, Dir='DV71_V58_SM.imesh/')
+	$end 'InitialSurfaceMeshes'
+	$begin 'MI'
+		$begin 'SubData'
+			ID=56001
+			MI(VID=71, Ver=58, Dir='DV71_MI56001_V58.sd/')
+		$end 'SubData'
+	$end 'MI'
+$end 'SolutionBlock1'
+$begin 'BlockMapName'
+	FileHeader='SolutionBlock1'
+	'SolutionKey(SimSetup=68, Instance=\'\', Solution=-3, VersionID=0)'='SolutionBlock5'
+	'SolutionKey(SimSetup=68, Instance=\'SetupDefinition\', Solution=-1, VersionID=0)'='SolutionBlock2'
+	'SolutionKey(SimSetup=68, Instance=\'SolutionDefinition\', Solution=69, VersionID=0)'='SolutionBlock4'
+	'SolutionKey(SimSetup=68, Instance=\'SolutionDefinition\', Solution=70, VersionID=0)'='SolutionBlock3'
+$end 'BlockMapName'
+$begin 'SolutionBlock2'
+	SimSetupID=68
+	SimSetupName='capSim'
+	VersionID=0
+	SolveSetupID=0
+	$begin 'CapSurfCurrentPassNum'
+		'CapSurf.CP'(VID=71, Ver=0, P=8)
+	$end 'CapSurfCurrentPassNum'
+	$begin 'CapSurfCurrentMeshes'
+		'CSM.cmesh'(VID=71, Ver=0, Dir='DV71_S68_V0_CSM.cmesh/')
+	$end 'CapSurfCurrentMeshes'
+	$begin 'CapSurfAdpFiles'
+		IDDblMap(91, 1, 96, 2, 100, 3, 104, 4, 108, 5, 112, 6, 116, 7, 120, 8)
+		$begin 'DataMap'
+			VID=71
+			Ver=0
+			'CSM.ADP'(DblID=91, Dir='DV71_S68_V0_P91_CSM.ADP/')
+			'CSM.ADP'(DblID=96, Dir='DV71_S68_V0_P96_CSM.ADP/')
+			'CSM.ADP'(DblID=100, Dir='DV71_S68_V0_P100_CSM.ADP/')
+			'CSM.ADP'(DblID=104, Dir='DV71_S68_V0_P104_CSM.ADP/')
+			'CSM.ADP'(DblID=108, Dir='DV71_S68_V0_P108_CSM.ADP/')
+			'CSM.ADP'(DblID=112, Dir='DV71_S68_V0_P112_CSM.ADP/')
+			'CSM.ADP'(DblID=116, Dir='DV71_S68_V0_P116_CSM.ADP/')
+			'CSM.ADP'(DblID=120, Dir='DV71_S68_V0_P120_CSM.ADP/')
+		$end 'DataMap'
+	$end 'CapSurfAdpFiles'
+	$begin 'SU'
+		$begin 'SubData'
+			ID=1
+			SU(VID=71, Ver=0, File='DV71_S68_SD1_V0.su')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=2
+			SU(VID=71, Ver=0, File='DV71_S68_SD2_V0.su')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=3
+			SU(VID=71, Ver=0, File='DV71_S68_SD3_V0.su')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=4
+			SU(VID=71, Ver=0, File='DV71_S68_SD4_V0.su')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=5
+			SU(VID=71, Ver=0, File='DV71_S68_SD5_V0.su')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=6
+			SU(VID=71, Ver=0, File='DV71_S68_SD6_V0.su')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=7
+			SU(VID=71, Ver=0, File='DV71_S68_SD7_V0.su')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=8
+			SU(VID=71, Ver=0, File='DV71_S68_SD8_V0.su')
+		$end 'SubData'
+	$end 'SU'
+	$begin 'SU'
+	$end 'SU'
+	$begin 'SU'
+	$end 'SU'
+	$begin 'CapLastPassNumbers'
+		'Cap.LP'(VID=71, Ver=0, P=8)
+	$end 'CapLastPassNumbers'
+	$begin 'Profiles'
+		PRF(VID=71, Ver=0, File='DV71_S68_V0.profile')
+	$end 'Profiles'
+	$begin 'MI'
+		$begin 'SubData'
+			ID=56001
+			MI(VID=71, Ver=0, Dir='DV71_S68_MI56001_V0.sd/')
+		$end 'SubData'
+	$end 'MI'
+$end 'SolutionBlock2'
+$begin 'SolutionBlock3'
+	SolutionName='AdaptivePass'
+	SolutionID=70
+	V=0
+	$begin 'States'
+		F(VID=71, Ver=0)
+	$end 'States'
+	$begin 'Definition'
+		SamplingInterpolation=false
+		Frequencies(5000000000)
+		SolutionType=6
+		CenterFreq=0
+	$end 'Definition'
+	SweepID=-1
+	$begin 'MCAP'
+		$begin 'SubData'
+			ID=1
+			MCAP(VID=71, Ver=0, File='DV71_SOL70_MCAP1_V0.sd')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=2
+			MCAP(VID=71, Ver=0, File='DV71_SOL70_MCAP2_V0.sd')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=3
+			MCAP(VID=71, Ver=0, File='DV71_SOL70_MCAP3_V0.sd')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=4
+			MCAP(VID=71, Ver=0, File='DV71_SOL70_MCAP4_V0.sd')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=5
+			MCAP(VID=71, Ver=0, File='DV71_SOL70_MCAP5_V0.sd')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=6
+			MCAP(VID=71, Ver=0, File='DV71_SOL70_MCAP6_V0.sd')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=7
+			MCAP(VID=71, Ver=0, File='DV71_SOL70_MCAP7_V0.sd')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=8
+			MCAP(VID=71, Ver=0, File='DV71_SOL70_MCAP8_V0.sd')
+		$end 'SubData'
+	$end 'MCAP'
+	$begin 'MCOND'
+		$begin 'SubData'
+			ID=1
+			MCOND(VID=71, Ver=0, File='DV71_SOL70_MCOND1_V0.sd')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=2
+			MCOND(VID=71, Ver=0, File='DV71_SOL70_MCOND2_V0.sd')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=3
+			MCOND(VID=71, Ver=0, File='DV71_SOL70_MCOND3_V0.sd')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=4
+			MCOND(VID=71, Ver=0, File='DV71_SOL70_MCOND4_V0.sd')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=5
+			MCOND(VID=71, Ver=0, File='DV71_SOL70_MCOND5_V0.sd')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=6
+			MCOND(VID=71, Ver=0, File='DV71_SOL70_MCOND6_V0.sd')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=7
+			MCOND(VID=71, Ver=0, File='DV71_SOL70_MCOND7_V0.sd')
+		$end 'SubData'
+		$begin 'SubData'
+			ID=8
+			MCOND(VID=71, Ver=0, File='DV71_SOL70_MCOND8_V0.sd')
+		$end 'SubData'
+	$end 'MCOND'
+$end 'SolutionBlock3'
+$begin 'SolutionBlock4'
+	SolutionName='LastAdaptive'
+	SolutionID=69
+	V=0
+	$begin 'States'
+		F(VID=71, Ver=0)
+	$end 'States'
+	$begin 'Definition'
+		SamplingInterpolation=false
+		Frequencies(5000000000)
+		SolutionType=6
+		CenterFreq=0
+	$end 'Definition'
+	SweepID=-1
+	$begin 'MCAP'
+		$begin 'SubData'
+			ID=0
+			MCAP(VID=71, Ver=0, File='DV71_SOL69_MCAP0_V0.sd')
+		$end 'SubData'
+	$end 'MCAP'
+	$begin 'MCOND'
+		$begin 'SubData'
+			ID=0
+			MCOND(VID=71, Ver=0, File='DV71_SOL69_MCOND0_V0.sd')
+		$end 'SubData'
+	$end 'MCOND'
+$end 'SolutionBlock4'
+$begin 'SolutionBlock5'
+	$begin '56001'
+		ConvSetupName='CapConv'
+		MaxPasses='99'
+		MinPasses='1'
+		ConvTarget='1'
+		ConvTargetConsecPasses='N/A'
+		ConvCurrentConsecPasses='N/A'
+		c(p=1, tri=337)
+		c(p=2, tri=1099, delta=7.72437)
+		c(p=3, tri=2432, delta=3.58393)
+		c(p=4, tri=5233, delta=4.37848)
+		c(p=5, tri=11241, delta=5.23728)
+		c(p=6, tri=23314, delta=2.67967)
+		c(p=7, tri=46892, delta=1.45712)
+		c(p=8, tri=86024, delta=0.484727)
+	$end '56001'
+$end 'SolutionBlock5'
+$begin '$index$'
+	$begin '$index$'
+		BlockMapName(pos=857, lin=23, lvl=0)
+		SolutionBlock5(pos=5856, lin=217, lvl=0)
+		SolutionBlock4(pos=5314, lin=190, lvl=0)
+		SolutionBlock3(pos=3386, lin=107, lvl=0)
+		SolutionBlock2(pos=1323, lin=30, lvl=0)
+		SolutionBlock1(pos=370, lin=1, lvl=0)
+		$base_index$(pos=0, lin=1, lvl=0)
+		$index$(pos=6332, lin=235, lvl=0)
+	$end '$index$'
+$end '$index$'
+                                                                                                                                                               

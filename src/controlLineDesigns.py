@@ -194,7 +194,7 @@ class FluxBiasLine(ControlLineDesign):
 
 
 def interpretDesign(designName):
-    if designName == 'Feedline':
+    if designName == 'FeedLine':
         return FeedLine
     elif designName == 'DriveLine':
         return DriveLine
