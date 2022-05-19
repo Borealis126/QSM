@@ -54,7 +54,7 @@ class CircuitSim:  # Y11R, YRest are CircuitSims.
             node2NetlistName = self.netlistName(node2Name)
             if self.qArch.sysParams["Simulate Feedline?"] == "Yes":
                 index1 = ansysCapMatHeaders.index(node1Name)
-                index2 = ansysCapMatHeaders.index(self.qArch.allControlLinesDict[0].lineNode.name)
+                index2 = ansysCapMatHeaders.index(self.qArch.allControlLinesDict[0].design.lineNode.name)
                 capVal = -capMat[index1][index2]
             elif self.qArch.sysParams["Simulate Feedline?"] == "No":
                 capVal = readoutResonator.componentParams["Capacitance to Feedline (F)"]

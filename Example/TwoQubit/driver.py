@@ -38,17 +38,17 @@ projectFolder = Path(__file__).parent.absolute()
 needs to be run before every command. Once geometries are completed (i.e., now) switch layoutCompleted to True"""
 
 """Now uncomment this and leave it uncommented."""
-# qArch = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=True)
+qArch = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=True)
 
 """Run the following analyses"""
 
 # CapMat(qArch).initialize() # -> Normally populate, but use the default values for now.
 # CapMat(qArch).run()
 # CapMat(qArch).postProcess()
-#
+# #
 # for readoutResonatorIndex, readoutResonator in qArch.allReadoutResonatorsDict.items():
 #     LumpedR(readoutResonatorIndex)(qArch).initialize() # -> Populate simParams inside LumpedR folder (defaults are good)
-
+#
 # for readoutResonatorIndex, readoutResonator in qArch.allReadoutResonatorsDict.items():
 #     LumpedR(readoutResonatorIndex)(qArch).run()
 
@@ -59,7 +59,7 @@ json populating or ansys simulations."""
 #
 # CapMatGE(qArch).initialize()
 # CapMatGE(qArch).postProcess()
-#
+# #
 # for qubitIndex, qubit in qArch.allQubitsDict.items():
 #     ECQ(qubitIndex)(qArch).initialize()  # Only creates directory, no simParams file.
 #     ECQ(qubitIndex)(qArch).postProcess()
@@ -67,10 +67,10 @@ json populating or ansys simulations."""
 # for readoutResonatorIndex,readoutResonator in qArch.allReadoutResonatorsDict.items():
 #     ECR(readoutResonatorIndex)(qArch).initialize()
 #     ECR(readoutResonatorIndex)(qArch).postProcess()
-#
+# #
 # Quantize(qArch).initialize() # -> Populate
 # Quantize(qArch).postProcess()
-
+#
 # print('ZZ (MHz):'+str(round(ZZQ(qArch, 0, 1), 3)))
 #
 # print('L_iQ0 (nH):'+str(round(L_iQ(qArch, 0)*1e9, 3)))
