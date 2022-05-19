@@ -19,10 +19,10 @@ def generateSystemParams(folder):
 
 
 def initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=False):
-    qSys = loadSystemParams(projectFolder, computeLocation, QSMSourceFolder)
+    qArch = loadSystemParams(projectFolder, computeLocation, QSMSourceFolder)
     if layoutCompleted:
-        qSys.loadDesignFiles()
-    return qSys
+        qArch.loadDesignFiles()
+    return qArch
 
 
 def loadSystemParams(projectFolder, computeLocation, QSMSourceFolder):

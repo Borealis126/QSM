@@ -1,16 +1,16 @@
 from simulations import *
 
 
-def L_iQ(qSys, qubitIndex):
-    qubit = qSys.allQubitsDict[qubitIndex]
-    EC = ECQ(qubitIndex)(qSys).EC
+def L_iQ(qArch, qubitIndex):
+    qubit = qArch.allQubitsDict[qubitIndex]
+    EC = ECQ(qubitIndex)(qArch).EC
     return 1 / (qubit.omega_i(EC) ** 2 * eConst ** 2 / (2 * EC))
 
 
-def ZZQ(qSys, q1Index, q2Index):
-    QuantizeObj = Quantize(qSys)
-    q1QuantizeIndex = QuantizeObj.quantizeIndex(qSys.allQubitsDict[q1Index])
-    q2QuantizeIndex = QuantizeObj.quantizeIndex(qSys.allQubitsDict[q2Index])
+def ZZQ(qArch, q1Index, q2Index):
+    QuantizeObj = Quantize(qArch)
+    q1QuantizeIndex = QuantizeObj.quantizeIndex(qArch.allQubitsDict[q1Index])
+    q2QuantizeIndex = QuantizeObj.quantizeIndex(qArch.allQubitsDict[q2Index])
 
     stateListFunc = QuantizeObj.stateList
 
@@ -27,9 +27,9 @@ def ZZQ(qSys, q1Index, q2Index):
     return gz * 1000  # In MHz
 
 
-def anharmonicityQ(qSys, qubitIndex):
-    QuantizeObj = Quantize(qSys)
-    qubit = qSys.allQubitsDict[qubitIndex]
+def anharmonicityQ(qArch, qubitIndex):
+    QuantizeObj = Quantize(qArch)
+    qubit = qArch.allQubitsDict[qubitIndex]
 
     quantizeIndex = QuantizeObj.quantizeIndex(qubit)
 
@@ -42,23 +42,23 @@ def anharmonicityQ(qSys, qubitIndex):
     return (E2-2*E1)*1000  # In MHz
 
 
-def quantizedFreqQ(qSys, qubitIndex):
-    QuantizeObj = Quantize(qSys)
-    return QuantizeObj.HEval(QuantizeObj.stateList([[QuantizeObj.quantizeIndex(qSys.allQubitsDict[qubitIndex]), 1]]))
+def quantizedFreqQ(qArch, qubitIndex):
+    QuantizeObj = Quantize(qArch)
+    return QuantizeObj.HEval(QuantizeObj.stateList([[QuantizeObj.quantizeIndex(qArch.allQubitsDict[qubitIndex]), 1]]))
 
 
-def quantizedFreqR(qSys, qubitIndex):
-    QuantizeObj = Quantize(qSys)
+def quantizedFreqR(qArch, qubitIndex):
+    QuantizeObj = Quantize(qArch)
     return QuantizeObj.HEval(QuantizeObj.stateList([
-        [QuantizeObj.quantizeIndex(qSys.allReadoutResonatorsDict[qubitIndex]), 1]
+        [QuantizeObj.quantizeIndex(qArch.allReadoutResonatorsDict[qubitIndex]), 1]
     ]))
 
 
-def dispersiveShiftR(qSys, resonatorIndex):
-    QuantizeObj = Quantize(qSys)
-    readoutResonator = qSys.allReadoutResonatorsDict[resonatorIndex]
+def dispersiveShiftR(qArch, resonatorIndex):
+    QuantizeObj = Quantize(qArch)
+    readoutResonator = qArch.allReadoutResonatorsDict[resonatorIndex]
     qubitIndex = resonatorIndex  # Dependent on qubit/resonator pair convention!!!!
-    qubit = qSys.allQubitsDict[qubitIndex]
+    qubit = qArch.allQubitsDict[qubitIndex]
 
     resonatorQuantizeIndex = QuantizeObj.quantizeIndex(readoutResonator)
     qubitQuantizeIndex = QuantizeObj.quantizeIndex(qubit)
