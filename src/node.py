@@ -97,6 +97,37 @@ class Rectangle(NodeShape):
         self.meshPeripheryPolylines = [np.array(rect(meshPeripheryWidth, meshPeripheryLength))]
 
 
+class PlusSign(NodeShape):
+    def __init__(self, extraParams=None):
+        if extraParams is None:
+            extraParams = []
+        params = ["Width", "Thickness", "Height", "Boundary", "MeshBoundary"] + extraParams
+        super().__init__(params)
+        self.paramsDict['Boundary'] = 0
+
+    def createPolylines(self):
+        width = self.paramsDict['Width']
+        length = self.paramsDict['Thickness']
+
+        horiz = np.array(rect(width, length))
+        vert = np.array(rect(length, width))
+        self.polyline = np.array([horiz[0], horiz[1], 
+                                  np.array([-length/2, length/2]),
+                                  vert[1], vert[2], 
+                                  np.array([length/2, length/2]),
+                                  horiz[2], horiz[3], 
+                                  np.array([length/2, -length/2]),
+                                  vert[3], vert[0],
+                                  np.array([-length/2, -length/2])])
+
+        peripheryWidth = width + 2*self.paramsDict['Boundary']
+        peripheryLength = length + 2*self.paramsDict['Boundary']
+        self.peripheryPolylines = [np.array(rect(peripheryWidth, peripheryLength)), np.array(rect(peripheryLength, peripheryWidth))]
+
+        meshPeripheryWidth = peripheryWidth + 2 * self.paramsDict['MeshBoundary']
+        meshPeripheryLength = peripheryLength + 2 * self.paramsDict['MeshBoundary']
+        self.meshPeripheryPolylines = [np.array(rect(meshPeripheryWidth, meshPeripheryLength)), np.array(rect(meshPeripheryLength, meshPeripheryWidth))]
+
 class RectanglePlusStem(Rectangle):
     '''Stem is pointed downward, origin is the center of the rectangle'''
 
@@ -206,3 +237,5 @@ def interpretShape(shapeName):
         return Path()
     elif shapeName == 'LaunchPad':
         return LaunchPad()
+    elif shapeName == 'PlusSign':
+        return PlusSign()

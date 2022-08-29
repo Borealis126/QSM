@@ -28,7 +28,7 @@ class Q3DExtractor(Q3DSim):
             ansysSetActiveDesignLine(self.name)
         ]
         lines += capMatLines
-        lines += capMatAnalysisLines(simParams["MaxPass"], simParams["PerRefine"], self.resultsFilePath)
+        # lines += capMatAnalysisLines(simParams["MaxPass"], simParams["PerRefine"], self.resultsFilePath)
         lines.append(ansysSaveLine)
         self.lines = lines
 

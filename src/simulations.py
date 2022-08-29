@@ -46,9 +46,10 @@ class Simulation:
     def runAnsysSimulator(self, aedtFile, simulatorFile, maxRunTime):
         simulateCommand = ""
         if self.qArch.sysParams["Compute Location"] == "Windows":
-            ansysExecutableFile = "\"%ProgramFiles%/AnsysEM/AnsysEM19.5/Win64/ansysedt.exe\""
+            ansysExecutableFile = "\"%ProgramFiles%/AnsysEM/v221/Win64/ansysedt.exe\""
             simulateCommand = (str(ansysExecutableFile) + ' -features=beta -ng -runscriptandexit '
                                + str(simulatorFile) + ' ' + str(aedtFile))
+            print(simulateCommand)
         elif self.qArch.sysParams["Compute Location"] == "Cluster":
             simulateCommand = (str(self.qArch.sysParams["QSM Source Folder"] / "helperFiles" / "ansysBatch") + " ansys "
                                + str(simulatorFile) + " " + str(aedtFile) + " "
@@ -229,11 +230,11 @@ class CapMat(Simulation):
 
     def capMatLayout_Lines(self):
         lines = ansysDrawNodes(self.qArch, self.simParams["Dimension"])
-        for chipIndex, chip in self.qArch.chipDict.items():
-            for thisNode in self.getChipNSignalNodes(chip.index):
-                lines += ansysSignalLine_Lines(thisNode)
+        # for chipIndex, chip in self.qArch.chipDict.items():
+        #     for thisNode in self.getChipNSignalNodes(chip.index):
+        #         lines += ansysSignalLine_Lines(thisNode)
         # Assign ground signal line (independent of flip chip)
-        lines += ansysGroundSignalLine_Lines(self.qArch.chipDict[0].ground)
+        # lines += ansysGroundSignalLine_Lines(self.qArch.chipDict[0].ground)
 
         return lines
 

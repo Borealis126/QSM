@@ -1,0 +1,91 @@
+$begin 'MatrixData'
+	Type='Cond'
+	HasTransMatrix=false
+	Frequency=5000000000
+	SolutionType='Adaptive'
+	Names(9, 10, 11, 12, 13, 14, 15, 16)
+	$begin 'Matrix'
+		m=8
+		n=8
+		$begin 'r0'
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+		$end 'r0'
+		$begin 'r1'
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+		$end 'r1'
+		$begin 'r2'
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+		$end 'r2'
+		$begin 'r3'
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+		$end 'r3'
+		$begin 'r4'
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+		$end 'r4'
+		$begin 'r5'
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+		$end 'r5'
+		$begin 'r6'
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+		$end 'r6'
+		$begin 'r7'
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+			c(0)
+		$end 'r7'
+	$end 'Matrix'
+$end 'MatrixData'

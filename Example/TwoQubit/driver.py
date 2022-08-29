@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 computeLocation = "Windows"  # Edit this based on where the QSM is being run. Should be "Windows" for most users.
-QSMSourceFolder = Path(r"O:\68707\JoelHoward\ChipDesign\QSMSource_v2\QSM\src")
+QSMSourceFolder = Path(r"C:\Users\jhoward\Desktop\QSM\src")
 sys.path.append(str(QSMSourceFolder))
 import qubitSimulationModule as QSM
 from simulations import *
@@ -42,8 +42,8 @@ qArch = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCo
 
 """Run the following analyses"""
 
-# CapMat(qArch).initialize() # -> Normally populate, but use the default values for now.
-# CapMat(qArch).run()
+CapMat(qArch).initialize() # -> Normally populate, but use the default values for now.
+CapMat(qArch).run()
 # CapMat(qArch).postProcess()
 # #
 # for readoutResonatorIndex, readoutResonator in qArch.allReadoutResonatorsDict.items():

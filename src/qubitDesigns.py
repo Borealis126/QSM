@@ -166,9 +166,62 @@ class GroundedRectangularTransmonSingleJJ(QubitDesign):
         pad2.node.Z = self.paramsDict['Z']
         pad2.node.orientShape()
 
+class XMon(QubitDesign):
+    def __init__(self, name):
+        super().__init__(name, ["Angle", "Center X", "Center Y",
+                                "Width", "Thickness", "Pad Height", "Boundary",
+                                "JJ Location", "JJ Stem Boundary", "JJ Stem Width", "JJ Patch Length", "Mesh Boundary"])
+        pad1, pad2 = self.padListGeom
+        pad1.node = Node(pad1.name, 'PlusSign')
+        pad2.node = Node(pad2.name, 'Rectangle')
+
+    @property
+    def padList(self):
+        return [self.padListGeom[0]]
+
+    def updateNodes(self):
+        stemGap = self.paramsDict['Boundary']
+        stemLength = (stemGap - self.paramsDict["JJ Patch Length"]) / 2
+        # Update the shapes
+        pad1, pad2 = self.padListGeom
+        pad1.node.shape.paramsDict['Width'] = self.paramsDict['Width']
+        pad1.node.shape.paramsDict['Thickness'] = self.paramsDict['Thickness']
+        pad1.node.shape.paramsDict['Height'] = self.paramsDict['Pad Height']
+        pad1.node.shape.paramsDict['Boundary'] = self.paramsDict['Boundary']
+        pad1.node.shape.paramsDict['StemWidth'] = self.paramsDict['JJ Stem Width']
+        pad1.node.shape.paramsDict['StemLength'] = stemLength
+        pad1.node.shape.paramsDict['MeshBoundary'] = self.paramsDict['Mesh Boundary']
+
+        pad2.node.shape.paramsDict['Width'] = self.paramsDict['JJ Stem Width']
+        pad2.node.shape.paramsDict['Length'] = stemLength
+        pad2.node.shape.paramsDict['Height'] = self.paramsDict['Pad Height']
+        pad2.node.shape.paramsDict['Boundaries'] = [self.paramsDict['Boundary']]*4
+        pad2.node.shape.paramsDict['Boundaries'][1] = pad2.node.shape.paramsDict['Boundaries'][3] = 0
+        pad2.node.shape.paramsDict['MeshBoundary'] = self.paramsDict['Mesh Boundary']
+        # Update the nodes
+        pad1Center_design = np.array([0, pad1.node.shape.paramsDict['Width'] / 2
+                                      + stemGap / 2])
+        pad1Center_absolute = translate(rotate(pad1Center_design, self.paramsDict['Angle']),
+                                        self.paramsDict['Center X'], self.paramsDict['Center Y'])
+        pad1.node.centerX, pad1.node.centerY = pad1Center_absolute
+        pad1.node.angle = self.paramsDict['Angle']
+        pad1.node.Z = self.paramsDict['Z']
+        pad1.node.orientShape()
+
+        pad2Center_design = np.array([0, -pad2.node.shape.paramsDict['Width'] / 2
+                                      - self.paramsDict["JJ Patch Length"] / 2])
+        pad2Center_absolute = translate(rotate(pad2Center_design, self.paramsDict['Angle']),
+                                        self.paramsDict['Center X'], self.paramsDict['Center Y'])
+        pad2.node.centerX, pad2.node.centerY = pad2Center_absolute
+        pad2.node.angle = self.paramsDict['Angle'] + np.pi
+        pad2.node.Z = self.paramsDict['Z']
+        pad2.node.orientShape()
+
 
 def interpretDesign(designName):
     if designName == 'FloatingRectangularTransmonSingleJJ':
         return FloatingRectangularTransmonSingleJJ
     elif designName == 'GroundedRectangularTransmonSingleJJ':
         return GroundedRectangularTransmonSingleJJ
+    elif designName == 'XMon':
+        return XMon
