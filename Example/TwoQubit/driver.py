@@ -47,10 +47,6 @@ qArch = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCo
 # CapMat(qArch).run()
 # CapMat(qArch).postProcess()
 
-# BBQ(qArch).initialize()
-BBQ(qArch).run()
-
-
 # for readoutResonatorIndex, readoutResonator in qArch.allReadoutResonatorsDict.items():
 #     LumpedR(readoutResonatorIndex)(qArch).initialize() # -> Populate simParams inside LumpedR folder (defaults are good)
 #

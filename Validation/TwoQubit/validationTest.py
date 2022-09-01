@@ -14,7 +14,7 @@ from simulations import *
 from calculations import *
 
 projectFolder = Path(__file__).parent.absolute()
-copyDir = projectFolder / ".." / "TwoQubit_filesToCopy"
+copyDir = projectFolder / ".." / ".." / "Example" / "TwoQubit"
 
 
 def copyFile(sourceFile, destinationFile):

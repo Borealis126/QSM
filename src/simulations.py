@@ -229,11 +229,11 @@ class CapMat(Simulation):
 
     def capMatLayout_Lines(self):
         lines = ansysDrawNodes(self.qArch, self.simParams["Dimension"])
-        # for chipIndex, chip in self.qArch.chipDict.items():
-        #     for thisNode in self.getChipNSignalNodes(chip.index):
-        #         lines += ansysSignalLine_Lines(thisNode)
+        for chipIndex, chip in self.qArch.chipDict.items():
+            for thisNode in self.getChipNSignalNodes(chip.index):
+                lines += ansysSignalLine_Lines(thisNode)
         # Assign ground signal line (independent of flip chip)
-        # lines += ansysGroundSignalLine_Lines(self.qArch.chipDict[0].ground)
+        lines += ansysGroundSignalLine_Lines(self.qArch.chipDict[0].ground)
 
         return lines
 
