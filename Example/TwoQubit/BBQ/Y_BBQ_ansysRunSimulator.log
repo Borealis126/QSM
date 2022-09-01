@@ -1,0 +1,75 @@
+ 
+Ansys Electronics Desktop Version 2022.1.0, Build: 2021-11-22 22:18:25
+Location: C:\Program Files\AnsysEM\v221\Win64\ansysedt.exe
+Batch Script: C:/Users/jhoward/Desktop/QSM/Example/TwoQubit/BBQ/Y_BBQ_ansysRunSimulator.py
+Starting Batch Run: 9:43:41 PM  Aug 28, 2022
+Running as user: LAB\jhoward
+Temp directory: C:\Users\tai\AppData\Local\Temp
+Project directory: C:\Users\jhoward\Documents\Ansoft
+[info] Project:Y_BBQ, Design:Netlist, (info): Processing circuit for new analysis. (9:43:50 PM  Aug 28, 2022)
+[warning] Project:Y_BBQ, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (9:43:50 PM  Aug 28, 2022)
+[warning] Project:Y_BBQ, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (9:43:50 PM  Aug 28, 2022)
+[info] Project:Y_BBQ, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (9:43:50 PM  Aug 28, 2022)
+[info] Project:Y_BBQ, Design:Netlist, (info): Starting analysis type LNA. (9:43:50 PM  Aug 28, 2022)
+[info] Project:Y_BBQ, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:00 (9:43:50 PM  Aug 28, 2022)
+Stopping Batch Run: 9:43:51 PM  Aug 28, 2022
+ 
+Ansys Electronics Desktop Version 2022.1.0, Build: 2021-11-22 22:18:25
+Location: C:\Program Files\AnsysEM\v221\Win64\ansysedt.exe
+Batch Script: C:/Users/jhoward/Desktop/QSM/Example/TwoQubit/BBQ/Y_BBQ_ansysRunSimulator.py
+Starting Batch Run: 9:46:51 PM  Aug 28, 2022
+Running as user: LAB\jhoward
+Temp directory: C:\Users\tai\AppData\Local\Temp
+Project directory: C:\Users\jhoward\Documents\Ansoft
+[info] Project:Y_BBQ, Design:Netlist, (info): Processing circuit for new analysis. (9:46:59 PM  Aug 28, 2022)
+[warning] Project:Y_BBQ, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (9:46:59 PM  Aug 28, 2022)
+[warning] Project:Y_BBQ, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (9:47:00 PM  Aug 28, 2022)
+[info] Project:Y_BBQ, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (9:47:00 PM  Aug 28, 2022)
+[info] Project:Y_BBQ, Design:Netlist, (info): Starting analysis type LNA. (9:47:00 PM  Aug 28, 2022)
+[info] Project:Y_BBQ, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:00 (9:47:00 PM  Aug 28, 2022)
+Stopping Batch Run: 9:47:01 PM  Aug 28, 2022
+ 
+Ansys Electronics Desktop Version 2022.1.0, Build: 2021-11-22 22:18:25
+Location: C:\Program Files\AnsysEM\v221\Win64\ansysedt.exe
+Batch Script: C:/Users/jhoward/Desktop/QSM/Example/TwoQubit/BBQ/Y_BBQ_ansysRunSimulator.py
+Starting Batch Run: 9:50:53 PM  Aug 28, 2022
+Running as user: LAB\jhoward
+Temp directory: C:\Users\tai\AppData\Local\Temp
+Project directory: C:\Users\jhoward\Documents\Ansoft
+[info] Project:Y_BBQ, Design:Netlist, (info): Processing circuit for new analysis. (9:51:01 PM  Aug 28, 2022)
+[warning] Project:Y_BBQ, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (9:51:01 PM  Aug 28, 2022)
+[warning] Project:Y_BBQ, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (9:51:01 PM  Aug 28, 2022)
+[info] Project:Y_BBQ, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (9:51:01 PM  Aug 28, 2022)
+[info] Project:Y_BBQ, Design:Netlist, (info): Starting analysis type LNA. (9:51:01 PM  Aug 28, 2022)
+[info] Project:Y_BBQ, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:00 (9:51:01 PM  Aug 28, 2022)
+Stopping Batch Run: 9:51:02 PM  Aug 28, 2022
+ 
+Ansys Electronics Desktop Version 2022.1.0, Build: 2021-11-22 22:18:25
+Location: C:\Program Files\AnsysEM\v221\Win64\ansysedt.exe
+Batch Script: C:/Users/jhoward/Desktop/QSM/Example/TwoQubit/BBQ/Y_BBQ_ansysRunSimulator.py
+Starting Batch Run: 10:00:20 PM  Aug 28, 2022
+Running as user: LAB\jhoward
+Temp directory: C:\Users\tai\AppData\Local\Temp
+Project directory: C:\Users\jhoward\Documents\Ansoft
+[info] Project:Y_BBQ, Design:Netlist, (info): Processing circuit for new analysis. (10:00:28 PM  Aug 28, 2022)
+[warning] Project:Y_BBQ, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (10:00:28 PM  Aug 28, 2022)
+[warning] Project:Y_BBQ, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (10:00:28 PM  Aug 28, 2022)
+[info] Project:Y_BBQ, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (10:00:28 PM  Aug 28, 2022)
+[info] Project:Y_BBQ, Design:Netlist, (info): Starting analysis type LNA. (10:00:28 PM  Aug 28, 2022)
+[info] Project:Y_BBQ, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:00 (10:00:28 PM  Aug 28, 2022)
+Stopping Batch Run: 10:00:29 PM  Aug 28, 2022
+ 
+Ansys Electronics Desktop Version 2022.1.0, Build: 2021-11-22 22:18:25
+Location: C:\Program Files\AnsysEM\v221\Win64\ansysedt.exe
+Batch Script: C:/Users/jhoward/Desktop/QSM/Example/TwoQubit/BBQ/Y_BBQ_ansysRunSimulator.py
+Starting Batch Run: 10:01:45 PM  Aug 28, 2022
+Running as user: LAB\jhoward
+Temp directory: C:\Users\tai\AppData\Local\Temp
+Project directory: C:\Users\jhoward\Documents\Ansoft
+[info] Project:Y_BBQ, Design:Netlist, (info): Processing circuit for new analysis. (10:01:54 PM  Aug 28, 2022)
+[warning] Project:Y_BBQ, Design:Netlist, omp(warning): The num_threads set in netlist is ignored. (10:01:54 PM  Aug 28, 2022)
+[warning] Project:Y_BBQ, Design:Netlist, diagnostics(warning): No DC path to ground from node net_q0pad1. (10:01:54 PM  Aug 28, 2022)
+[info] Project:Y_BBQ, Design:Netlist, (info): See simulation logfile for a complete list of warning messages. (10:01:54 PM  Aug 28, 2022)
+[info] Project:Y_BBQ, Design:Netlist, (info): Starting analysis type LNA. (10:01:54 PM  Aug 28, 2022)
+[info] Project:Y_BBQ, Design:Netlist, (info): Simulation succeeded. Total simulator time: 0:00:00 (10:01:54 PM  Aug 28, 2022)
+Stopping Batch Run: 10:01:55 PM  Aug 28, 2022
