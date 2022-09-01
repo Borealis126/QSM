@@ -192,7 +192,7 @@ $begin 'AnsoftProject'
 		$end 'Scripts'
 		$begin 'Symbols'
 			$begin 'capMatExtractor'
-				ModTime=1660855159
+				ModTime=1661747300
 				Library=''
 				ModSinceLib=false
 				LibLocation='Project'
@@ -220,7 +220,7 @@ $begin 'AnsoftProject'
 		$end 'Symbols'
 		$begin 'DefInfo'
 			Netlist(1002, 0, 17, 0, '', 1600375107, '', 'Netlist', '', '', '', '', '', 'Design.bmp', '', 'Project', '', '', 1600375107, '', 0, 0)
-			capMatExtractor(1002, 0, 0, 0, '', 1660855159, '', 'capMatExtractor', '', '', '', '', '', 'Design.bmp', '', 'Project', '', '', 1660855159, '', 0, 0)
+			capMatExtractor(1002, 0, 0, 0, '', 1661747300, '', 'capMatExtractor', '', '', '', '', '', 'Design.bmp', '', 'Project', '', '', 1661747300, '', 0, 0)
 		$end 'DefInfo'
 		$begin 'Compdefs'
 			$begin 'Netlist'
@@ -318,7 +318,7 @@ $begin 'AnsoftProject'
 		Notes=$begin_cdata$ $end_cdata$
 		$begin 'AnimationSetups'
 		$end 'AnimationSetups'
-		CacheHeaderFile='HDR6AD220532166085561718.tmp'
+		CacheHeaderFile='HDR596C11132166174731115.tmp'
 	$end 'NexximNetlist'
 	$begin 'Q3DModel'
 		RepRewriteV2=true
@@ -18822,7 +18822,7 @@ $begin 'AnsoftProject'
 				NetTypePriority(4, 2, 3)
 			$end 'GlobalBoundData'
 			$begin 'Boundaries'
-				NextUniqueID=18
+				NextUniqueID=9
 				MoveBackwards=false
 				$begin 'ThinCondQ0Pad1'
 					ID=0
@@ -18905,69 +18905,6 @@ $begin 'AnsoftProject'
 					Material='perfect conductor'
 					Thickness='0.1um'
 				$end 'ThinCondG0'
-				$begin 'Q0Pad1'
-					ID=9
-					BoundType='SignalNet'
-					IsComponent=false
-					Objects(48)
-					ParentBndID=-1
-				$end 'Q0Pad1'
-				$begin 'Q0Pad2'
-					ID=10
-					BoundType='SignalNet'
-					IsComponent=false
-					Objects(209)
-					ParentBndID=-1
-				$end 'Q0Pad2'
-				$begin 'Q1Pad1'
-					ID=11
-					BoundType='SignalNet'
-					IsComponent=false
-					Objects(350)
-					ParentBndID=-1
-				$end 'Q1Pad1'
-				$begin 'Q1Pad2'
-					ID=12
-					BoundType='SignalNet'
-					IsComponent=false
-					Objects(514)
-					ParentBndID=-1
-				$end 'Q1Pad2'
-				$begin 'R0Pad1'
-					ID=13
-					BoundType='SignalNet'
-					IsComponent=false
-					Objects(654)
-					ParentBndID=-1
-				$end 'R0Pad1'
-				$begin 'R0Pad2'
-					ID=14
-					BoundType='SignalNet'
-					IsComponent=false
-					Objects(851)
-					ParentBndID=-1
-				$end 'R0Pad2'
-				$begin 'R1Pad1'
-					ID=15
-					BoundType='SignalNet'
-					IsComponent=false
-					Objects(979)
-					ParentBndID=-1
-				$end 'R1Pad1'
-				$begin 'R1Pad2'
-					ID=16
-					BoundType='SignalNet'
-					IsComponent=false
-					Objects(1176)
-					ParentBndID=-1
-				$end 'R1Pad2'
-				$begin 'GroundNet1'
-					ID=17
-					BoundType='GroundNet'
-					IsComponent=false
-					Objects(36)
-					ParentBndID=-1
-				$end 'GroundNet1'
 			$end 'Boundaries'
 			$begin 'ProductSpecificData'
 			$end 'ProductSpecificData'
@@ -19027,27 +18964,8 @@ $begin 'AnsoftProject'
 				$end 'CPPInfo'
 			$end 'CircuitData'
 			$begin 'SolveSetups'
-				NextUniqueID=1
+				NextUniqueID=0
 				MoveBackwards=false
-				$begin 'capSim'
-					ID=0
-					SetupType='Matrix'
-					AdaptiveFreq='5GHz'
-					SaveFields=false
-					Enabled=true
-					$begin 'Cap'
-						MaxPass=99
-						MinPass=1
-						MinConvPass=1
-						PerError=1
-						PerRefine=100
-						AutoIncreaseSolutionOrder=true
-						SolutionOrder='High'
-						'Solver Type'='Iterative'
-					$end 'Cap'
-					EnableTransitionRegionSolve=false
-					ErrorValue='0.1'
-				$end 'capSim'
 			$end 'SolveSetups'
 		$end 'AnalysisSetup'
 		$begin 'Optimetrics'
@@ -19063,14 +18981,6 @@ $begin 'AnsoftProject'
 				$end 'AC'
 				$begin 'Cap'
 					'Value Type'='N'
-					Entry(ID=9, Name='Q0Pad1', Magnitude='1V', Phase='0deg')
-					Entry(ID=10, Name='Q0Pad2', Magnitude='0V', Phase='0deg')
-					Entry(ID=11, Name='Q1Pad1', Magnitude='0V', Phase='0deg')
-					Entry(ID=12, Name='Q1Pad2', Magnitude='0V', Phase='0deg')
-					Entry(ID=13, Name='R0Pad1', Magnitude='0V', Phase='0deg')
-					Entry(ID=14, Name='R0Pad2', Magnitude='0V', Phase='0deg')
-					Entry(ID=15, Name='R1Pad1', Magnitude='0V', Phase='0deg')
-					Entry(ID=16, Name='R1Pad2', Magnitude='0V', Phase='0deg')
 				$end 'Cap'
 				$begin 'DC'
 					'Value Type'='A'
@@ -19082,10 +18992,8 @@ $begin 'AnsoftProject'
 				Line_Discretization=1000
 			$end 'FieldsCalculator'
 			$begin 'PlotDefaults'
-				Default_SolutionId=143
+				Default_SolutionId=-1
 				Default_PlotFolder='Automatic'
-				Default_Phase='0deg'
-				Default_Freq='5GHz'
 			$end 'PlotDefaults'
 			$begin 'FieldsPlotManagerID'
 				NextUniqueID=0
@@ -19176,103 +19084,14 @@ $begin 'AnsoftProject'
 				MoveBackwards=false
 			$end 'NearFieldSetups'
 			RadFieldComputationVersion=1.7
-			RadfieldHeaderFile='RAD6AD220532166085561719.tmp'
+			RadfieldHeaderFile='RAD596C11132166174731116.tmp'
 			RadPowerMethod=0
 		$end 'RadField'
 		$begin 'SolutionManager'
-			$begin 'SimSetup'
-				TypeName='BaseSetup'
-				ID=141
-				Name='capSim'
-				$begin 'Solution'
-					ID=142
-					Name='LastAdaptive'
-					$begin 'SimDataExtractor'
-						$begin 'QuantityIDs'
-							NextUniqueID=0
-							MoveBackwards=false
-							IDMap()
-						$end 'QuantityIDs'
-					$end 'SimDataExtractor'
-				$end 'Solution'
-				$begin 'Solution'
-					ID=143
-					Name='AdaptivePass'
-					$begin 'SimDataExtractor'
-						$begin 'QuantityIDs'
-							NextUniqueID=0
-							MoveBackwards=false
-							IDMap()
-						$end 'QuantityIDs'
-						$begin 'Sweeps'
-							$begin 'Sweep'
-								Variable='Freq'
-								Column='5GHz'
-								Units='GHz'
-							$end 'Sweep'
-							$begin 'Sweep'
-								Variable='X'
-								Column='0'
-								Units=''
-							$end 'Sweep'
-							$begin 'PostprocessSweep'
-								Variable='NormalizedDistance'
-								RegularSweep=1
-								Units=''
-								Minimum=0
-								Maximum=1
-								Increment=0.01
-								CreateIndexedSubsweepFlag=false
-							$end 'PostprocessSweep'
-							$begin 'PostprocessSweep'
-								Variable='Phi'
-								RegularSweep=1
-								Units='deg'
-								Minimum=0
-								Maximum=6.28318530717959
-								Increment=0.0872664625997165
-								CreateIndexedSubsweepFlag=false
-							$end 'PostprocessSweep'
-							$begin 'PostprocessSweep'
-								Variable='Theta'
-								RegularSweep=1
-								Units='deg'
-								Minimum=0
-								Maximum=6.28318530717959
-								Increment=0.0872664625997165
-								CreateIndexedSubsweepFlag=false
-							$end 'PostprocessSweep'
-							$begin 'PostprocessSweep'
-								Variable='Phase'
-								RegularSweep=1
-								Units='deg'
-								Minimum=0
-								Maximum=6.28318530717959
-								Increment=0.0872664625997165
-								CreateIndexedSubsweepFlag=false
-							$end 'PostprocessSweep'
-						$end 'Sweeps'
-					$end 'SimDataExtractor'
-				$end 'Solution'
-			$end 'SimSetup'
 			$begin 'Version ID Map'
 				V=122
-				$begin 'Setup'
-					N='capSim'
-					V=0
-					Soln(N='LastAdaptive', V=0)
-					Soln(N='AdaptivePass', V=0)
-				$end 'Setup'
-				IVM=138
+				IVM=122
 			$end 'Version ID Map'
-			$begin 'ID Map'
-				$begin 'Setup'
-					N='capSim'
-					I=141
-					Soln(N='LastAdaptive', I=142)
-					Soln(N='AdaptivePass', I=143)
-				$end 'Setup'
-			$end 'ID Map'
 			ValidationCacheHeader=''
 		$end 'SolutionManager'
 		$begin 'UserDefinedSolutionMgr'
@@ -19286,7 +19105,7 @@ $begin 'AnsoftProject'
 		Notes=$begin_cdata$ $end_cdata$
 		$begin 'AnimationSetups'
 		$end 'AnimationSetups'
-		CacheHeaderFile='HDR6AD220532166085561720.tmp'
+		CacheHeaderFile='HDR596C11132166174731117.tmp'
 	$end 'Q3DModel'
 	$begin 'DataInstances'
 		DesignEditor='TopLevel'
@@ -19413,9 +19232,9 @@ $begin 'ProjectPreview'
 		DesignName='capMatExtractor'
 		Notes=''
 		Factory='Q3D Extractor'
-		IsSolved=true
-		'Nominal Setups'[1: 'capSim']
-		'Nominal Setup Types'[1: '']
+		IsSolved=false
+		'Nominal Setups'[0:]
+		'Nominal Setup Types'[0:]
 		'Optimetrics Setups'[0:]
 		'Optimetrics Experiment Types'[0:]
 		Image64=''

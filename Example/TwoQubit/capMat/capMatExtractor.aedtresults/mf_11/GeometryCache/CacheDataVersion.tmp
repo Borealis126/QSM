@@ -1,5 +1,5 @@
 $begin 'CacheDataVersion'
-	DataVersion=13
+	DataVersion=-1
 $end 'CacheDataVersion'
 $begin 'VariableValues'
 $end 'VariableValues'

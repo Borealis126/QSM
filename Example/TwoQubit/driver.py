@@ -6,6 +6,7 @@ sys.path.append(str(QSMSourceFolder))
 import qubitSimulationModule as QSM
 from simulations import *
 from calculations import *
+from BBQ import *
 projectFolder = Path(__file__).parent.absolute()
 
 """Start here. Uncomment the following line and run this file."""
@@ -42,10 +43,14 @@ qArch = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCo
 
 """Run the following analyses"""
 
-CapMat(qArch).initialize() # -> Normally populate, but use the default values for now.
-CapMat(qArch).run()
+# CapMat(qArch).initialize() # -> Normally populate, but use the default values for now.
+# CapMat(qArch).run()
 # CapMat(qArch).postProcess()
-# #
+
+# BBQ(qArch).initialize()
+BBQ(qArch).run()
+
+
 # for readoutResonatorIndex, readoutResonator in qArch.allReadoutResonatorsDict.items():
 #     LumpedR(readoutResonatorIndex)(qArch).initialize() # -> Populate simParams inside LumpedR folder (defaults are good)
 #

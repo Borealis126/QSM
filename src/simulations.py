@@ -49,7 +49,6 @@ class Simulation:
             ansysExecutableFile = "\"%ProgramFiles%/AnsysEM/v221/Win64/ansysedt.exe\""
             simulateCommand = (str(ansysExecutableFile) + ' -features=beta -ng -runscriptandexit '
                                + str(simulatorFile) + ' ' + str(aedtFile))
-            print(simulateCommand)
         elif self.qArch.sysParams["Compute Location"] == "Cluster":
             simulateCommand = (str(self.qArch.sysParams["QSM Source Folder"] / "helperFiles" / "ansysBatch") + " ansys "
                                + str(simulatorFile) + " " + str(aedtFile) + " "

@@ -16,10 +16,14 @@
  },
  "Readout Resonators": {
   "0": {
-   "Type": "CPWResonatorWithT"
+   "Type": "CPWResonatorWithT",
+   "Capacitance to Feedline (F)": 8.84E-15,
+   "Feedline Pad Capacitance to Ground (F)": 5.36E-14
   },
   "1": {
-   "Type": "CPWResonatorWithT"
+   "Type": "CPWResonatorWithT",
+   "Capacitance to Feedline (F)": 8.84E-15,
+   "Feedline Pad Capacitance to Ground (F)": 5.36E-14
   }
  },
  "Control Lines": {

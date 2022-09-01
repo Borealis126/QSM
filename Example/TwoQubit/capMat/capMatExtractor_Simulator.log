@@ -11,3 +11,12 @@ Temp directory: C:\Users\tai\AppData\Local\Temp
 Project directory: C:\Users\jhoward\Documents\Ansoft
 [info] Project:capMatExtractor, Design:capMatExtractor, Normal completion of simulation on server: Local Machine. (1:46:57 PM  Aug 18, 2022)
 Stopping Batch Run: 1:46:58 PM  Aug 18, 2022
+ 
+Ansys Electronics Desktop Version 2022.1.0, Build: 2021-11-22 22:18:25
+Location: C:\Program Files\AnsysEM\v221\Win64\ansysedt.exe
+Batch Script: C:/Users/jhoward/Desktop/QSM/Example/TwoQubit/capMat/capMatExtractor_Simulator.py
+Starting Batch Run: 9:28:12 PM  Aug 28, 2022
+Running as user: LAB\jhoward
+Temp directory: C:\Users\tai\AppData\Local\Temp
+Project directory: C:\Users\jhoward\Documents\Ansoft
+Stopping Batch Run: 9:28:32 PM  Aug 28, 2022
