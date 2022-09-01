@@ -1,3 +1,10 @@
 *.tmp
 *.asol
 *.pyc
+*.stats
+*.su
+*.msh
+*.adp
+*.sd
+*.sdmd
+*.sab
