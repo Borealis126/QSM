@@ -1,4 +1,4 @@
-from basicGeometry import rotate, translate, nextPointSegment
+from .basicGeometry import rotate, translate, nextPointSegment
 import numpy as np
 
 

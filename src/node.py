@@ -1,6 +1,6 @@
-from polyline import pathPolyline
-from basicGeometry import rotate, translate
-from constants import traceBuffer
+from .polyline import pathPolyline
+from .basicGeometry import rotate, translate
+from .constants import traceBuffer
 from abc import ABC, abstractmethod
 import numpy as np
 class Node:

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from sympy import symbols
-from node import Node
-from basicGeometry import translate, rotate, rotatePolyline
+from .node import Node
+from .basicGeometry import translate, rotate, rotatePolyline
 import numpy as np
 from copy import copy
 

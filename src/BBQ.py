@@ -1,6 +1,6 @@
-from circuitSimulations import CircuitSim, S21_params, YReportLines
-from simulations import Simulation, CapMat
-from dataIO import jsonWrite
+from .circuitSimulations import CircuitSim, S21_params, YReportLines
+from .simulations import Simulation, CapMat
+from .dataIO import jsonWrite
 from copy import deepcopy
 
 class BBQ(Simulation):

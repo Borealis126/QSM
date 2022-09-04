@@ -1,14 +1,14 @@
 import numpy as np
 from sympy import symbols
-from constants import Phi_0Const, hbarConst, eConst
-from basicGeometry import nearestPoint, distancePointPoint, midpoint, segmentBoundary, vertexBoundary
-from meander import meanderNodeGen
-from node import Node
-from polyline import launchPadPolylines
-from pointToLine import pnt2line
-import qubitDesigns
-import resonatorDesigns
-import controlLineDesigns
+from .constants import Phi_0Const, hbarConst, eConst
+from .basicGeometry import nearestPoint, distancePointPoint, midpoint, segmentBoundary, vertexBoundary
+from .meander import meanderNodeGen
+from .node import Node
+from .polyline import launchPadPolylines
+from .pointToLine import pnt2line
+from . import qubitDesigns
+from . import resonatorDesigns
+from . import controlLineDesigns
 
 
 class Qubit:

@@ -2,11 +2,11 @@ import subprocess
 import numpy as np
 import os
 import gdspy
-from ChipElements import OtherComponents
-from basicGeometry import pointInPolyline, rotate, translate
-from qSysObjects import *
-from constants import *
-from dataIO import jsonRead, jsonWrite
+from .ChipElements import OtherComponents
+from .basicGeometry import pointInPolyline, rotate, translate
+from .qSysObjects import *
+from .constants import *
+from .dataIO import jsonRead, jsonWrite
 
 
 def generateSystemParams(folder):

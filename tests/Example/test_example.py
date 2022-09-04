@@ -1,39 +1,34 @@
 import sys
 from pathlib import Path
 computeLocation = "Windows"  # Edit this based on where the QSM is being run. Should be "Windows" for most users.
-QSMSourceFolder = Path(r"C:\Users\jhoward\Desktop\QSM\src")
-sys.path.append(str(QSMSourceFolder))
-import qubitSimulationModule as QSM
-from simulations import *
-from calculations import *
-from BBQ import *
+QSMParentFolder = Path(r"C:\Users\jhoward\Desktop")
+sys.path.append(str(QSMParentFolder))
+
+import QSM.src.qubitSimulationModule as QSM_init
+from QSM.src.simulations import *
+from QSM.src.calculations import *
 projectFolder = Path(__file__).parent.absolute()
 import subprocess
 import pytest
+from QSM.tests.helpers import copyFile
 
-"""Start here. Uncomment the following line and run this file."""
-def copyFile(sourceFile, destinationFile):
-    copyCommand = ""
-    if computeLocation == "Windows":
-        copyCommand = "copy " + str(Path(sourceFile)) + " " + str(Path(destinationFile))
-    if computeLocation == "Cluster":
-        copyCommand = "cp " + str(Path(sourceFile)) + " " + str(Path(destinationFile))
-    subprocess.call(copyCommand, shell=True)
+QSMFolder = QSMParentFolder / 'QSM'
+QSMSourceFolder = QSMFolder / 'src'
 
 def test_example():
-    copyDir = projectFolder / ".." / "Example" / "TwoQubit"
-    QSM.generateSystemParams(projectFolder)  # First, run just this command to generate the systemParameters file.
+    copyDir = QSMFolder / "Example" / "TwoQubit"
+    QSM_init.generateSystemParams(projectFolder)  # First, run just this command to generate the systemParameters file.
     copyFile(copyDir / "systemParameters_reference.json", projectFolder / "systemParameters.json")
 
-    qArch = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=False)
+    qArch = QSM_init.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=False)
     qArch.generateComponentParams()
     copyFile(copyDir / "componentParameters_reference.json", projectFolder / "componentParameters.json")
-
-    qArch = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=False)
+#
+    qArch = QSM_init.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=False)
     qArch.generateGeometries()
     copyFile(copyDir / "componentGeometries_reference.json", projectFolder / "componentGeometries.json")
 
-    qArch = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=True)
+    qArch = QSM_init.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=True)
     qArch.generateGDS(addMesh=False)
 
     HFSSModel(qArch).initialize()

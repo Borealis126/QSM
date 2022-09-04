@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
-from node import Node
+from .node import Node
 import numpy as np
-from meander import meanderNodeGen
-from polyline import launchPadPolylines
-from pointToLine import pnt2line
-from meander import meanderNodeGen
-from basicGeometry import nearestPoint, distancePointPoint, midpoint, segmentBoundary, vertexBoundary
+from .meander import meanderNodeGen
+from .polyline import launchPadPolylines
+from .pointToLine import pnt2line
+from .meander import meanderNodeGen
+from .basicGeometry import nearestPoint, distancePointPoint, midpoint, segmentBoundary, vertexBoundary
 
 
 class ControlLineDesign(ABC):

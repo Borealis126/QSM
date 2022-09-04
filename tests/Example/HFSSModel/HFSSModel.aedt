@@ -192,7 +192,7 @@ $begin 'AnsoftProject'
 		$end 'Scripts'
 		$begin 'Symbols'
 			$begin 'HFSSModel'
-				ModTime=1662012538
+				ModTime=1662334469
 				Library=''
 				ModSinceLib=false
 				LibLocation='Project'
@@ -220,7 +220,7 @@ $begin 'AnsoftProject'
 		$end 'Symbols'
 		$begin 'DefInfo'
 			Netlist(1002, 0, 17, 0, '', 1600375107, '', 'Netlist', '', '', '', '', '', 'Design.bmp', '', 'Project', '', '', 1600375107, '', 0, 0)
-			HFSSModel(1002, 0, 0, 0, '', 1662012538, '', 'HFSSModel', '', '', '', '', '', 'Design.bmp', '', 'Project', '', '', 1662012538, '', 0, 0)
+			HFSSModel(1002, 0, 0, 0, '', 1662334469, '', 'HFSSModel', '', '', '', '', '', 'Design.bmp', '', 'Project', '', '', 1662334469, '', 0, 0)
 		$end 'DefInfo'
 		$begin 'Compdefs'
 			$begin 'Netlist'
@@ -318,7 +318,7 @@ $begin 'AnsoftProject'
 		Notes=$begin_cdata$ $end_cdata$
 		$begin 'AnimationSetups'
 		$end 'AnimationSetups'
-		CacheHeaderFile='HDR10D12508166201254715.tmp'
+		CacheHeaderFile='HDR1B6C24712166233447815.tmp'
 	$end 'NexximNetlist'
 	$begin 'HFSSModel'
 		RepRewriteV2=true
@@ -21135,7 +21135,7 @@ $begin 'AnsoftProject'
 				MoveBackwards=false
 			$end 'NearFieldSetups'
 			RadFieldComputationVersion=1.7
-			RadfieldHeaderFile='RAD10D12508166201254716.tmp'
+			RadfieldHeaderFile='RAD1B6C24712166233447816.tmp'
 			RadPowerMethod=0
 		$end 'RadField'
 		$begin 'SolutionManager'
@@ -21156,13 +21156,22 @@ $begin 'AnsoftProject'
 		Notes=$begin_cdata$ $end_cdata$
 		$begin 'AnimationSetups'
 		$end 'AnimationSetups'
-		CacheHeaderFile='HDR10D12508166201254717.tmp'
+		CacheHeaderFile='HDR1B6C24712166233447817.tmp'
 	$end 'HFSSModel'
 	$begin 'DataInstances'
 		DesignEditor='TopLevel'
-		Refdes('3', 'U1')
 		Refdes('4', 'U2')
+		Refdes('3', 'U1')
 		$begin 'CompInstances'
+			$begin 'Compinst'
+				ID='4'
+				Status='Status'
+				CompName='HFSSModel'
+				GatesInUse()
+				$begin 'Properties'
+					TextProp('ID', 'SRID', '', '4')
+				$end 'Properties'
+			$end 'Compinst'
 			$begin 'Compinst'
 				ID='3'
 				Status='Status'
@@ -21176,16 +21185,36 @@ $begin 'AnsoftProject'
 					ButtonProp('CosimDefinition', 'OHD', '', '', 'Edit', 40501, ButtonPropClientData())
 				$end 'Parameters'
 			$end 'Compinst'
-			$begin 'Compinst'
-				ID='4'
-				Status='Status'
-				CompName='HFSSModel'
-				GatesInUse()
-				$begin 'Properties'
-					TextProp('ID', 'SRID', '', '4')
-				$end 'Properties'
-			$end 'Compinst'
 		$end 'CompInstances'
+		$begin 'Instance'
+			DesignEditor='HFSSModel'
+			ID='4'
+			$begin 'HfssDesignInstance'
+				DesignInstanceID=12
+				$begin 'ReportSetup'
+					$begin 'ReportManager'
+						$begin 'Reports'
+						$end 'Reports'
+						NextUniqueID=0
+						MoveBackwards=false
+						$begin 'NextVersID'
+							NextUniqueID=0
+							MoveBackwards=false
+						$end 'NextVersID'
+					$end 'ReportManager'
+					$begin 'Reports'
+					$end 'Reports'
+					$begin 'ReportsWindowInfoList'
+					$end 'ReportsWindowInfoList'
+				$end 'ReportSetup'
+				$begin 'Properties'
+				$end 'Properties'
+				$begin 'UserDefinedDocument'
+					$begin 'Data'
+					$end 'Data'
+				$end 'UserDefinedDocument'
+			$end 'HfssDesignInstance'
+		$end 'Instance'
 		$begin 'Instance'
 			DesignEditor='Netlist'
 			ID='3'
@@ -21220,35 +21249,6 @@ $begin 'AnsoftProject'
 				$end 'UserDefinedDocument'
 			$end 'NexximNetlist'
 		$end 'Instance'
-		$begin 'Instance'
-			DesignEditor='HFSSModel'
-			ID='4'
-			$begin 'HfssDesignInstance'
-				DesignInstanceID=12
-				$begin 'ReportSetup'
-					$begin 'ReportManager'
-						$begin 'Reports'
-						$end 'Reports'
-						NextUniqueID=0
-						MoveBackwards=false
-						$begin 'NextVersID'
-							NextUniqueID=0
-							MoveBackwards=false
-						$end 'NextVersID'
-					$end 'ReportManager'
-					$begin 'Reports'
-					$end 'Reports'
-					$begin 'ReportsWindowInfoList'
-					$end 'ReportsWindowInfoList'
-				$end 'ReportSetup'
-				$begin 'Properties'
-				$end 'Properties'
-				$begin 'UserDefinedDocument'
-					$begin 'Data'
-					$end 'Data'
-				$end 'UserDefinedDocument'
-			$end 'HfssDesignInstance'
-		$end 'Instance'
 		$begin 'SODInfo'
 			$begin 'Netlist'
 				$begin 'CosimDefinition'
@@ -21280,9 +21280,9 @@ $begin 'ProjectPreview'
 	IsEncrypted=false
 	Thumbnail64=''
 	$begin 'DesignInfo'
-		DesignName='Netlist'
+		DesignName='HFSSModel'
 		Notes=''
-		Factory='Circuit Netlist'
+		Factory='HFSS'
 		IsSolved=false
 		'Nominal Setups'[0:]
 		'Nominal Setup Types'[0:]
@@ -21291,9 +21291,9 @@ $begin 'ProjectPreview'
 		Image64=''
 	$end 'DesignInfo'
 	$begin 'DesignInfo'
-		DesignName='HFSSModel'
+		DesignName='Netlist'
 		Notes=''
-		Factory='HFSS'
+		Factory='Circuit Netlist'
 		IsSolved=false
 		'Nominal Setups'[0:]
 		'Nominal Setup Types'[0:]

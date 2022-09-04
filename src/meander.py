@@ -1,8 +1,8 @@
 from sympy import symbols, solve
-from polyline import pathPolyline
+from .polyline import pathPolyline
 import numpy as np
-from node import Node
-from basicGeometry import translate, rotate, arcLength
+from .node import Node
+from .basicGeometry import translate, rotate, arcLength
 
 
 def meanderNodeGen(name, turnRadius, length, endSeparation, meanderToEndMinDist, endAngles, angle, centerX, centerY,

@@ -1,7 +1,7 @@
-from constants import lengthUnits
-from node import Node
-from controlLineDesigns import FeedLine, FluxBiasLine
-from qubitDesigns import GroundedRectangularTransmonSingleJJ
+from .constants import lengthUnits
+from .node import Node
+from .controlLineDesigns import FeedLine, FluxBiasLine
+from .qubitDesigns import GroundedRectangularTransmonSingleJJ
 
 ansysSimulatorPreamb = [
     "import ScriptEnv\n",

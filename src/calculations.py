@@ -1,4 +1,4 @@
-from simulations import *
+from .simulations import *
 
 
 def L_iQ(qArch, qubitIndex):

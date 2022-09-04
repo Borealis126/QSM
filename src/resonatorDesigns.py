@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from node import Node
-from basicGeometry import translate, rotate
+from .node import Node
+from .basicGeometry import translate, rotate
 import numpy as np
-from qubitDesigns import ComponentPad
-from meander import meanderNodeGen
+from .qubitDesigns import ComponentPad
+from .meander import meanderNodeGen
 
 
 class ResonatorDesign(ABC):

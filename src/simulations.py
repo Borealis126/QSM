@@ -1,22 +1,22 @@
 import numpy as np
 import os
 import time
-from dataIO import jsonRead, jsonWrite, csvRead, arrayNoBlanks, readY11Data
-from ansysAPI import *
+from .dataIO import jsonRead, jsonWrite, csvRead, arrayNoBlanks, readY11Data
+from .ansysAPI import *
 import subprocess
-from q3dSimulations import Q3DExtractor
-from hfssSimulations import *
-from circuitSimulations import *
+from .q3dSimulations import Q3DExtractor
+from .hfssSimulations import *
+from .circuitSimulations import *
 from sympy import symbols
-from constants import *
-from misc import *
-from quantumState import stateFromHeader, baseRepresentation, H_Header
+from .constants import *
+from .misc import *
+from .quantumState import stateFromHeader, baseRepresentation, H_Header
 from scipy.misc import derivative
 from sympy import Matrix, zeros, sin
-from qSysObjects import ReadoutResonator, Qubit
+from .qSysObjects import ReadoutResonator, Qubit
 from qutip import state_number_index, qzero, ket, bra, tensor, destroy, qeye
-from qubitDesigns import FloatingRectangularTransmonSingleJJ, GroundedRectangularTransmonSingleJJ
-from controlLineDesigns import FeedLine
+from .qubitDesigns import FloatingRectangularTransmonSingleJJ, GroundedRectangularTransmonSingleJJ
+from .controlLineDesigns import FeedLine
 
 """Simulations are anything that is saved to a folder. 
 These are anything requiring Ansys and anything with a non-trivial calculation time (matrix inversion, etc.)"""

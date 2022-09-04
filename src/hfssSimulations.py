@@ -1,4 +1,4 @@
-from generalAnsysLines import *
+from .generalAnsysLines import *
 
 
 class HFSSSim:

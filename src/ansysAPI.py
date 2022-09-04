@@ -1,5 +1,5 @@
-from constants import lengthUnits
-from node import Node
+from .constants import lengthUnits
+from .node import Node
 
 ansysSimulatorPreamb = [
     "import ScriptEnv\n",

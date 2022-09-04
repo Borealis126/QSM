@@ -1,6 +1,6 @@
-from ansysAPI import aedtEdit
+from .ansysAPI import aedtEdit
 from copy import deepcopy
-from qubitDesigns import FloatingRectangularTransmonSingleJJ, GroundedRectangularTransmonSingleJJ
+from .qubitDesigns import FloatingRectangularTransmonSingleJJ, GroundedRectangularTransmonSingleJJ
 
 
 class CircuitSim:  # Y11R, YRest are CircuitSims.

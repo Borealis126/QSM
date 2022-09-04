@@ -1,37 +1,41 @@
 import sys
 from pathlib import Path
 computeLocation = "Windows"  # Edit this based on where the QSM is being run. Should be "Windows" for most users.
-QSMSourceFolder = Path(r"C:\Users\jhoward\Desktop\QSM\src")
-sys.path.append(str(QSMSourceFolder))
-import qubitSimulationModule as QSM
-from simulations import *
-from calculations import *
-from BBQ import *
+QSMParentFolder = Path(r"C:\Users\jhoward\Desktop")
+sys.path.append(str(QSMParentFolder))
+
+import QSM.src.qubitSimulationModule as QSM_init
+from QSM.src.simulations import *
+from QSM.src.calculations import *
 projectFolder = Path(__file__).parent.absolute()
+import subprocess
+
+QSMFolder = QSMParentFolder / 'QSM'
+QSMSourceFolder = QSMFolder / 'src'
 
 """Start here. Uncomment the following line and run this file."""
-# QSM.generateSystemParams(projectFolder)  # First, run just this command to generate the systemParameters file.
+# QSM_init.generateSystemParams(projectFolder)  # First, run just this command to generate the systemParameters file.
 
 """Now populate the system parameters (see reference jsons)"""
 
 """Next run the following two lines (re-commenting previous commands):"""
-# qArch = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=False)
+# qArch = QSM_init.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=False)
 # qArch.generateComponentParams()
 
 """Populate the component parameters"""
 
 """Next run the following two lines"""
-# qArch = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=False)
+# qArch = QSM_init.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=False)
 # qArch.generateGeometries()
 
 """Populate the geometries. Once finished the architecture is fully specified."""
 
 """Check out the GDS:"""
-# qArch = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=True)
+# qArch = QSM_init.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=True)
 # qArch.generateGDS(addMesh=False)
 
 """Generate the HFSS model"""
-# qArch = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=True)
+# qArch = QSM_init.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=True)
 # HFSSModel(qArch).initialize()
 # HFSSModel(qArch).run()
 
@@ -39,7 +43,7 @@ projectFolder = Path(__file__).parent.absolute()
 needs to be run before every command. Once geometries are completed (i.e., now) switch layoutCompleted to True"""
 
 """Now uncomment this and leave it uncommented."""
-qArch = QSM.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=True)
+# qArch = QSM_init.initialize(projectFolder, computeLocation, QSMSourceFolder, layoutCompleted=True)
 
 """Run the following analyses"""
 

@@ -6219,5 +6219,5 @@ oModuleAnalysis.InsertSetup("Matrix",
         ]
     ])
 oDesign.AnalyzeAll()
-oDesign.ExportMatrixData(r"C:\Users\jhoward\Desktop\QSM\tests\capMat\capMatExtractor_Results.csv", "C", "", "capSim:LastAdaptive", "Original", "ohm", "nH", "pF", "mSie", 5000000000, "Maxwell,Spice,Couple", 0, False, 5, 8, 0)
+oDesign.ExportMatrixData(r"C:\Users\jhoward\Desktop\QSM\tests\Example\capMat\capMatExtractor_Results.csv", "C", "", "capSim:LastAdaptive", "Original", "ohm", "nH", "pF", "mSie", 5000000000, "Maxwell,Spice,Couple", 0, False, 5, 8, 0)
 oProject.Save()

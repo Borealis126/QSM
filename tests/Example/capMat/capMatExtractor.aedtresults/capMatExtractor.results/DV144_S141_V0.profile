@@ -4,15 +4,15 @@ $begin 'Profile'
 			MajorVer=2022
 			MinorVer=1
 			Name='Solution Process'
-			StartInfo='Time:  08/31/2022 23:09:32; Host: LABWIN002; Processor: 44; OS: NT 6.3; Q3D 2022.1.0'
-			TotalInfo='Elapsed time : 00:06:20 , ComEngine Memory : 71.3 M'
+			StartInfo='Time:  09/04/2022 16:35:03; Host: LABWIN002; Processor: 44; OS: NT 6.3; Q3D 2022.1.0'
+			TotalInfo='Elapsed time : 00:06:23 , ComEngine Memory : 70.8 M'
 			GroupOptions=2
 			TaskDataOptions(Memory=8)
 			$begin 'ProfileGroup'
 				MajorVer=2022
 				MinorVer=1
 				Name='Initialization'
-				StartInfo='Time:  08/31/2022 23:09:32'
+				StartInfo='Time:  09/04/2022 16:35:03'
 				TotalInfo='Elapsed time : 00:00:00'
 				GroupOptions=1
 				TaskDataOptions('CPU Time'=8, Memory=8, 'Real Time'=8)
@@ -23,135 +23,135 @@ $begin 'Profile'
 				MajorVer=2022
 				MinorVer=1
 				Name='Initial Meshing'
-				StartInfo='Time:  08/31/2022 23:09:32'
+				StartInfo='Time:  09/04/2022 16:35:03'
 				TotalInfo='Elapsed time : 00:00:00'
 				GroupOptions=0
 				TaskDataOptions(Memory=8)
-				ProfileItem('  Mesh (phi surface)', 0, 0, 0, 0, 36376, 'I(1, 0, \'646 triangles\')', true, true)
+				ProfileItem('  Mesh (phi surface)', 0, 0, 0, 0, 36404, 'I(1, 0, \'646 triangles\')', true, true)
 			$end 'ProfileGroup'
 			$begin 'ProfileGroup'
 				MajorVer=2022
 				MinorVer=1
 				Name='Adaptive Meshing'
-				StartInfo='Time:  08/31/2022 23:09:33'
-				TotalInfo='Elapsed time : 00:06:19'
-				GroupOptions=3575856
+				StartInfo='Time:  09/04/2022 16:35:04'
+				TotalInfo='Elapsed time : 00:06:22'
+				GroupOptions=4091248
 				TaskDataOptions()
 				$begin 'ProfileGroup'
 					MajorVer=2022
 					MinorVer=1
 					Name='Pass 1'
-					StartInfo='Time:  08/31/2022 23:09:33'
+					StartInfo='Time:  09/04/2022 16:35:04'
 					TotalInfo='Elapsed time : 00:00:03'
-					GroupOptions=3575856
+					GroupOptions=4091248
 					TaskDataOptions()
 					ProfileItem('  Machine Configuration', 0, 0, 0, 0, 0, 'I(1, 0, \'labwin002 Using 4 core(s); 805173364 K aval. mem.\')', false, true)
-					ProfileItem('  Solver setup', 0, 0, 1, 0, 44816, 'I(1, 0, \'4 core(s)\')', true, true)
-					ProfileItem('  Matrix solution', 0, 0, 0, 0, 44816, 'I(1, 0, \'4 core(s)\')', true, true)
+					ProfileItem('  Solver setup', 0, 0, 1, 0, 44284, 'I(1, 0, \'4 core(s)\')', true, true)
+					ProfileItem('  Matrix solution', 0, 0, 0, 0, 44284, 'I(1, 0, \'4 core(s)\')', true, true)
 				$end 'ProfileGroup'
 				$begin 'ProfileGroup'
 					MajorVer=2022
 					MinorVer=1
 					Name='Pass 2'
-					StartInfo='Time:  08/31/2022 23:09:36'
+					StartInfo='Time:  09/04/2022 16:35:08'
 					TotalInfo='Elapsed time : 00:00:05'
-					GroupOptions=3575856
+					GroupOptions=4091248
 					TaskDataOptions()
-					ProfileItem('  Mesh (surface, adaptive)', 0, 0, 0, 0, 31116, 'I(1, 0, \'1730 triangles\')', true, true)
+					ProfileItem('  Mesh (surface, adaptive)', 0, 0, 0, 0, 31160, 'I(1, 0, \'1730 triangles\')', true, true)
 					ProfileItem('  Machine Configuration', 0, 0, 0, 0, 0, 'I(1, 0, \'labwin002 Using 4 core(s); 805173364 K aval. mem.\')', false, true)
-					ProfileItem('  Solver setup', 2, 0, 6, 0, 137612, 'I(1, 0, \'4 core(s)\')', true, true)
-					ProfileItem('  Matrix solution', 0, 0, 1, 0, 137612, 'I(1, 0, \'4 core(s)\')', true, true)
+					ProfileItem('  Solver setup', 2, 0, 6, 0, 137596, 'I(1, 0, \'4 core(s)\')', true, true)
+					ProfileItem('  Matrix solution', 0, 0, 0, 0, 137596, 'I(1, 0, \'4 core(s)\')', true, true)
 				$end 'ProfileGroup'
 				$begin 'ProfileGroup'
 					MajorVer=2022
 					MinorVer=1
 					Name='Pass 3'
-					StartInfo='Time:  08/31/2022 23:09:42'
+					StartInfo='Time:  09/04/2022 16:35:13'
 					TotalInfo='Elapsed time : 00:00:06'
-					GroupOptions=3575856
+					GroupOptions=4091248
 					TaskDataOptions()
-					ProfileItem('  Mesh (surface, adaptive)', 0, 0, 0, 0, 35632, 'I(1, 0, \'3742 triangles\')', true, true)
+					ProfileItem('  Mesh (surface, adaptive)', 0, 0, 0, 0, 35720, 'I(1, 0, \'3742 triangles\')', true, true)
 					ProfileItem('  Machine Configuration', 0, 0, 0, 0, 0, 'I(1, 0, \'labwin002 Using 4 core(s); 805173364 K aval. mem.\')', false, true)
-					ProfileItem('  Solver setup', 3, 0, 11, 0, 156752, 'I(1, 0, \'4 core(s)\')', true, true)
-					ProfileItem('  Matrix solution', 0, 0, 1, 0, 156752, 'I(1, 0, \'4 core(s)\')', true, true)
+					ProfileItem('  Solver setup', 3, 0, 11, 0, 154288, 'I(1, 0, \'4 core(s)\')', true, true)
+					ProfileItem('  Matrix solution', 0, 0, 1, 0, 154288, 'I(1, 0, \'4 core(s)\')', true, true)
 				$end 'ProfileGroup'
 				$begin 'ProfileGroup'
 					MajorVer=2022
 					MinorVer=1
 					Name='Pass 4'
-					StartInfo='Time:  08/31/2022 23:09:49'
+					StartInfo='Time:  09/04/2022 16:35:20'
 					TotalInfo='Elapsed time : 00:00:08'
-					GroupOptions=3575856
+					GroupOptions=4091248
 					TaskDataOptions()
-					ProfileItem('  Mesh (surface, adaptive)', 0, 0, 0, 0, 44652, 'I(1, 0, \'7954 triangles\')', true, true)
+					ProfileItem('  Mesh (surface, adaptive)', 0, 0, 0, 0, 44768, 'I(1, 0, \'7954 triangles\')', true, true)
 					ProfileItem('  Machine Configuration', 0, 0, 0, 0, 0, 'I(1, 0, \'labwin002 Using 4 core(s); 805173364 K aval. mem.\')', false, true)
-					ProfileItem('  Solver setup', 3, 0, 14, 0, 130688, 'I(1, 0, \'4 core(s)\')', true, true)
-					ProfileItem('  Matrix solution', 1, 0, 2, 0, 132296, 'I(1, 0, \'4 core(s)\')', true, true)
+					ProfileItem('  Solver setup', 3, 0, 14, 0, 131252, 'I(1, 0, \'4 core(s)\')', true, true)
+					ProfileItem('  Matrix solution', 1, 0, 2, 0, 133072, 'I(1, 0, \'4 core(s)\')', true, true)
 				$end 'ProfileGroup'
 				$begin 'ProfileGroup'
 					MajorVer=2022
 					MinorVer=1
 					Name='Pass 5'
-					StartInfo='Time:  08/31/2022 23:09:57'
+					StartInfo='Time:  09/04/2022 16:35:28'
 					TotalInfo='Elapsed time : 00:00:20'
-					GroupOptions=3575856
+					GroupOptions=4091248
 					TaskDataOptions()
-					ProfileItem('  Mesh (surface, adaptive)', 0, 0, 0, 0, 62180, 'I(1, 0, \'16352 triangles\')', true, true)
+					ProfileItem('  Mesh (surface, adaptive)', 0, 0, 0, 0, 62192, 'I(1, 0, \'16352 triangles\')', true, true)
 					ProfileItem('  Machine Configuration', 0, 0, 0, 0, 0, 'I(1, 0, \'labwin002 Using 4 core(s); 805173364 K aval. mem.\')', false, true)
-					ProfileItem('  Solver setup', 14, 0, 55, 0, 392128, 'I(1, 0, \'4 core(s)\')', true, true)
-					ProfileItem('  Matrix solution', 1, 0, 6, 0, 392128, 'I(1, 0, \'4 core(s)\')', true, true)
+					ProfileItem('  Solver setup', 14, 0, 55, 0, 392928, 'I(1, 0, \'4 core(s)\')', true, true)
+					ProfileItem('  Matrix solution', 1, 0, 6, 0, 392928, 'I(1, 0, \'4 core(s)\')', true, true)
 				$end 'ProfileGroup'
 				$begin 'ProfileGroup'
 					MajorVer=2022
 					MinorVer=1
 					Name='Pass 6'
-					StartInfo='Time:  08/31/2022 23:10:17'
+					StartInfo='Time:  09/04/2022 16:35:49'
 					TotalInfo='Elapsed time : 00:00:37'
-					GroupOptions=3575856
+					GroupOptions=4091248
 					TaskDataOptions()
 					ProfileItem('  Mesh (surface, adaptive)', 1, 0, 1, 0, 94236, 'I(1, 0, \'32236 triangles\')', true, true)
 					ProfileItem('  Machine Configuration', 0, 0, 0, 0, 0, 'I(1, 0, \'labwin002 Using 4 core(s); 805173364 K aval. mem.\')', false, true)
-					ProfileItem('  Solver setup', 27, 0, 108, 0, 710652, 'I(1, 0, \'4 core(s)\')', true, true)
-					ProfileItem('  Matrix solution', 4, 0, 15, 0, 710652, 'I(1, 0, \'4 core(s)\')', true, true)
+					ProfileItem('  Solver setup', 27, 0, 108, 0, 712864, 'I(1, 0, \'4 core(s)\')', true, true)
+					ProfileItem('  Matrix solution', 4, 0, 15, 0, 712864, 'I(1, 0, \'4 core(s)\')', true, true)
 				$end 'ProfileGroup'
 				$begin 'ProfileGroup'
 					MajorVer=2022
 					MinorVer=1
 					Name='Pass 7'
-					StartInfo='Time:  08/31/2022 23:10:54'
+					StartInfo='Time:  09/04/2022 16:36:26'
 					TotalInfo='Elapsed time : 00:00:59'
-					GroupOptions=3575856
+					GroupOptions=4091248
 					TaskDataOptions()
-					ProfileItem('  Mesh (surface, adaptive)', 3, 0, 3, 0, 152088, 'I(1, 0, \'60630 triangles\')', true, true)
+					ProfileItem('  Mesh (surface, adaptive)', 3, 0, 3, 0, 152300, 'I(1, 0, \'60630 triangles\')', true, true)
 					ProfileItem('  Machine Configuration', 0, 0, 0, 0, 0, 'I(1, 0, \'labwin002 Using 4 core(s); 805173364 K aval. mem.\')', false, true)
-					ProfileItem('  Solver setup', 43, 0, 167, 0, 995516, 'I(1, 0, \'4 core(s)\')', true, true)
-					ProfileItem('  Matrix solution', 8, 0, 32, 0, 1082056, 'I(1, 0, \'4 core(s)\')', true, true)
+					ProfileItem('  Solver setup', 43, 0, 167, 0, 993952, 'I(1, 0, \'4 core(s)\')', true, true)
+					ProfileItem('  Matrix solution', 8, 0, 31, 0, 1080944, 'I(1, 0, \'4 core(s)\')', true, true)
 				$end 'ProfileGroup'
 				$begin 'ProfileGroup'
 					MajorVer=2022
 					MinorVer=1
 					Name='Pass 8'
-					StartInfo='Time:  08/31/2022 23:11:54'
+					StartInfo='Time:  09/04/2022 16:37:26'
 					TotalInfo='Elapsed time : 00:01:30'
-					GroupOptions=3575856
+					GroupOptions=4091248
 					TaskDataOptions()
-					ProfileItem('  Mesh (surface, adaptive)', 6, 0, 6, 0, 260048, 'I(1, 0, \'111530 triangles\')', true, true)
+					ProfileItem('  Mesh (surface, adaptive)', 6, 0, 6, 0, 260240, 'I(1, 0, \'111530 triangles\')', true, true)
 					ProfileItem('  Machine Configuration', 0, 0, 0, 0, 0, 'I(1, 0, \'labwin002 Using 4 core(s); 805173364 K aval. mem.\')', false, true)
-					ProfileItem('  Solver setup', 59, 0, 224, 0, 1401208, 'I(1, 0, \'4 core(s)\')', true, true)
-					ProfileItem('  Matrix solution', 18, 0, 74, 0, 1587616, 'I(1, 0, \'4 core(s)\')', true, true)
+					ProfileItem('  Solver setup', 59, 0, 224, 0, 1399656, 'I(1, 0, \'4 core(s)\')', true, true)
+					ProfileItem('  Matrix solution', 19, 0, 74, 0, 1586724, 'I(1, 0, \'4 core(s)\')', true, true)
 				$end 'ProfileGroup'
 				$begin 'ProfileGroup'
 					MajorVer=2022
 					MinorVer=1
 					Name='Pass 9'
-					StartInfo='Time:  08/31/2022 23:13:25'
-					TotalInfo='Elapsed time : 00:02:28'
-					GroupOptions=3575856
+					StartInfo='Time:  09/04/2022 16:38:56'
+					TotalInfo='Elapsed time : 00:02:30'
+					GroupOptions=4091248
 					TaskDataOptions()
-					ProfileItem('  Mesh (surface, adaptive)', 11, 0, 11, 0, 443096, 'I(1, 0, \'198620 triangles\')', true, true)
+					ProfileItem('  Mesh (surface, adaptive)', 11, 0, 11, 0, 443608, 'I(1, 0, \'198620 triangles\')', true, true)
 					ProfileItem('  Machine Configuration', 0, 0, 0, 0, 0, 'I(1, 0, \'labwin002 Using 4 core(s); 805173364 K aval. mem.\')', false, true)
-					ProfileItem('  Solver setup', 79, 0, 292, 0, 1753548, 'I(1, 0, \'4 core(s)\')', true, true)
-					ProfileItem('  Matrix solution', 48, 0, 190, 0, 2155140, 'I(1, 0, \'4 core(s)\')', true, true)
+					ProfileItem('  Solver setup', 80, 0, 293, 0, 1753972, 'I(1, 0, \'4 core(s)\')', true, true)
+					ProfileItem('  Matrix solution', 49, 0, 195, 0, 2155788, 'I(1, 0, \'4 core(s)\')', true, true)
 				$end 'ProfileGroup'
 				ProfileFootnote('I(1, 0, \'Adaptive Passes converged\')', 0)
 			$end 'ProfileGroup'
@@ -159,12 +159,12 @@ $begin 'Profile'
 				MajorVer=2022
 				MinorVer=1
 				Name='Frequency Sweep'
-				StartInfo='Time:  08/31/2022 23:15:53'
+				StartInfo='Time:  09/04/2022 16:41:27'
 				TotalInfo='Elapsed time : 00:00:00'
-				GroupOptions=3575856
+				GroupOptions=4091248
 				TaskDataOptions()
 			$end 'ProfileGroup'
-			ProfileFootnote('I(1, 0, \'Time:  08/31/2022 23:15:53, Status: Normal Completion\')', 0)
+			ProfileFootnote('I(1, 0, \'Time:  09/04/2022 16:41:27, Status: Normal Completion\')', 0)
 		$end 'ProfileGroup'
 	$end '56001'
 $end 'Profile'

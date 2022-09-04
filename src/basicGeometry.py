@@ -1,7 +1,7 @@
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 import numpy as np
-import pointToLine
+from . import pointToLine
 
 
 def nearestPoint(point, pointList):  # Point in format [x,y]

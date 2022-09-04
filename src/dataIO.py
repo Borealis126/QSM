@@ -1,7 +1,7 @@
 import csv
 from math import floor
-from ansysAPI import ansysOutputToComplex
-from constants import GHzToOmega
+from .ansysAPI import ansysOutputToComplex
+from .constants import GHzToOmega
 from scipy.interpolate import interp1d
 import json
 
