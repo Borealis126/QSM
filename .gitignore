@@ -8,3 +8,12 @@
 *.sd
 *.sdmd
 *.sab
+
+tests/Example/*
+!tests/Example/test_example.py
+
+tests/Grounded/*
+!tests/Grounded/test_grounded.py
+!tests/Grounded/systemParameters_reference.json
+!tests/Grounded/componentParameters_reference.json
+!tests/Grounded/componentGeometries_reference.json

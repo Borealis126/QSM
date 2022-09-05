@@ -2,57 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c6b8000e-68c7-4216-8e83-b59025795129" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/helpers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/QSM.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/QSM.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Example/TwoQubit/driver.py" beforeDir="false" afterPath="$PROJECT_DIR$/Example/TwoQubit/driver.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BBQ.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/BBQ.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ansysAPI.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ansysAPI.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/basicGeometry.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/basicGeometry.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/calculations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/calculations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/circuitSimulations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/circuitSimulations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controlLineDesigns.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controlLineDesigns.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/dataIO.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/dataIO.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/generalAnsysLines.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/generalAnsysLines.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hfssSimulations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/hfssSimulations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/meander.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/meander.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/node.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/node.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/polyline.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/polyline.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/q3dSimulations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/q3dSimulations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/qSysObjects.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/qSysObjects.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/qubitDesigns.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/qubitDesigns.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/qubitSimulationModule.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/qubitSimulationModule.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resonatorDesigns.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/resonatorDesigns.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/simulations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/simulations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/HFSSModel/HFSSModel.aedt" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/HFSSModel/HFSSModel.aedt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/HFSSModel/HFSSModel_Simulator.log" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/HFSSModel/HFSSModel_Simulator.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/capMat/capMatExtractor.aedt" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/capMat/capMatExtractor.aedt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/capMat/capMatExtractor.aedtresults/capMatExtractor.results/DV144_S141_V0.profile" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/capMat/capMatExtractor.aedtresults/capMatExtractor.results/DV144_S141_V0.profile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/capMat/capMatExtractor_Simulator.log" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/capMat/capMatExtractor_Simulator.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/capMat/capMatExtractor_Simulator.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/capMat/capMatExtractor_Simulator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/componentParameters.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/layout.gds" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/layout.gds" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/lumpedR0/Y11R0.aedt" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/lumpedR0/Y11R0.aedt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/lumpedR0/Y11R0_ansysRunSimulator.log" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/lumpedR0/Y11R0_ansysRunSimulator.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/lumpedR0/Y11R0_ansysRunSimulator.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/lumpedR0/Y11R0_ansysRunSimulator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/lumpedR0/YRestR0.aedt" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/lumpedR0/YRestR0.aedt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/lumpedR0/YRestR0_ansysRunSimulator.log" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/lumpedR0/YRestR0_ansysRunSimulator.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/lumpedR0/YRestR0_ansysRunSimulator.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/lumpedR0/YRestR0_ansysRunSimulator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/lumpedR1/Y11R1.aedt" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/lumpedR1/Y11R1.aedt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/lumpedR1/Y11R1_ansysRunSimulator.log" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/lumpedR1/Y11R1_ansysRunSimulator.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/lumpedR1/Y11R1_ansysRunSimulator.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/lumpedR1/Y11R1_ansysRunSimulator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/lumpedR1/YRestR1.aedt" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/lumpedR1/YRestR1.aedt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/lumpedR1/YRestR1_ansysRunSimulator.log" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/lumpedR1/YRestR1_ansysRunSimulator.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/lumpedR1/YRestR1_ansysRunSimulator.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/lumpedR1/YRestR1_ansysRunSimulator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/systemParameters.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Example/test_example.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Example/test_example.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Grounded/componentGeometries.json" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Grounded/componentGeometries_reference.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Grounded/componentParameters.json" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Grounded/componentParameters_reference.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Grounded/systemParameters.json" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Grounded/systemParameters_reference.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/Grounded/test_grounded.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Grounded/test_grounded.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -80,7 +31,7 @@
     "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
 }]]></component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python tests.pytest for test_grounded.test_grounded">
     <configuration name="pytest for test_example.test_example" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
       <module name="QSM" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -98,8 +49,26 @@
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
+    <configuration name="pytest for test_grounded.test_grounded" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="QSM" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests/Grounded" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_grounded.test_grounded&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python tests.pytest for test_grounded.test_grounded" />
         <item itemvalue="Python tests.pytest for test_example.test_example" />
       </list>
     </recent_temporary>
@@ -112,7 +81,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1662331687886</updated>
-      <workItem from="1662331689641" duration="3479000" />
+      <workItem from="1662331689641" duration="6753000" />
     </task>
     <servers />
   </component>
@@ -138,10 +107,16 @@
           <line>11</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tests/Grounded/test_grounded.py</url>
+          <line>62</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/QSM$pytest_for_test_grounded_test_grounded.coverage" NAME="pytest for test_grounded.test_grounded Coverage Results" MODIFIED="1662347224542" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/Grounded" />
     <SUITE FILE_PATH="coverage/QSM$pytest_for_test_example_test_example.coverage" NAME="pytest for test_example.test_example Coverage Results" MODIFIED="1662334014306" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/Example" />
   </component>
 </project>
