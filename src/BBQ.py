@@ -1,7 +1,14 @@
 from .circuitSimulations import CircuitSim, S21_params, YReportLines
 from .simulations import Simulation, CapMat
-from .dataIO import jsonWrite
 from copy import deepcopy
+from itertools import product
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+from .ansysAPI import ansysOutputToComplex
+from scipy.interpolate import interp1d
+from scipy.optimize import fsolve
+from .dataIO import jsonWrite
 
 class BBQ(Simulation):
     def __init__(self, qArch):
@@ -19,7 +26,17 @@ class BBQ(Simulation):
 
     def postProcess(self):
         self.deleteUnneededFiles()
-        resultsDict = {"equivL(H):": 1, "equivC(F):": 1}
+        df = pd.read_csv(self.circuitSims[self.Y_BBQ_SimName].resultsFilePath)
+        fig, ax = plt.subplots(1)
+
+        resultsDict = dict()
+
+        for qubitIndex, qubit in self.qArch.allQubitsDict.items():
+            freq_data = df['Freq [GHz]']
+            y_data = np.imag(df['Y('+str(qubitIndex+1)+','+str(qubitIndex+1)+') [mSie]'].apply(ansysOutputToComplex).astype(complex))
+            ax.plot(freq_data, y_data)
+            resultsDict['Q'+str(qubitIndex)+"Freq (GHz)"] = fsolve(interp1d(freq_data, y_data), freq_data[0])[0]
+        plt.savefig(self.directoryPath / 'Yplots.png')
         jsonWrite(self.resultsFilePath, resultsDict)
 
 class Y_BBQ_Simulation(CircuitSim):
@@ -73,6 +90,27 @@ class Y_BBQ_Simulation(CircuitSim):
 
     @property
     def reportLines(self):
-        return YReportLines(self.resultsFilePath)
+        N=len(self.qArch.allQubitsDict)
+        return [
+            "oModuleReport.CreateReport(\"Y Parameter Table 1\", \"Standard\", \"Data Table\", \"LNA\",\n",
+            "    [\n",
+            "        \"NAME:Context\",\n",
+            "        \"SimValueContext:=\"	, [3,0,2,0,False,False,-1,1,0,1,1,\"\",0,0]\n",
+            "    ],\n",
+            "    [\n",
+            "        \"F:=\"			, [\"All\"]\n",
+            "    ],\n",
+            "    [\n",
+            "        \"X Component:=\"		, \"F\",\n",
+            "        \"Y Component:=\"		, ["+    ",".join(["\"Y("+str(i[0]+1)+","+str(i[1]+1)+")\""
+                                                                 for i in product(range(N),range(N))])  +"]\n",
+            "    ], [])\n",
+            (
+                    "oModuleReport.ExportToFile(\"Y Parameter Table 1\", r\""
+                    + str(self.resultsFilePath)
+                    + "\", False)\n"
+            )
+        ]
 
-        super().__init__(qArch, "capMat")
+def readYData(file):
+    df = pd.read_csv(file)
