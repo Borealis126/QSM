@@ -36,6 +36,12 @@ class BBQ(Simulation):
             y_data = np.imag(df['Y('+str(qubitIndex+1)+','+str(qubitIndex+1)+') [mSie]'].apply(ansysOutputToComplex).astype(complex))
             ax.plot(freq_data, y_data)
             resultsDict['Q'+str(qubitIndex)+"Freq (GHz)"] = fsolve(interp1d(freq_data, y_data), freq_data[0])[0]
+        N = len(self.qArch.allQubitsDict)
+        for resonatorIndex, resonator in self.qArch.allReadoutResonatorsDict.items():
+            freq_data = df['Freq [GHz]']
+            y_data = np.imag(df['Y('+str(resonatorIndex+N+1)+','+str(resonatorIndex+N+1)+') [mSie]'].apply(ansysOutputToComplex).astype(complex))
+            ax.plot(freq_data, y_data)
+            resultsDict['R'+str(resonatorIndex)+"Freq (GHz)"] = fsolve(interp1d(freq_data, y_data), freq_data[0])[0]
         plt.savefig(self.directoryPath / 'Yplots.png')
         jsonWrite(self.resultsFilePath, resultsDict)
 
@@ -77,6 +83,15 @@ class Y_BBQ_Simulation(CircuitSim):
                     qubitIndex) + " RZ=50\n",
                 ".PORT " + node_1 + " " + node_2 + " " + str(qubitIndex) + " RPort" + str(
                     qubitIndex) + "\n"]
+        N = len(self.qArch.allQubitsDict.items())
+        for resonatorIndex, resonator in self.qArch.allReadoutResonatorsDict.items():
+            node_1 = self.netlistName(resonator.design.pad1.node.name)
+            node_2 = self.netlistName(resonator.design.pad2.node.name)
+            portsLines += [
+                "RPort" + str(resonatorIndex + N) + " " + node_1 + " " + node_2 + " PORTNUM=" + str(
+                    resonatorIndex+N) + " RZ=50\n",
+                ".PORT " + node_1 + " " + node_2 + " " + str(resonatorIndex+N) + " RPort" + str(
+                    resonatorIndex+N) + "\n"]
         return portsLines
 
     @staticmethod
@@ -90,7 +105,7 @@ class Y_BBQ_Simulation(CircuitSim):
 
     @property
     def reportLines(self):
-        N=len(self.qArch.allQubitsDict)
+        N=len(self.qArch.allQubitsDict) + len(self.qArch.allReadoutResonatorsDict)
         return [
             "oModuleReport.CreateReport(\"Y Parameter Table 1\", \"Standard\", \"Data Table\", \"LNA\",\n",
             "    [\n",
@@ -111,6 +126,3 @@ class Y_BBQ_Simulation(CircuitSim):
                     + "\", False)\n"
             )
         ]
-
-def readYData(file):
-    df = pd.read_csv(file)
