@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c6b8000e-68c7-4216-8e83-b59025795129" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/BBQ.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/BBQ.py" afterDir="false" />
     </list>
@@ -140,7 +141,7 @@
       <updated>1662331687886</updated>
       <workItem from="1662331689641" duration="8928000" />
       <workItem from="1662922341883" duration="13123000" />
-      <workItem from="1668878187987" duration="12887000" />
+      <workItem from="1668878187987" duration="19277000" />
     </task>
     <servers />
   </component>
@@ -166,6 +167,11 @@
           <line>11</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/BBQ.py</url>
+          <line>70</line>
+          <option name="timeStamp" value="20" />
+        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -180,6 +186,6 @@
     <SUITE FILE_PATH="coverage/QSM$pytest_for_test_grounded_test_grounded.coverage" NAME="pytest for test_grounded.test_grounded Coverage Results" MODIFIED="1662347224542" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/Grounded" />
     <SUITE FILE_PATH="coverage/QSM$pytest_for_test_example_test_example.coverage" NAME="pytest for test_example.test_example Coverage Results" MODIFIED="1662334014306" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/Example" />
     <SUITE FILE_PATH="coverage/QSM$BBQ.coverage" NAME="BBQ Coverage Results" MODIFIED="1662433254377" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../TwoQubit_BBQ" />
-    <SUITE FILE_PATH="coverage/QSM$driver.coverage" NAME="driver Coverage Results" MODIFIED="1668908992188" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../TwoQubit_Example" />
+    <SUITE FILE_PATH="coverage/QSM$driver.coverage" NAME="driver Coverage Results" MODIFIED="1668929028905" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../TwoQubit_Example" />
   </component>
 </project>

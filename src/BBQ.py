@@ -32,7 +32,6 @@ class BBQ(Simulation):
                          "TrigOrder": 10})
         self.generateParams(simParamsDict)
 
-
     def run(self):
         self.runAllSims()
 
@@ -48,16 +47,11 @@ class BBQ(Simulation):
         for w in range(len(omegas)):
             for i in range(num_components):
                 for j in range(num_components):
-                    Y[w, i, j] = df['Y('+str(i+1)+','+str(j+1)+') [mSie]'][w]
+                    Y[w, i, j] = df['Y('+str(i+1)+','+str(j+1)+') [mSie]'][w] * 1e-3 #Convert to Sie
         Z = np.array([np.linalg.inv(Y[w, :, :]) for w in range(len(omegas))])
 
         Y_interp = np.array([[interp1d(omegas, Y[:, i, j]) for i in range(num_components)] for j in range(num_components)])
         Z_interp = np.array([[interp1d(omegas, Z[:, i, j]) for i in range(num_components)] for j in range(num_components)])
-
-        # Y[i, j] = interp1d(omegas, df['Y(' + str(i + 1) + ',' + str(j + 1) + ') [mSie]'])
-
-        H_comps = list()
-        H4_comps = list()
 
         N=5
         k = 1
@@ -66,16 +60,19 @@ class BBQ(Simulation):
                for i in range(num_components)]
         Z_kp_effs = [2 / (omega_ps[p] * np.imag(derivative(Y_interp[k, k], omega_ps[p], omegas[1] - omegas[0])))
                      for p in range(num_components)]
-        phi_ells = [sum([Z_interp[l, k](omega_ps[p]) / Z_interp[k, k](omega_ps[p]) * np.sqrt(hbarConst/2*Z_kp_effs[p])*(a_s[p]+a_s[p].dag())
+        phi_ells = [sum([Z_interp[l, k](omega_ps[p]) / Z_interp[k, k](omega_ps[p]) * np.sqrt(1/2*Z_kp_effs[p])*(a_s[p]+a_s[p].dag())
                         for p in range(num_components)])
                     for l in range(num_components)]
 
-        H_0 = sum([hbarConst*omega_ps[p]*Joules_To_GHz*a_s[p].dag()*a_s[p] for p in range(num_components)])
-        H_nl = sum([-phi_ells[i]**4*Joules_To_GHz/(24*Phi_0Const**2*self.qArch.allQubitsDict[i].LJ) for i in range(num_qubits)])
-
+        H_0 = sum([omega_ps[p]*Joules_To_GHz*a_s[p].dag()*a_s[p] for p in range(num_components)])*hbarConst
+        H_nl = sum([-phi_ells[i]**4/(24*Phi_0Const**2*self.qArch.allQubitsDict[i].LJ) for i in range(num_qubits)])*Joules_To_GHz*hbarConst**2
+        H = H_0 + H_nl
 
         print(H_0.eigenenergies()[0:10])
-        print((H_0+H_nl).eigenenergies()[0:10]*Joules_To_GHz)
+
+        eigs = H.eigenenergies()
+        eigs_zeroed = eigs-eigs[0]
+        print(eigs_zeroed[0:10])
 
         #     freq_data = df['Freq [GHz]']
         #     y_data = np.imag(df['Y('+str(qubitIndex+1)+','+str(qubitIndex+1)+') [mSie]'].apply(ansysOutputToComplex).astype(complex))

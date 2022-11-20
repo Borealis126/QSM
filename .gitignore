@@ -8,6 +8,7 @@
 *.sd
 *.sdmd
 *.sab
+*.xml
 
 tests/Example/*
 !tests/Example/test_example.py
