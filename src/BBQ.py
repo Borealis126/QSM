@@ -1,14 +1,16 @@
-from .circuitSimulations import CircuitSim, S21_params, YReportLines
+from .circuitSimulations import CircuitSim, S21_params
 from .simulations import Simulation, CapMat
 from copy import deepcopy
 from itertools import product
 import pandas as pd
-import matplotlib.pyplot as plt
 import numpy as np
 from .ansysAPI import ansysOutputToComplex
 from scipy.interpolate import interp1d
 from scipy.optimize import fsolve
 from .dataIO import jsonWrite
+import qutip as qt
+from .constants import hbarConst, GHzToOmega, Joules_To_GHz, Phi_0Const
+from scipy.misc import derivative
 
 class BBQ(Simulation):
     def __init__(self, qArch):
@@ -19,31 +21,74 @@ class BBQ(Simulation):
 
     def initialize(self):
         simParamsDict = S21_params
+
+        quantizeList = "["
+        for qubitIndex, qubit in self.qArch.allQubitsDict.items():
+            quantizeList += qubit.name + ":"
+        for resonatorIndex, resonator in self.qArch.allReadoutResonatorsDict.items():
+            quantizeList += resonator.name + ":"
+        quantizeList = quantizeList[0:-1] + "]"
+        simParamsDict.update({"QuantizeList": quantizeList, "NumResonatorPhotons": 5, "NumQubitPhotons": 5,
+                         "TrigOrder": 10})
         self.generateParams(simParamsDict)
+
 
     def run(self):
         self.runAllSims()
 
     def postProcess(self):
         self.deleteUnneededFiles()
-        df = pd.read_csv(self.circuitSims[self.Y_BBQ_SimName].resultsFilePath)
-        fig, ax = plt.subplots(1)
+        df = pd.read_csv(self.circuitSims[self.Y_BBQ_SimName].resultsFilePath,
+                         dtype=str).applymap(ansysOutputToComplex).astype(complex)
+        omegas = df['Freq [GHz]'].astype(float) * GHzToOmega
+        num_qubits = len(self.qArch.allQubitsDict)
+        num_resonators = len(self.qArch.allReadoutResonatorsDict)
+        num_components = num_qubits+num_resonators
+        Y = np.empty((len(omegas), num_components, num_components), dtype=complex)
+        for w in range(len(omegas)):
+            for i in range(num_components):
+                for j in range(num_components):
+                    Y[w, i, j] = df['Y('+str(i+1)+','+str(j+1)+') [mSie]'][w]
+        Z = np.array([np.linalg.inv(Y[w, :, :]) for w in range(len(omegas))])
 
-        resultsDict = dict()
+        Y_interp = np.array([[interp1d(omegas, Y[:, i, j]) for i in range(num_components)] for j in range(num_components)])
+        Z_interp = np.array([[interp1d(omegas, Z[:, i, j]) for i in range(num_components)] for j in range(num_components)])
 
-        for qubitIndex, qubit in self.qArch.allQubitsDict.items():
-            freq_data = df['Freq [GHz]']
-            y_data = np.imag(df['Y('+str(qubitIndex+1)+','+str(qubitIndex+1)+') [mSie]'].apply(ansysOutputToComplex).astype(complex))
-            ax.plot(freq_data, y_data)
-            resultsDict['Q'+str(qubitIndex)+"Freq (GHz)"] = fsolve(interp1d(freq_data, y_data), freq_data[0])[0]
-        N = len(self.qArch.allQubitsDict)
-        for resonatorIndex, resonator in self.qArch.allReadoutResonatorsDict.items():
-            freq_data = df['Freq [GHz]']
-            y_data = np.imag(df['Y('+str(resonatorIndex+N+1)+','+str(resonatorIndex+N+1)+') [mSie]'].apply(ansysOutputToComplex).astype(complex))
-            ax.plot(freq_data, y_data)
-            resultsDict['R'+str(resonatorIndex)+"Freq (GHz)"] = fsolve(interp1d(freq_data, y_data), freq_data[0])[0]
-        plt.savefig(self.directoryPath / 'Yplots.png')
-        jsonWrite(self.resultsFilePath, resultsDict)
+        # Y[i, j] = interp1d(omegas, df['Y(' + str(i + 1) + ',' + str(j + 1) + ') [mSie]'])
+
+        H_comps = list()
+        H4_comps = list()
+
+        N=5
+        k = 1
+        omega_ps = [fsolve(lambda x: np.imag(Y_interp[i, i](x)), omegas[0])[0] for i in range(num_components)]
+        a_s = [qt.tensor([qt.qeye(N)] * i + [qt.destroy(N)] + [qt.qeye(N)] * (num_components - i - 1))
+               for i in range(num_components)]
+        Z_kp_effs = [2 / (omega_ps[p] * np.imag(derivative(Y_interp[k, k], omega_ps[p], omegas[1] - omegas[0])))
+                     for p in range(num_components)]
+        phi_ells = [sum([Z_interp[l, k](omega_ps[p]) / Z_interp[k, k](omega_ps[p]) * np.sqrt(hbarConst/2*Z_kp_effs[p])*(a_s[p]+a_s[p].dag())
+                        for p in range(num_components)])
+                    for l in range(num_components)]
+
+        H_0 = sum([hbarConst*omega_ps[p]*Joules_To_GHz*a_s[p].dag()*a_s[p] for p in range(num_components)])
+        H_nl = sum([-phi_ells[i]**4*Joules_To_GHz/(24*Phi_0Const**2*self.qArch.allQubitsDict[i].LJ) for i in range(num_qubits)])
+
+
+        print(H_0.eigenenergies()[0:10])
+        print((H_0+H_nl).eigenenergies()[0:10]*Joules_To_GHz)
+
+        #     freq_data = df['Freq [GHz]']
+        #     y_data = np.imag(df['Y('+str(qubitIndex+1)+','+str(qubitIndex+1)+') [mSie]'].apply(ansysOutputToComplex).astype(complex))
+        #     ax.plot(freq_data, y_data)
+        #     resultsDict['Q'+str(qubitIndex)+"Freq (GHz)"] = fsolve(interp1d(freq_data, y_data), freq_data[0])[0]
+        # N = len(self.qArch.allQubitsDict)
+        # for resonatorIndex, resonator in self.qArch.allReadoutResonatorsDict.items():
+        #     freq_data = df['Freq [GHz]']
+        #     y_data = np.imag(df['Y('+str(resonatorIndex+N+1)+','+str(resonatorIndex+N+1)+') [mSie]'].apply(ansysOutputToComplex).astype(complex))
+        #     ax.plot(freq_data, y_data)
+        #     resultsDict['R'+str(resonatorIndex)+"Freq (GHz)"] = fsolve(interp1d(freq_data, y_data), freq_data[0])[0]
+        # plt.savefig(self.directoryPath / 'Yplots.png')
+        # jsonWrite(self.resultsFilePath, resultsDict)
 
 class Y_BBQ_Simulation(CircuitSim):
 
