@@ -115,7 +115,19 @@ class FloatingRectangularTransmonSingleJJ(QubitDesign):
         pad2.node.orientShape()
 
 
-class GroundedRectangularTransmonSingleJJ(QubitDesign):
+class GroundedTransmon(QubitDesign):
+    def __init__(self, name, params):
+        super().__init__(name, params)
+
+    @property
+    def padList(self):
+        return [self.padListGeom[0]]
+
+    def updateNodes(self):
+        ...
+
+
+class GroundedRectangularTransmonSingleJJ(GroundedTransmon):
     def __init__(self, name):
         super().__init__(name, ["Angle", "Center X", "Center Y",
                                 "Pad Width", "Pad Length", "Pad Height", "Pad Boundaries",
@@ -123,10 +135,6 @@ class GroundedRectangularTransmonSingleJJ(QubitDesign):
         pad1, pad2 = self.padListGeom
         pad1.node = Node(pad1.name, 'RectanglePlusStem')
         pad2.node = Node(pad2.name, 'Rectangle')
-
-    @property
-    def padList(self):
-        return [self.padListGeom[0]]
 
     def updateNodes(self):
         stemGap = self.paramsDict['Pad Boundaries'][3]
@@ -166,7 +174,7 @@ class GroundedRectangularTransmonSingleJJ(QubitDesign):
         pad2.node.Z = self.paramsDict['Z']
         pad2.node.orientShape()
 
-class XMon(QubitDesign):
+class XMon(GroundedTransmon):
     def __init__(self, name):
         super().__init__(name, ["Angle", "Center X", "Center Y",
                                 "Width", "Thickness", "Pad Height", "Boundary",
@@ -174,10 +182,6 @@ class XMon(QubitDesign):
         pad1, pad2 = self.padListGeom
         pad1.node = Node(pad1.name, 'PlusSign')
         pad2.node = Node(pad2.name, 'Rectangle')
-
-    @property
-    def padList(self):
-        return [self.padListGeom[0]]
 
     def updateNodes(self):
         stemGap = self.paramsDict['Boundary']

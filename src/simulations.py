@@ -15,7 +15,7 @@ from scipy.misc import derivative
 from sympy import Matrix, zeros, sin
 from .qSysObjects import ReadoutResonator, Qubit
 from qutip import state_number_index, qzero, ket, bra, tensor, destroy, qeye
-from .qubitDesigns import FloatingRectangularTransmonSingleJJ, GroundedRectangularTransmonSingleJJ
+from .qubitDesigns import FloatingRectangularTransmonSingleJJ, GroundedTransmon
 from .controlLineDesigns import FeedLine
 
 """Simulations are anything that is saved to a folder. 
@@ -359,7 +359,7 @@ class CapMatGE(Simulation):
                 RHS[component.design.pad2.quantCapMatIndex, 0] = -RHS[component.design.pad1.quantCapMatIndex, 0]
                 phiMat[component.design.pad1.quantCapMatIndex, 0] = component.design.pad1.phiSym.diff(t, 2)
                 phiMat[component.design.pad2.quantCapMatIndex, 0] = component.design.pad2.phiSym.diff(t, 2)
-            elif isinstance(component.design, GroundedRectangularTransmonSingleJJ):
+            elif isinstance(component.design, GroundedTransmon):
                 RHS[component.design.pad1.quantCapMatIndex, 0] = I_c * sin(component.design.pad1.phiSym / Phi_0Const)
                 phiMat[component.design.pad1.quantCapMatIndex, 0] = component.design.pad1.phiSym.diff(t, 2)
             elif isinstance(component, ReadoutResonator):

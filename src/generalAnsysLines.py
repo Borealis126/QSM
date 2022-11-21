@@ -1,7 +1,7 @@
 from .constants import lengthUnits
 from .node import Node
 from .controlLineDesigns import FeedLine, FluxBiasLine
-from .qubitDesigns import GroundedRectangularTransmonSingleJJ
+from .qubitDesigns import GroundedTransmon
 
 ansysSimulatorPreamb = [
     "import ScriptEnv\n",
@@ -410,7 +410,7 @@ def ansysDrawNodes(qArch, dimension):
             lines += makeTrenchComponent3DLines
         # For grounded qubits unite pad 2 with ground.
         for qubitIndex, qubit in qArch.allQubitsDict.items():
-            if isinstance(qubit.design, GroundedRectangularTransmonSingleJJ):
+            if isinstance(qubit.design, GroundedTransmon):
                 lines += ansysUniteNodes([chip.ground.outlineNode, qubit.design.pad2.node])
         # For control lines unite trace and launchpads, also unite flux bias if applicable.
         for controlLineIndex, controlLine in qArch.chipDict[chip.index].controlLineDict.items():

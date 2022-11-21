@@ -28,8 +28,7 @@ class BBQ(Simulation):
         for resonatorIndex, resonator in self.qArch.allReadoutResonatorsDict.items():
             quantizeList += resonator.name + ":"
         quantizeList = quantizeList[0:-1] + "]"
-        simParamsDict.update({"QuantizeList": quantizeList, "NumResonatorPhotons": 5, "NumQubitPhotons": 5,
-                              "TrigOrder": 10})
+        simParamsDict.update({"QuantizeList": quantizeList, "NumResonatorPhotons": 5, "NumQubitPhotons": 5})
         self.generateParams(simParamsDict)
 
     def run(self):
@@ -55,23 +54,31 @@ class BBQ(Simulation):
         Z_interp = np.array(
             [[interp1d(omegas, Z[:, i, j]) for i in range(num_components)] for j in range(num_components)])
 
-        N = 5
+        N_Q = self.simParams["NumQubitPhotons"]
+        N_R = self.simParams["NumResonatorPhotons"]
         k = 1
+        print("Calculating omegas")
         omega_ps = [fsolve(lambda x: np.imag(Y_interp[i, i](x)), omegas[0])[0] for i in range(num_components)]
-        a_s = [qt.tensor([qt.qeye(N)] * i + [qt.destroy(N)] + [qt.qeye(N)] * (num_components - i - 1))
-               for i in range(num_components)]
+        a_s = [qt.tensor([qt.qeye(N_Q)] * i + [qt.destroy(N_Q)] + [qt.qeye(N_Q)] * (num_qubits - i - 1) + [qt.qeye(N_R)] * num_resonators)
+               for i in range(num_qubits)] + \
+              [qt.tensor([qt.qeye(N_Q)]*num_qubits + [qt.qeye(N_R)] * i + [qt.destroy(N_R)] + [qt.qeye(N_R)] * (num_resonators - i - 1))
+               for i in range(num_resonators)]
+
+        print("Calculating Z_kp_effs")
         Z_kp_effs = [2 / (omega_ps[p] * np.imag(derivative(Y_interp[k, k], omega_ps[p], omegas[1] - omegas[0])))
                      for p in range(num_components)]
         phi_ells = [sum([Z_interp[l, k](omega_ps[p]) / Z_interp[k, k](omega_ps[p]) * np.sqrt(1 / 2 * Z_kp_effs[p]) * (
                     a_s[p] + a_s[p].dag())
                          for p in range(num_components)])
-                    for l in range(num_components)]
+                    for l in range(num_qubits)]
 
+        print("Calculating H")
         H_0 = sum([omega_ps[p] * Joules_To_GHz * a_s[p].dag() * a_s[p] for p in range(num_components)]) * hbarConst
         H_nl = sum([-phi_ells[i] ** 4 / (24 * Phi_0Const ** 2 * self.qArch.allQubitsDict[i].LJ) for i in
                     range(num_qubits)]) * Joules_To_GHz * hbarConst ** 2
         H = H_0 + H_nl
 
+        print("Calculating eigenenergies")
         print(H_0.eigenenergies()[0:10])
 
         eigs = H.eigenenergies()
@@ -113,21 +120,26 @@ class Y_BBQ_Simulation(CircuitSim):
         portsLines = []
         for qubitIndex, qubit in self.qArch.allQubitsDict.items():
             node_1 = self.netlistName(qubit.design.pad1.node.name)
-            node_2 = self.netlistName(qubit.design.pad2.node.name)
+            if len(qubit.design.padList) == 1: # if grounded
+                node_2 = self.netlistName("G")
+            else:
+                node_2 = self.netlistName(qubit.design.pad2.node.name)
+            port_index = qubitIndex + 1
             portsLines += [
-                "RPort" + str(qubitIndex) + " " + node_1 + " " + node_2 + " PORTNUM=" + str(
-                    qubitIndex) + " RZ=50\n",
-                ".PORT " + node_1 + " " + node_2 + " " + str(qubitIndex) + " RPort" + str(
-                    qubitIndex) + "\n"]
+                "RPort" + str(port_index) + " " + node_1 + " " + node_2 + " PORTNUM=" + str(
+                    port_index) + " RZ=50\n",
+                ".PORT " + node_1 + " " + node_2 + " " + str(port_index) + " RPort" + str(
+                    port_index) + "\n"]
         N = len(self.qArch.allQubitsDict.items())
         for resonatorIndex, resonator in self.qArch.allReadoutResonatorsDict.items():
             node_1 = self.netlistName(resonator.design.pad1.node.name)
             node_2 = self.netlistName(resonator.design.pad2.node.name)
+            port_index = resonatorIndex + N + 1
             portsLines += [
-                "RPort" + str(resonatorIndex + N) + " " + node_1 + " " + node_2 + " PORTNUM=" + str(
-                    resonatorIndex + N) + " RZ=50\n",
-                ".PORT " + node_1 + " " + node_2 + " " + str(resonatorIndex + N) + " RPort" + str(
-                    resonatorIndex + N) + "\n"]
+                "RPort" + str(port_index) + " " + node_1 + " " + node_2 + " PORTNUM=" + str(
+                    port_index) + " RZ=50\n",
+                ".PORT " + node_1 + " " + node_2 + " " + str(port_index) + " RPort" + str(
+                    port_index) + "\n"]
         return portsLines
 
     @staticmethod

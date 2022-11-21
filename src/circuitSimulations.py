@@ -1,6 +1,6 @@
 from .ansysAPI import aedtEdit
 from copy import deepcopy
-from .qubitDesigns import FloatingRectangularTransmonSingleJJ, GroundedRectangularTransmonSingleJJ
+from .qubitDesigns import GroundedTransmon
 
 
 class CircuitSim:  # Y11R, YRest are CircuitSims.
@@ -70,7 +70,7 @@ class CircuitSim:  # Y11R, YRest are CircuitSims.
             node1NetlistName = self.netlistName(node1Name)
             node2Name = qubit.design.pad2.node.name
             node2NetlistName = self.netlistName(node2Name)
-            if isinstance(qubit.design, GroundedRectangularTransmonSingleJJ):
+            if isinstance(qubit.design, GroundedTransmon):
                 node2Name = "G"
                 node2NetlistName = self.netlistName(node2Name)
 
