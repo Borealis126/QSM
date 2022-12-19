@@ -39,50 +39,77 @@ class BBQ(Simulation):
         df = pd.read_csv(self.circuitSims[self.Y_BBQ_SimName].resultsFilePath,
                          dtype=str).applymap(ansysOutputToComplex).astype(complex)
         omegas = df['Freq [GHz]'].astype(float) * GHzToOmega
-        num_qubits = len(self.qArch.allQubitsDict)
-        num_resonators = len(self.qArch.allReadoutResonatorsDict)
+        num_qubits_all = len(self.qArch.allQubitsDict)
+        num_resonators_all = len(self.qArch.allReadoutResonatorsDict)
+        num_components_all = num_qubits_all + num_resonators_all
+
+        quantize_list = [str(i) for i in self.simParams["QuantizeList"][1:-1].split(":")]
+        qubits_dict = {key: val for key, val in self.qArch.allQubitsDict.items() if val.name in quantize_list}
+        resonators_dict = {key: val for key, val in self.qArch.allReadoutResonatorsDict.items() if val.name in quantize_list}
+        num_qubits = len(qubits_dict)
+        num_resonators = len(resonators_dict)
         num_components = num_qubits + num_resonators
-        Y = np.empty((len(omegas), num_components, num_components), dtype=complex)
+
+        qubit_indices = {key: {"tensor": len([q for q in qubits_dict.values() if q.index < val.index]),
+                               "component": val.index}
+                                   for key, val in qubits_dict.items()}
+        resonator_indices = {key: {"tensor": len([r for r in resonators_dict.values() if r.index < val.index]) + num_qubits,
+                                   "component": val.index + num_qubits_all}
+                                       for key, val in resonators_dict.items()}
+        component_indices = deepcopy(qubit_indices)
+        component_indices.update(resonator_indices)
+
+        Y = np.empty((len(omegas), num_components_all, num_components_all), dtype=complex)
         for w in range(len(omegas)):
-            for i in range(num_components):
-                for j in range(num_components):
+            for i in range(num_components_all):
+                for j in range(num_components_all):
                     Y[w, i, j] = df['Y(' + str(i + 1) + ',' + str(j + 1) + ') [mSie]'][w] * 1e-3  # Convert to Sie
         Z = np.array([np.linalg.inv(Y[w, :, :]) for w in range(len(omegas))])
 
         Y_interp = np.array(
-            [[interp1d(omegas, Y[:, i, j]) for i in range(num_components)] for j in range(num_components)])
+            [[interp1d(omegas, Y[:, i, j]) for i in range(num_components_all)] for j in range(num_components_all)])
         Z_interp = np.array(
-            [[interp1d(omegas, Z[:, i, j]) for i in range(num_components)] for j in range(num_components)])
+            [[interp1d(omegas, Z[:, i, j]) for i in range(num_components_all)] for j in range(num_components_all)])
 
         N_Q = self.simParams["NumQubitPhotons"]
         N_R = self.simParams["NumResonatorPhotons"]
         k = 1
         print("Calculating omegas")
-        omega_ps = [fsolve(lambda x: np.imag(Y_interp[i, i](x)), omegas[0])[0] for i in range(num_components)]
-        a_s = [qt.tensor([qt.qeye(N_Q)] * i + [qt.destroy(N_Q)] + [qt.qeye(N_Q)] * (num_qubits - i - 1) + [qt.qeye(N_R)] * num_resonators)
-               for i in range(num_qubits)] + \
-              [qt.tensor([qt.qeye(N_Q)]*num_qubits + [qt.qeye(N_R)] * i + [qt.destroy(N_R)] + [qt.qeye(N_R)] * (num_resonators - i - 1))
-               for i in range(num_resonators)]
+        omega_ps = [fsolve(lambda x: np.imag(Y_interp[i, i](x)), omegas[0])[0] for i in range(num_components_all)]
 
         print("Calculating Z_kp_effs")
         Z_kp_effs = [2 / (omega_ps[p] * np.imag(derivative(Y_interp[k, k], omega_ps[p], omegas[1] - omegas[0])))
-                     for p in range(num_components)]
-        phi_ells = [sum([Z_interp[l, k](omega_ps[p]) / Z_interp[k, k](omega_ps[p]) * np.sqrt(1 / 2 * Z_kp_effs[p]) * (
-                    a_s[p] + a_s[p].dag())
-                         for p in range(num_components)])
-                    for l in range(num_qubits)]
+                     for p in range(num_components_all)]
+
+        #Now we only consider the components in QuantizeList
+        a_s = [qt.tensor([qt.qeye(N_Q)] * val["tensor"] + [qt.destroy(N_Q)] + [qt.qeye(N_Q)] * (num_qubits - val["tensor"] - 1) + [
+            qt.qeye(N_R)] * num_resonators)
+               for key, val in qubit_indices.items()] + \
+              [qt.tensor([qt.qeye(N_Q)] * num_qubits + [qt.qeye(N_R)] * (val["tensor"]-num_qubits) + [qt.destroy(N_R)] + [qt.qeye(N_R)] * (
+                          num_resonators + num_qubits - val["tensor"] - 1))
+               for key, val in resonator_indices.items()]
+
+        phi_ells = [sum([Z_interp[val2["component"], k](omega_ps[val["component"]]) / Z_interp[k, k](omega_ps[val["component"]]) * np.sqrt(1 / 2 * Z_kp_effs[val["component"]]) * (
+                a_s[val["tensor"]] + a_s[val["tensor"]].dag())
+                         for key, val in component_indices.items()])
+                    for key2, val2 in qubit_indices.items()]
 
         print("Calculating H")
-        H_0 = sum([omega_ps[p] * Joules_To_GHz * a_s[p].dag() * a_s[p] for p in range(num_components)]) * hbarConst
-        H_nl = sum([-phi_ells[i] ** 4 / (24 * Phi_0Const ** 2 * self.qArch.allQubitsDict[i].LJ) for i in
-                    range(num_qubits)]) * Joules_To_GHz * hbarConst ** 2
+        H_0 = sum([omega_ps[val["component"]] * Joules_To_GHz * a_s[val["tensor"]].dag() * a_s[val["tensor"]]
+                   for key, val in component_indices.items()]) * hbarConst
+
+        H_nl = sum([-phi_ells[val["tensor"]] ** 4 / (24 * Phi_0Const ** 2 * self.qArch.allQubitsDict[key].LJ)
+                    for key, val in qubit_indices.items()]) * Joules_To_GHz * hbarConst ** 2
         H = H_0 + H_nl
 
         print("Calculating eigenenergies")
+
+        print("H0 eigenenergies:")
         print(H_0.eigenenergies()[0:10])
 
         eigs = H.eigenenergies()
         eigs_zeroed = np.real(eigs - eigs[0])
+        print("H eigenenergies:")
         print(eigs_zeroed[0:10])
         qt.qsave(H, self.directoryPath / 'hamiltonian')
         np.savetxt(self.directoryPath / "eigenvalues.csv", eigs_zeroed, delimiter=",")
@@ -120,7 +147,7 @@ class Y_BBQ_Simulation(CircuitSim):
         portsLines = []
         for qubitIndex, qubit in self.qArch.allQubitsDict.items():
             node_1 = self.netlistName(qubit.design.pad1.node.name)
-            if len(qubit.design.padList) == 1: # if grounded
+            if len(qubit.design.padList) == 1:  # if grounded
                 node_2 = self.netlistName("G")
             else:
                 node_2 = self.netlistName(qubit.design.pad2.node.name)
