@@ -56,5 +56,5 @@ needs to be run before every command. Once geometries are completed (i.e., now) 
 # BBQ(qArch).run()
 # BBQ(qArch).postProcess()
 
-"""Congrats! You have simulated a 2-qubit system. If you don't like any calculated values, you can go back and
+"""Congrats! You have simulated an 8-qubit system. If you don't like any calculated values, you can go back and
 tweak any of your layout files and restart the process. """
