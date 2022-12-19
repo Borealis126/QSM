@@ -1,0 +1,8 @@
+{
+ "LNA_start (GHz)": 4,
+ "LNA_stop (GHz)": 20,
+ "LNA_counts": 1000,
+ "QuantizeList": "[Q0:Q1:Q2:Q3]",
+ "NumResonatorPhotons": 5,
+ "NumQubitPhotons": 5
+}
